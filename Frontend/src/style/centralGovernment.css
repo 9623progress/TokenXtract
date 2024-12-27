@@ -1,0 +1,88 @@
+.cg-box {
+    margin-top: 85px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.cg-heading {
+    text-align: center;
+}
+
+.cg-heading img {
+    width: 150px;
+    margin: auto;
+}
+
+.cg-heading h1 {
+    font-size: 1.2rem;
+    background: linear-gradient(45deg, #e73204, #03ec07);
+    /* Define gradient colors */
+    -webkit-background-clip: text;
+    /* Clip background to text */
+    -webkit-text-fill-color: transparent;
+    /* Set text color to transparent to show gradient */
+
+}
+
+.cg-navigation-panel {
+    /* width: 250px; */
+    padding: 2px;
+    position: absolute;
+    left: -180px;
+    display: flex;
+    /* flex-direction: column; */
+    background-color: white;
+    height: 100vh;
+
+}
+
+.cg-nav-open {
+    left: 0px;
+    border: 2px solid #ccc;
+}
+
+.cg-panel-button button {
+    padding: 5px;
+    font-size: 1.1rem;
+    color: black;
+    font-weight: bold;
+    margin: 5px;
+}
+
+.cg-functions {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+    align-items: center;
+    margin: auto;
+    width: 80%;
+}
+
+.cg-functions a {
+
+    /* border: 1px solid rgb(173, 171, 171); */
+    /* border-radius: 10px; */
+    padding: 10px;
+    /* background-color: #E4F1FF; */
+    background-color: #27005D;
+    color: white;
+    font-size: 1rem;
+    box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+    width: 100%;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+
+
+.cg-fun-card p {
+    margin: 0%;
+}
+
+.cg-action-panel {
+    width: 100%;
+    right: 0%;
+}

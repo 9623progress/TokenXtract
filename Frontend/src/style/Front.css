@@ -1,0 +1,127 @@
+.front-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 50px;
+    font-family: "Roboto Slab", serif;
+}
+
+.front-heading {
+    width: 50%;
+    text-align: center;
+}
+
+.front-heading h1 {
+    font-size: 3rem;
+    color: #3c0688;
+
+}
+
+.front-heading p {
+    font-size: 1.2rem;
+    color: #5e02e0;
+    /* font-style: italic; */
+    font-weight: bold;
+}
+
+.changingWord {
+    color: rgb(193, 126, 2);
+    font-weight: bold;
+}
+
+
+
+
+.front-circle-container {
+    position: relative;
+    width: 400px;
+    height: 400px;
+    margin: 50px;
+    border-radius: 50%;
+    border: 2px dashed #3c0688;
+    /* Make the circular path visible */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Center icon styling */
+.front-center-icon {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    /* background-color: yellow; */
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    font-size: 24px;
+    z-index: 10;
+    /* Ensure the center icon is on top */
+}
+
+/* Styling for icons on the circular path */
+.front-icon {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    /* background-color: #3498db; */
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* border-radius: 50%; */
+    font-size: 20px;
+    animation: moveInCircle 10s infinite linear;
+}
+
+/* Circular animation path */
+@keyframes moveInCircle {
+    0% {
+        transform: rotate(0deg) translateX(200px) rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg) translateX(200px) rotate(-360deg);
+    }
+}
+
+/* Staggering animation start for each icon */
+.front-icon:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.front-icon:nth-child(2) {
+    animation-delay: 2s;
+}
+
+.front-icon:nth-child(3) {
+    animation-delay: 4s;
+}
+
+.front-icon:nth-child(4) {
+    animation-delay: 6s;
+}
+
+.front-icon:nth-child(5) {
+    animation-delay: 8s;
+}
+
+img {
+    width: 100px;
+
+}
+
+.front-center {
+    width: 150px;
+    height: 200px;
+}
+
+.front-icon {
+    display: flex;
+    flex-direction: column;
+    color: rgb(3, 3, 137);
+
+
+}

@@ -1,0 +1,79 @@
+.navbar-top {
+    position: fixed;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #AED2FF;
+    /* padding: 0px 20px 0px 20px; */
+    font-family: "Roboto Slab", serif;
+    font-weight: 600;
+    font-size: 1.1rem;
+    box-shadow: rgba(0, 0, 0, 0.05) 0px 3px 5px 0px;
+    z-index: 1000;
+    width: 100%;
+}
+
+.navbar-logo img {
+    width: 75px;
+}
+
+.navbar-left-div {
+    display: flex;
+    align-items: center;
+    justify-items: center;
+}
+
+.navbar-left-div .navbar-elements {
+    margin: 10px;
+    text-decoration: none;
+    color: #27005D;
+
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.navbar-elements:hover {
+    /* color: #9400FF; */
+    background-color: #27005D;
+    color: white;
+}
+
+.navbar-logo {
+    font-size: 1.2rem;
+
+}
+
+.navbar-right-div a {
+    color: white;
+    text-decoration: none;
+}
+
+.navbar-right-div {
+    padding: 10px 15px;
+    border: none;
+    background-color: #27005D;
+    color: white;
+    text-decoration: none;
+    margin-right: 5px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    text-decoration: none;
+}
+
+.navbar-right-div:hover {
+    color: #27005D;
+    background-color: white;
+}
+
+.right-buttons {
+    display: flex;
+    align-items: center;
+
+}
+
+/* .navbar-right-div a:hover {
+
+    color: #27005D;
+} */

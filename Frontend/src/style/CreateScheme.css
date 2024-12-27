@@ -1,0 +1,83 @@
+.scheme-div {
+    margin-top: 30px;
+    text-align: center;
+    font-family: "Roboto Slab"
+}
+
+.scheme-form {
+    width: 70%;
+    margin: auto;
+    border: 1px solid #ccc;
+    /* border-radius: 10px; */
+}
+
+h2 {
+    color: #27005D;
+    font-size: 1.5rem;
+}
+
+select {
+    padding: 5px;
+    font-size: 1rem;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.scheme-default-input {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    margin: 10px;
+}
+
+input {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+    outline: none;
+}
+
+
+.scheme-custom-field {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.scheme-button {
+    padding: 8px 12px;
+    border: none;
+    background-color: #27005D;
+    color: white;
+    margin-right: 5px;
+    border-radius: 5px;
+    font-weight: 500;
+    font-size: 1.05rem;
+    margin: 10px;
+    border: 1px solid #27005D;
+}
+
+.scheme-button:hover {
+    background-color: white;
+    color: #27005D;
+
+}
+
+table,
+th,
+td {
+    border: 1px solid #ccc;
+    border-collapse: collapse;
+}
+
+table {
+    /* width: 90%; */
+    margin: auto;
+}
+
+td,
+th {
+    padding: 10px;
+}

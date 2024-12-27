@@ -1,0 +1,21 @@
+.department-box {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 30px;
+    align-items: center;
+    justify-content: space-between;
+    align-items: stretch;
+}
+
+.dep-heading {
+    font-size: 1.3rem;
+    text-align: center;
+    color: #53018d;
+}
+
+.department {
+    /* background: linear-gradient(to right, #53018d, #E4F1FF, #E4F1FF); */
+
+    background: linear-gradient(to right, #E4F1FF, white);
+    /* background-color: #E4F1FF; */
+}

@@ -1,0 +1,85 @@
+.login-box {
+    margin: 100px;
+    /* width: 100%; */
+}
+
+.login-form {
+    /* border: 1px solid black; */
+    border-radius: 10px;
+    margin: auto;
+    text-align: center;
+    padding: 20px;
+    width: 320px;
+    margin: auto;
+
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+
+.login-form h1 {
+    font-size: 1.2rem;
+    color: rgb(39, 0, 93);
+}
+
+.login-input {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    gap: 5px;
+}
+
+.login-form input {
+    font-size: medium;
+    outline: none;
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+
+.login-warning {
+    color: red;
+
+}
+
+.login-button button {
+    padding: 8px;
+    background-color: #27005D;
+    border: 1px solid #27005D;
+    border-radius: 5px;
+    color: white;
+    margin: 5px;
+    margin-top: 10px;
+    font-size: 1.1rem;
+    width: 100%;
+    cursor: pointer;
+}
+
+.login-button button:hover {
+    background-color: white;
+    color: #27005D;
+}
+
+
+
+.login-verify-otp-button button:hover {
+    background-color: white;
+    color: #005d17;
+}
+
+
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-wrapper input {
+    flex: 1;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+}

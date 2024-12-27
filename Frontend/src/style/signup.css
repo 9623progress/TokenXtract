@@ -1,0 +1,146 @@
+/* General Styling for the Signup Box */
+.signin-box {
+    margin-top: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Form Box Styling */
+.signin-form-box {
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    border-radius: 10px;
+    padding: 20px;
+    width: 320px;
+    text-align: center;
+    background-color: #fff;
+}
+
+/* Header Styling */
+.signin-form-box h1 {
+    font-size: 1.5rem;
+    color: #27005D;
+    margin-bottom: 20px;
+}
+
+/* Input Field Wrapper */
+.sign-in-input {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+/* Input Field Styling */
+.signin-form-box input {
+    font-size: 1rem;
+    outline: none;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    box-sizing: border-box;
+    transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+
+.signin-form-box input:focus {
+    border: 1px solid #27005D;
+    box-shadow: 0 0 5px rgba(39, 0, 93, 0.5);
+}
+
+/* Button Styling */
+.register-button {
+    padding: 10px;
+    background-color: #27005D;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-size: 1.1rem;
+    width: 100%;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.register-button:hover {
+    background-color: white;
+    color: #27005D;
+    border: 1px solid #27005D;
+}
+
+/* Password Wrapper (Input + Toggle) */
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* Password Input Field */
+.password-wrapper input {
+    flex: 1;
+    padding: 10px;
+    padding-right: 40px;
+    /* Space for toggle button */
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+/* Eye Toggle Button */
+.toggle-password {
+    /* width: 10px; */
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    color: #888;
+    padding: 5px;
+    transition: color 0.3s ease;
+
+}
+
+.toggle-password:hover {
+    color: #555;
+}
+
+/* Link Styling */
+.signin-form-box a {
+    color: #27005D;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+}
+
+.signin-form-box a:hover {
+    color: #551A8B;
+    text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .signin-form-box {
+        width: 90%;
+        padding: 15px;
+    }
+
+    .signin-form-box h1 {
+        font-size: 1.3rem;
+    }
+
+    .signin-form-box input,
+    .password-wrapper input {
+        font-size: 0.9rem;
+        padding: 8px;
+    }
+
+    .toggle-password {
+        font-size: 16px;
+    }
+
+    .signin-form-box button {
+        font-size: 1rem;
+        padding: 8px;
+    }
+}
