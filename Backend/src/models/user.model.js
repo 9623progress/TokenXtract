@@ -1,7 +1,5 @@
 import mongoose from "mongoose";
-import bcrypt from "bcryptjs";
 
-// Define the user schema
 const UserSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -31,6 +29,28 @@ const UserSchema = new mongoose.Schema({
   },
 });
 
-// Create and export the User model
-const User = mongoose.model("User", UserSchema);
-export default User;
+const userResponseModel = new mongoose.Schema({
+  schemeID: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "schemeForm",
+    required: true,
+  },
+  responses: [
+    {
+      label: { type: String, required: true }, // Field label from the form
+      value: { type: mongoose.Schema.Types.Mixed, required: true }, // User's input value
+    },
+  ],
+  userID: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  submittedAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
+export const userResponse = mongoose.model("userResponse", userResponseModel);
+export const User = mongoose.model("User", UserSchema);

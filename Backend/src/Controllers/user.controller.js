@@ -1,6 +1,7 @@
-import User from "../models/user.model.js";
+import { User, userResponse } from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { scheme } from "../models/scheme.model.js";
 
 export const login = async (req, res) => {
   try {
@@ -34,15 +35,15 @@ export const login = async (req, res) => {
     // Create a JWT token
     const token = jwt.sign(
       { id: user._id, name: user.name, adhar: user.adhar },
-      process.env.JWT_SECRET, // Secret key (store in .env)
-      { expiresIn: "5h" } // Token expiration (5 hours)
+      process.env.JWT_SECRET,
+      { expiresIn: "5h" }
     );
 
     // Set the token in an HTTP-only cookie
     res.cookie("auth_token", token, {
-      httpOnly: true, // Prevents client-side JS access
-      secure: process.env.NODE_ENV === "production", // Set to true for HTTPS in production
-      maxAge: 5 * 60 * 60 * 1000, // Cookie expiration time (5 hours in milliseconds)
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 5 * 60 * 60 * 1000,
     });
 
     // Respond with the user information (excluding password)
@@ -107,9 +108,9 @@ export const register = async (req, res) => {
 
 export const logout = (req, res) => {
   res.clearCookie("auth_token", {
-    httpOnly: true, // Matches the settings used during login
-    secure: process.env.NODE_ENV === "production", // Set to true for HTTPS in production
-    sameSite: "strict", // Use the same settings as when the cookie was created
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
   });
 
   res.status(200).json({ message: "Logout successful" });
@@ -122,5 +123,45 @@ export const isAuthenticatedFunc = (req, res) => {
     res.status(200).send({ isAuthenticated: true });
   } else {
     res.status(404).send({ isAuthenticated: false });
+  }
+};
+
+export const getSchemeForm = async (req, res) => {
+  const { schemeID } = req.body;
+  if (!schemeID) {
+    res.status(400).json({
+      message: "Invalid schemeID",
+    });
+  }
+  const form = await scheme.findById(schemeID);
+
+  res.status(201).json({
+    message: "success",
+    form: form.form,
+  });
+};
+
+export const submitForm = async (req, res) => {
+  try {
+    const { schemeID, userID, responses } = req.body;
+
+    if (!schemeID || !userID || !responses) {
+      res.status(400).json({
+        message: "all fields are required",
+      });
+    }
+
+    const responseEntry = new userResponse({
+      schemeID,
+      userID,
+      responses,
+    });
+
+    await responseEntry.save();
+
+    res.status(201).json({ message: "Form submitted successfully!" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to submit the form." });
   }
 };
