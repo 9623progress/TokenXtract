@@ -16,7 +16,7 @@ import { userResponse } from "../models/user.model.js";
 export const createScheme = async (req, res) => {
   const { departmentID, schemeName, budget, amountPerUser, form } = req.body;
 
-  if (!departmentID || schemeName || budget || amountPerUser || form) {
+  if (!departmentID || !schemeName || !budget || !amountPerUser || !form) {
     return res.status(400).json({
       message: "fill all fields",
     });
@@ -36,7 +36,7 @@ export const createScheme = async (req, res) => {
     });
   }
 
-  const scheme = await scheme.create({
+  const newScheme = new scheme({
     departmentID,
     schemeName,
     budget,
@@ -44,14 +44,22 @@ export const createScheme = async (req, res) => {
     form,
   });
 
+  await newScheme.save();
+
   return res.status(200).json({
     message: "Scheme created sucessfully",
   });
 };
 
 export const getAllschemeByDepartment = async (req, res) => {
-  const departmentID = req.body;
-  const schemes = await scheme.findAll(departmentID);
+  const { departmentID } = req.params;
+
+  if (!departmentID) {
+    res.status(400).json({
+      message: "department id is required",
+    });
+  }
+  const schemes = await scheme.find({ departmentID });
 
   return res.status(200).json({
     schemes,
@@ -59,12 +67,20 @@ export const getAllschemeByDepartment = async (req, res) => {
 };
 
 export const createDepartment = async (req, res) => {
-  const { DepartmentName, file } = req.body;
+  const { departmentName, image } = req.body;
 
-  await department.create({
-    DepartmentName,
-    file,
+  if (!departmentName || !image) {
+    return res.status(400).json({
+      message: "All fields are required",
+    });
+  }
+
+  const newDepartment = new department({
+    departmentName,
+    image,
   });
+
+  await newDepartment.save();
 
   res.status(200).json({
     message: "department created successfully",
@@ -72,15 +88,16 @@ export const createDepartment = async (req, res) => {
 };
 
 export const getAllApplicationByScheme = async (req, res) => {
-  const { schemeID } = req.body;
+  const { schemeID } = req.params;
+
   if (!schemeID) {
     res.status(400).json({
       message: "Invalid schemeID",
     });
   }
-  const applicants = userResponse.findAll(schemeID);
+  const applicants = await userResponse.find({ schemeID });
 
-  res.status(201).json({
+  res.status(200).json({
     applicants,
     message: "all applicants are send",
   });

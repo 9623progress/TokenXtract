@@ -49,7 +49,12 @@ export const login = async (req, res) => {
     // Respond with the user information (excluding password)
     res.status(200).json({
       message: "Login successful",
-      user: { name: user.name, adhar: user.adhar, role: user.role }, // Excluding password from the response
+      user: {
+        id: user._id,
+        name: user.name,
+        adhar: user.adhar,
+        role: user.role,
+      }, // Excluding password from the response
     });
   } catch (error) {
     console.error("Login error:", error); // Improved error logging
@@ -116,18 +121,8 @@ export const logout = (req, res) => {
   res.status(200).json({ message: "Logout successful" });
 };
 
-export const isAuthenticatedFunc = (req, res) => {
-  const token = req.cookies["auth_token"];
-
-  if (token) {
-    res.status(200).send({ isAuthenticated: true });
-  } else {
-    res.status(404).send({ isAuthenticated: false });
-  }
-};
-
 export const getSchemeForm = async (req, res) => {
-  const { schemeID } = req.body;
+  const { schemeID } = req.params;
   if (!schemeID) {
     res.status(400).json({
       message: "Invalid schemeID",
@@ -164,4 +159,32 @@ export const submitForm = async (req, res) => {
     console.error(error);
     res.status(500).json({ message: "Failed to submit the form." });
   }
+};
+
+export const userProfile = async (req, res) => {
+  const { id } = req.params;
+
+  if (!id) {
+    res.status(400).json({
+      message: "invalid id",
+    });
+  }
+
+  const user = await User.findById(id);
+
+  if (!user) {
+    res.status(400).json({
+      message: "sorry user not found",
+    });
+  }
+
+  res.status(200).json({
+    message: `welcome ${user.name}`,
+    user: {
+      id: user._id,
+      name: user.name,
+      adhar: user.adhar,
+      role: user.role,
+    },
+  });
 };

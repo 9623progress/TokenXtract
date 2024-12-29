@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const dep = new mongoose.Schema({
-  department: {
+  departmentName: {
     type: String,
     required: true,
   },
