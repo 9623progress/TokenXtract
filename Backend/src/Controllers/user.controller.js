@@ -170,7 +170,6 @@ export const submitForm = async (req, res) => {
       })
     );
 
-    // Save the entry with processed responses
     const responseEntry = new userResponse({
       schemeID,
       userID,
