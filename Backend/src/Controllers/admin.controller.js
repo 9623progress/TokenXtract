@@ -67,8 +67,8 @@ export const getAllschemeByDepartment = async (req, res) => {
 };
 
 export const createDepartment = async (req, res) => {
-  const { departmentName, image } = req.body;
-
+  const { departmentName } = req.body;
+  const image = req.file.path;
   if (!departmentName || !image) {
     return res.status(400).json({
       message: "All fields are required",

@@ -2,6 +2,7 @@ import { User, userResponse } from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { scheme } from "../models/scheme.model.js";
+import cloudinary from "../config/cloudinary.js";
 
 export const login = async (req, res) => {
   try {
@@ -141,15 +142,39 @@ export const submitForm = async (req, res) => {
     const { schemeID, userID, responses } = req.body;
 
     if (!schemeID || !userID || !responses) {
-      res.status(400).json({
-        message: "all fields are required",
+      return res.status(400).json({
+        message: "All fields are required",
       });
     }
 
+    // Process responses to handle file uploads with specific labels
+    const processedResponses = await Promise.all(
+      responses.map(async (response) => {
+        if (response.type === "file" && response.file) {
+          // Upload the file to Cloudinary
+          const uploadedFile = await cloudinary.uploader.upload(response.file, {
+            folder: "government_fund_distribution/form_upload", // Cloudinary folder
+            resource_type: "auto", // Auto-detect file type (e.g., image, PDF)
+          });
+
+          // Return the response with file metadata and label
+          return {
+            label: response.label, // Preserve the specific label
+            fileUrl: uploadedFile.secure_url, // File URL from Cloudinary
+            originalName: uploadedFile.original_filename, // Optional metadata
+          };
+        }
+
+        // Return non-file responses as-is
+        return response;
+      })
+    );
+
+    // Save the entry with processed responses
     const responseEntry = new userResponse({
       schemeID,
       userID,
-      responses,
+      responses: processedResponses,
     });
 
     await responseEntry.save();
