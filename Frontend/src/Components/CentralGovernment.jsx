@@ -7,6 +7,8 @@ import ViewApplication from "./ViewApplication";
 import CreateToken from "./CreateToken";
 import ViewBankRequest from "./ViewBankRequests";
 import ViewAllSCheme from "./ViewAllSCheme";
+import CreateDepartment from "./createDepartment";
+
 const CentralGovernment = () => {
   //create scheme
   //view application-approve ,reject
@@ -26,6 +28,8 @@ const CentralGovernment = () => {
       setActive(<ViewBankRequest />);
     } else if (type == "View All Scheme") {
       setActive(<ViewAllSCheme />);
+    } else if ("create department") {
+      setActive(<CreateDepartment />);
     } else {
       setActive(<CreateScheme />);
     }
@@ -79,6 +83,15 @@ const CentralGovernment = () => {
               className="cg-fun-card"
             >
               <p>View All Scheme</p>
+            </a>
+
+            <a
+              className="cg-fun-card"
+              onClick={() => {
+                HandleClick("create department");
+              }}
+            >
+              <p>Add department</p>
             </a>
           </div>
         </div>

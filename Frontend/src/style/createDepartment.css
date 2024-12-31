@@ -1,0 +1,36 @@
+.department-top-div {
+    width: 100%;
+    height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    /* opacity: 1; */
+}
+
+
+
+.dep-form {
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #ccc;
+    width: 300px;
+    gap: 10px;
+    padding: 10px;
+
+    /* opacity: 5; */
+}
+
+.dep-button {
+    padding: 8px;
+    font-size: medium;
+    background-color: #3c0688;
+    border: none;
+    color: white;
+    border-radius: 5px;
+}
+
+.dep-button:hover {
+    background-color: #7034c4;
+}

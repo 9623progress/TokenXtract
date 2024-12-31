@@ -1,4 +1,4 @@
-import { department } from "../models/department.modal.js";
+import { department, department } from "../models/department.modal.js";
 import { scheme } from "../models/scheme.model.js";
 import { userResponse } from "../models/user.model.js";
 
@@ -67,38 +67,54 @@ export const getAllschemeByDepartment = async (req, res) => {
 };
 
 export const createDepartment = async (req, res) => {
-  const { departmentName } = req.body;
-  const image = req.file.path;
-  if (!departmentName || !image) {
-    return res.status(400).json({
-      message: "All fields are required",
+  try {
+    const { departmentName, des } = req.body;
+    const image = req.file?.path;
+
+    if (!departmentName || !image || !des) {
+      return res.status(400).json({
+        message: "All fields are required",
+      });
+    }
+
+    const newDepartment = new department({
+      departmentName,
+      des,
+      image,
+    });
+    await newDepartment.save();
+
+    res.status(200).json({
+      message: "Department created successfully",
+      department: newDepartment,
+    });
+  } catch (error) {
+    console.error("Error creating department:", error);
+    res.status(500).json({
+      message: "Internal Server Error",
     });
   }
-
-  const newDepartment = new department({
-    departmentName,
-    image,
-  });
-
-  await newDepartment.save();
-
-  res.status(200).json({
-    message: "department created successfully",
-  });
 };
 
 export const getAllApplicationByScheme = async (req, res) => {
-  const { schemeID } = req.params;
+  try {
+    const { schemeID } = req.params;
 
-  if (!schemeID) {
-    res.status(400).json({
-      message: "Invalid schemeID",
+    if (!schemeID) {
+      res.status(400).json({
+        message: "Invalid schemeID",
+      });
+    }
+    const applicants = await userResponse.find({ schemeID });
+
+    res.status(200).json({
+      applicants,
+      message: "all applicants are send",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Internal Server Error",
     });
   }
-  const applicants = await userResponse.find({ schemeID });
-
-  res.status(200).json({
-    applicants,
-    message: "all applicants are send",
-  });
 };
