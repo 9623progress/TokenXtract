@@ -1,4 +1,4 @@
-import { department, department } from "../models/department.modal.js";
+import { department } from "../models/department.modal.js";
 import { scheme } from "../models/scheme.model.js";
 import { userResponse } from "../models/user.model.js";
 
@@ -115,6 +115,21 @@ export const getAllApplicationByScheme = async (req, res) => {
     console.log(error);
     res.status(500).json({
       message: "Internal Server Error",
+    });
+  }
+};
+
+export const getDepartment = async (req, res) => {
+  try {
+    const departments = await department.find();
+
+    res.status(200).json({
+      message: "here are the departments",
+      departments,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Internal server error",
     });
   }
 };
