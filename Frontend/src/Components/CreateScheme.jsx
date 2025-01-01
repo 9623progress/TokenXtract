@@ -1,26 +1,31 @@
 import React, { useState } from "react";
-import departments from "../utils/DepartmentsData"; // Assuming this is correct
 import "../style/CreateScheme.css";
 import DepartmentCard from "./DepartmentCard";
+import { useSelector } from "react-redux";
+import axios from "axios"; // For API requests
+
+import { toast } from "react-toastify";
 
 const CreateScheme = () => {
   const [selectedDepartment, setSelectedDepartment] = useState(null);
   const [departmentFields, setDepartmentFields] = useState([]);
   const [schemeName, setSchemeName] = useState("");
   const [budget, setBudget] = useState("");
+  const [amountPerUser, setAmountPerUser] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
-  // Handle department change
+  const { departments } = useSelector((state) => state.departments);
+
   const handleDepartmentChange = (e) => {
-    const departmentId = Number(e.target.value); // Ensure it's a number
+    const departmentId = e.target.value;
     setSelectedDepartment(departmentId);
   };
 
-  // Find the selected department from the list
   const selectedDept = departments.find(
-    (dept) => dept.id === selectedDepartment
+    (dept) => dept._id === selectedDepartment
   );
 
-  // Handle custom field changes (for labels and names)
   const handleFieldChange = (e, index) => {
     const { name, value } = e.target;
     const updatedFields = [...departmentFields];
@@ -28,33 +33,68 @@ const CreateScheme = () => {
     setDepartmentFields(updatedFields);
   };
 
-  // Add a new field to the form template
   const addField = () => {
     setDepartmentFields([
       ...departmentFields,
-      { label: "", name: "", type: "text", options: [] }, // New field added with default values
+      { label: "", name: "", type: "text", options: [] },
     ]);
   };
 
-  // Remove a field from the form template
   const removeField = (index) => {
     const updatedFields = departmentFields.filter((_, i) => i !== index);
     setDepartmentFields(updatedFields);
   };
 
-  // Add a new option for radio type fields
   const addRadioOption = (index) => {
     const updatedFields = [...departmentFields];
-    updatedFields[index].options.push(""); // Add empty option
+    updatedFields[index].options.push("");
     setDepartmentFields(updatedFields);
   };
 
-  // Handle radio option input
   const handleRadioOptionChange = (e, fieldIndex, optionIndex) => {
     const { value } = e.target;
     const updatedFields = [...departmentFields];
     updatedFields[fieldIndex].options[optionIndex] = value;
     setDepartmentFields(updatedFields);
+  };
+
+  const saveSchemeTemplate = async () => {
+    if (!selectedDepartment || !schemeName || !budget || !amountPerUser) {
+      toast.error("Please fill all required fields!");
+      return;
+    }
+
+    setLoading(true);
+    setMessage("");
+
+    try {
+      const formTemplate = departmentFields.map((field) => ({
+        label: field.label,
+        name: field.name,
+        type: field.type,
+        options: field.type === "radio" ? field.options : undefined,
+      }));
+
+      const payload = {
+        departmentID: selectedDepartment,
+        schemeName,
+        budget,
+        amountPerUser,
+        form: formTemplate,
+      };
+
+      const response = await axios.post(
+        "http://localhost:5000/api/v1/admin/create-scheme",
+        payload
+      );
+      toast.success(response.data.message);
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "An error occurred while saving!"
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -69,18 +109,18 @@ const CreateScheme = () => {
             Select Department
           </option>
           {departments.map((department) => (
-            <option key={department.id} value={department.id}>
-              {department.name}
+            <option key={department._id} value={department._id}>
+              {department.departmentName}
             </option>
           ))}
         </select>
 
-        {/* Display department details */}
         {selectedDept ? (
           <div className="scheme-form-div">
             <DepartmentCard
-              title={selectedDept.name}
-              des={selectedDept.tagline}
+              key={selectedDept._id}
+              title={selectedDept.departmentName}
+              des={selectedDept.des}
               image={selectedDept.image}
             />
           </div>
@@ -88,14 +128,13 @@ const CreateScheme = () => {
           <p>Please select a department to view details.</p>
         )}
 
-        {/* Scheme Name and Budget Fields - Editable */}
         <div className="scheme-default-input">
           <div className="scheme-name">
             <input
               type="text"
               name="schemeName"
               value={schemeName}
-              onChange={(e) => setSchemeName(e.target.value)} // Update Scheme Name
+              onChange={(e) => setSchemeName(e.target.value)}
               placeholder="Enter Scheme Name"
               required
             />
@@ -105,15 +144,23 @@ const CreateScheme = () => {
               type="number"
               name="budget"
               value={budget}
-              onChange={(e) => setBudget(e.target.value)} // Update Budget
+              onChange={(e) => setBudget(e.target.value)}
               placeholder="Enter Budget Scheme"
+              required
+            />
+          </div>
+          <div className="scheme-amount-per-user">
+            <input
+              type="number"
+              name="amountPerUser"
+              value={amountPerUser}
+              onChange={(e) => setAmountPerUser(e.target.value)}
+              placeholder="Enter Amount Per User"
               required
             />
           </div>
         </div>
 
-        {/* Add Custom Fields */}
-        {/* Render Custom Fields */}
         {departmentFields.map((field, index) => (
           <div key={index} className="scheme-custom-field">
             <label>Field Label:</label>
@@ -141,11 +188,10 @@ const CreateScheme = () => {
               <option value="text">Text</option>
               <option value="number">Number</option>
               <option value="date">Date</option>
-              <option value="image">Image</option> {/* Added Image option */}
-              <option value="radio">Radio</option> {/* Added Radio option */}
+              <option value="image">Image</option>
+              <option value="radio">Radio</option>
             </select>
 
-            {/* Render options for radio type fields */}
             {field.type === "radio" && (
               <div>
                 <label>Radio Options:</label>
@@ -181,11 +227,9 @@ const CreateScheme = () => {
         </button>
       </div>
 
-      {/* Display the final form template (for visualization) */}
       <div className="scheme-form-preview">
         <h3>Scheme Template Preview</h3>
 
-        {/* Table for Scheme Name and Budget */}
         <table className="preview-table">
           <thead>
             <tr>
@@ -205,8 +249,11 @@ const CreateScheme = () => {
               <td>Number</td>
               <td>budget</td>
             </tr>
-
-            {/* Render custom fields in the table */}
+            <tr>
+              <td>Amount Per User</td>
+              <td>Number</td>
+              <td>amountPerUser</td>
+            </tr>
             {departmentFields.map((field, index) => (
               <tr key={index}>
                 <td>{field.label}</td>
@@ -218,8 +265,13 @@ const CreateScheme = () => {
         </table>
       </div>
 
-      <button className="scheme-button" type="button">
-        Save Scheme Template
+      <button
+        className="scheme-button"
+        type="button"
+        onClick={saveSchemeTemplate}
+        disabled={loading}
+      >
+        {loading ? "Saving..." : "Save Scheme Template"}
       </button>
     </div>
   );

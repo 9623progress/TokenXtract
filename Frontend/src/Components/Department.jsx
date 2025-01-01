@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from "react";
-import departments from "../utils/DepartmentsData.js";
+// import departments from "../utils/DepartmentsData.js";
 import DepartmentCard from "./DepartmentCard";
 import "../style/Department.css";
 import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { setDepartments } from "../ReduxStore/reduxSlice/department.js";
 
 const Department = () => {
+  const dispatch = useDispatch();
   const [dep, setDep] = useState(null);
+  const { departments } = useSelector((state) => state.departments);
   const fetch = async () => {
     try {
       const response = await axios.get(
@@ -15,6 +19,7 @@ const Department = () => {
       // console.log(response);
       if (response.status == 200) {
         setDep(response.data.departments);
+        dispatch(setDepartments(response.data.departments));
       }
     } catch (error) {
       console.log(error);
@@ -33,7 +38,7 @@ const Department = () => {
         <h1>Our Focused Areas of Support</h1>
       </div>
       <div className="department-box">
-        {dep.map((data) => (
+        {departments.map((data) => (
           <DepartmentCard
             key={data._id}
             title={data.departmentName}
