@@ -14,9 +14,26 @@ import { userResponse } from "../models/user.model.js";
 // 5.view bank request
 
 export const createScheme = async (req, res) => {
-  const { departmentID, schemeName, budget, amountPerUser, form } = req.body;
+  const {
+    departmentID,
+    schemeName,
+    budget,
+    amountPerUser,
+    form,
+    minAge,
+    maxAge,
+    specialRequirement,
+  } = req.body;
 
-  if (!departmentID || !schemeName || !budget || !amountPerUser || !form) {
+  if (
+    !departmentID ||
+    !schemeName ||
+    !budget ||
+    !amountPerUser ||
+    !form ||
+    !minAge ||
+    !maxAge
+  ) {
     return res.status(400).json({
       message: "fill all fields",
     });
@@ -41,6 +58,9 @@ export const createScheme = async (req, res) => {
     schemeName,
     budget,
     amountPerUser,
+    minAge,
+    maxAge,
+    specialRequirement,
     form,
   });
 

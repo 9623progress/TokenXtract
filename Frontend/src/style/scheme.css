@@ -1,0 +1,50 @@
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+th,
+td {
+    padding: 12px;
+    border: 1px solid #dddddd;
+    text-align: left;
+}
+
+th {
+
+    font-weight: bold;
+    color: #27005D;
+}
+
+tr:hover {
+    background-color: #f1f9ff;
+}
+
+.nowrap {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+
+.apply-btn {
+    padding: 8px 12px;
+    border: none;
+    background-color: #27005D;
+    color: white;
+    margin-right: 5px;
+    border-radius: 5px;
+    font-weight: 500;
+    font-size: 1.05rem;
+    margin: 10px;
+    border: 1px solid #27005D;
+    cursor: pointer;
+}
+
+.apply-btn:hover {
+    background-color: white;
+    color: #27005D;
+
+}

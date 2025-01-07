@@ -131,7 +131,7 @@ export const getSchemeForm = async (req, res) => {
   }
   const form = await scheme.findById(schemeID);
 
-  res.status(201).json({
+  res.status(200).json({
     message: "success",
     form: form.form,
   });

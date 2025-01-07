@@ -44,6 +44,7 @@ const Department = () => {
             title={data.departmentName}
             des={data.des}
             image={data.image}
+            id={data._id}
           />
         ))}
       </div>

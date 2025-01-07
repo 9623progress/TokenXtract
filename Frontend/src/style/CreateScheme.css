@@ -5,7 +5,7 @@
 }
 
 .scheme-form {
-    width: 70%;
+    width: 90%;
     margin: auto;
     border: 1px solid #ccc;
     /* border-radius: 10px; */
@@ -23,20 +23,43 @@ select {
     border: 1px solid #ccc;
 }
 
+.scheme-special-Requirement {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.scheme-special-Requirement textarea {
+    font-size: 1.1rem;
+}
+
 .scheme-default-input {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 20px;
     margin: 10px;
+    flex-wrap: wrap;
+    /* flex-direction: column; */
 }
 
+.scheme-input-box {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-direction: column;
+}
+
+
+
 input {
-    padding: 5px;
+    padding: 6px;
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 1rem;
     outline: none;
+    width: 300px;
 }
 
 

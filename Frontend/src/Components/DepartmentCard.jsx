@@ -2,13 +2,13 @@ import React from "react";
 import "../style/Card.css";
 import { useNavigate } from "react-router-dom";
 
-const DepartmentCard = ({ title, des, image }) => {
+const DepartmentCard = ({ title, des, image, id }) => {
   const navigate = useNavigate(); // Initializing the useHistory hook
 
   const handleImageClick = () => {
     // Passing the data as state to the /scheme route
     navigate("/scheme", {
-      state: { title }, // Pass the state to the SchemePage
+      state: { id }, // Pass the state to the SchemePage
     });
   };
 

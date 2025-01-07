@@ -20,6 +20,7 @@ import PrivateRoute from "./Components/PrivateRoute";
 import validateAuth from "./utils/isValidate";
 import { useDispatch } from "react-redux";
 import { logout } from "./ReduxStore/reduxSlice/userSlice";
+import SchemeForm from "./Components/SchemeForm";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -87,10 +88,24 @@ const App = () => {
 
         // Other routes
         { path: "/scheme", element: <Schemes /> },
+        {
+          path: "/scheme-form",
+          element: <SchemeForm />,
+        },
       ],
     },
   ]);
 
+  //for check when when website load
+  // useEffect(async () => {
+  //   const isAuthenticated = await validateAuth();
+  //   if (!isAuthenticated) {
+  //     dispatch(logout());
+  //     localStorage.removeItem("user");
+  //   }
+  // }, []);
+
+  //checking by after every 5 min is token expire
   useEffect(() => {
     const interval = setInterval(async () => {
       const isAuthenticated = await validateAuth();
@@ -98,7 +113,7 @@ const App = () => {
         dispatch(logout());
         localStorage.removeItem("user");
       }
-    }, 1000 * 60);
+    }, 1000 * 60 * 5);
     return () => clearInterval(interval);
   }, []);
 

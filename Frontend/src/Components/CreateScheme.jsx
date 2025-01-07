@@ -14,6 +14,9 @@ const CreateScheme = () => {
   const [amountPerUser, setAmountPerUser] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [minAge, setMinAge] = useState("");
+  const [maxAge, setMaxAge] = useState("");
+  const [specialRequirement, setSpecialRequirement] = useState("");
 
   const { departments } = useSelector((state) => state.departments);
 
@@ -80,6 +83,9 @@ const CreateScheme = () => {
         schemeName,
         budget,
         amountPerUser,
+        maxAge,
+        minAge,
+        specialRequirement,
         form: formTemplate,
       };
 
@@ -125,40 +131,94 @@ const CreateScheme = () => {
             />
           </div>
         ) : (
-          <p>Please select a department to view details.</p>
+          <p style={{ color: "red" }}>
+            Please select a department to view details.
+          </p>
         )}
 
         <div className="scheme-default-input">
-          <div className="scheme-name">
+          <div className="scheme-name scheme-input-box">
+            <label for="schemeName">Scheme Name : </label>
             <input
+              className="scheme-input"
               type="text"
               name="schemeName"
               value={schemeName}
               onChange={(e) => setSchemeName(e.target.value)}
               placeholder="Enter Scheme Name"
               required
+              id="schemeName"
             />
           </div>
-          <div className="scheme-budget">
+          <div className="scheme-budget scheme-input-box">
+            <label for="scheme-budget">scheme-budget : </label>
             <input
+              className="scheme-input"
               type="number"
               name="budget"
               value={budget}
               onChange={(e) => setBudget(e.target.value)}
               placeholder="Enter Budget Scheme"
               required
+              id="scheme-budget"
             />
           </div>
-          <div className="scheme-amount-per-user">
+          <div className="scheme-amount-per-user scheme-input-box">
+            <label for="amount-per-user">Amount Per User : </label>
             <input
+              className="scheme-input"
               type="number"
               name="amountPerUser"
               value={amountPerUser}
               onChange={(e) => setAmountPerUser(e.target.value)}
               placeholder="Enter Amount Per User"
               required
+              id="amount-per-user"
             />
           </div>
+
+          <div className="scheme-minAge scheme-input-box">
+            <label for="minAge">Minimum Age : </label>
+            <input
+              className="scheme-input"
+              type="number"
+              name="minAge"
+              value={minAge}
+              onChange={(e) => setMinAge(e.target.value)}
+              placeholder="Enter minimum Age eligible "
+              required
+              id="minAge"
+            />
+          </div>
+          <div className="scheme-maxAge scheme-input-box">
+            <label for="maxAge">Maximum Age : </label>
+            <input
+              className="scheme-input"
+              type="number"
+              name="maxAge"
+              value={maxAge}
+              onChange={(e) => setMaxAge(e.target.value)}
+              placeholder="Enter Maximum  Age eligible "
+              required
+              id="maxAge"
+            />
+          </div>
+        </div>
+
+        <div className="scheme-special-Requirement ">
+          <label for="special-Requirement">Special Requirements : </label>
+          <textarea
+            className="scheme-input"
+            type="text"
+            name="specialRequirement"
+            value={specialRequirement}
+            onChange={(e) => setSpecialRequirement(e.target.value)}
+            placeholder="Enter the Special Requirement if needed  "
+            required
+            id="special-Requirement"
+            rows={5}
+            cols={100}
+          />
         </div>
 
         {departmentFields.map((field, index) => (
@@ -207,7 +267,11 @@ const CreateScheme = () => {
                     />
                   </div>
                 ))}
-                <button type="button" onClick={() => addRadioOption(index)}>
+                <button
+                  type="button"
+                  className="scheme-button"
+                  onClick={() => addRadioOption(index)}
+                >
                   Add Option
                 </button>
               </div>

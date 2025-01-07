@@ -17,6 +17,25 @@ const schemeModel = new mongoose.Schema({
     type: Number,
     required: true,
   },
+
+  minAge: {
+    type: Number,
+    required: true,
+    min: [0, "Minimum age cannot be negative"],
+  },
+  maxAge: {
+    type: Number,
+    required: true,
+    validate: {
+      validator: function (value) {
+        return value >= this.minAge; // Ensure maxAge is greater than or equal to minAge
+      },
+      message: "Maximum age must be greater than or equal to minimum age",
+    },
+  },
+  specialRequirement: {
+    type: String,
+  },
   form: [
     {
       label: { type: String, required: true },
