@@ -40,8 +40,8 @@ const schemeModel = new mongoose.Schema({
     {
       label: { type: String, required: true },
       type: { type: String, required: true },
-      placeholder: { type: String },
-      required: { type: Boolean, default: false }, // Is the field required?
+      uniqueName: { type: String, required: true },
+      required: { type: Boolean, default: true }, // Is the field required?
       options: { type: [String] }, // Options for dropdowns/radio buttons
     },
   ],

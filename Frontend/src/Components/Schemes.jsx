@@ -25,8 +25,8 @@ const Schemes = () => {
     fetch();
   }, []);
 
-  const HandleOnClick = (id) => {
-    navigate("/scheme-form", { state: { id } });
+  const HandleOnClick = (id, schemeName) => {
+    navigate("/scheme-form", { state: { id, schemeName } });
   };
 
   const formatSpecialRequirements = (text) => {
@@ -68,7 +68,7 @@ const Schemes = () => {
                   <button
                     className="apply-btn"
                     onClick={() => {
-                      HandleOnClick(scheme._id);
+                      HandleOnClick(scheme._id, scheme.schemeName);
                     }}
                   >
                     Apply

@@ -73,7 +73,7 @@ const CreateScheme = () => {
     try {
       const formTemplate = departmentFields.map((field) => ({
         label: field.label,
-        name: field.name,
+        uniqueName: field.name,
         type: field.type,
         options: field.type === "radio" ? field.options : undefined,
       }));

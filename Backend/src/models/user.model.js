@@ -37,7 +37,7 @@ const userResponseModel = new mongoose.Schema({
   },
   responses: [
     {
-      label: { type: String, required: true }, // Field label from the form
+      key: { type: String, required: true }, // Field label from the form
       value: { type: mongoose.Schema.Types.Mixed, required: true }, // User's input value
     },
   ],

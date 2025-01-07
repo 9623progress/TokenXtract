@@ -2,12 +2,16 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import "../style/schemeForm.css";
+import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
 const SchemeForm = () => {
   const location = useLocation();
-  const { id } = location.state;
+  const { id, schemeName } = location.state;
   const [form, setForm] = useState([]);
-  const [formData, setFormData] = useState({}); // To store user input
+  const [responses, setResponses] = useState([]); // To store user input
+  const userID = useSelector((state) => state.user.user.id);
+  const [loading, setloading] = useState(false);
 
   const fetch = async () => {
     try {
@@ -18,18 +22,62 @@ const SchemeForm = () => {
         setForm(response.data.form);
       }
     } catch (error) {
-      console.log(error);
+      console.error("Error fetching form", error);
     }
   };
 
-  const handleInputChange = (e, fieldId) => {
-    setFormData({ ...formData, [fieldId]: e.target.value });
+  const handleInputChange = (e, fieldId, inputType, uniqueName) => {
+    const value = inputType === "file" ? e.target.files[0] : e.target.value;
+
+    setResponses((prevResponses) => {
+      // Update responses array by replacing or adding the current field's data
+      const updatedResponses = prevResponses.filter(
+        (response) => response.key !== fieldId
+      );
+      updatedResponses.push({
+        key: fieldId,
+        type: inputType,
+        value,
+        label: uniqueName,
+      });
+      return updatedResponses;
+    });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Add your submit logic here (e.g., send formData to server)
-    console.log(formData);
+
+    // Prepare FormData
+    const formData = new FormData();
+    formData.append("userID", userID);
+    formData.append("schemeID", id);
+
+    // Append each response to the FormData
+    responses.forEach((response) => {
+      if (response.type === "file") {
+        formData.append(response.key, response.value); // File
+      } else {
+        formData.append(response.key, response.value); // Text
+      }
+    });
+
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/v1/user/submit",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+
+      if (res.status == 200) {
+        toast.success(res.data.message);
+      }
+
+      console.log("Form submitted successfully", res.data);
+    } catch (error) {
+      console.error("Error submitting form", error);
+    }
   };
 
   useEffect(() => {
@@ -38,30 +86,32 @@ const SchemeForm = () => {
 
   return (
     <div className="form-top">
-      <h1 className="form-heading">Scheme Application Form</h1>
+      <h1 className="form-heading">{`${schemeName} Application Form`}</h1>
       <div className="form-div">
         <form onSubmit={handleSubmit}>
           {form.map((field) => (
             <div key={field._id} style={{ marginBottom: "15px" }}>
-              <label>{field.label} : </label>
+              <label>{field.label}:</label>
 
               {/* Handle text input */}
               {field.type === "text" && (
                 <input
                   type="text"
                   required={field.required}
-                  value={formData[field._id] || ""}
-                  onChange={(e) => handleInputChange(e, field._id)}
+                  onChange={(e) =>
+                    handleInputChange(e, field._id, "text", field.uniqueName)
+                  }
                   style={{ width: "100%", padding: "8px", marginTop: "5px" }}
                 />
               )}
 
-              {/* Handle radio (now dropdown) input */}
+              {/* Handle radio (dropdown) input */}
               {field.type === "radio" && (
                 <select
                   required={field.required}
-                  value={formData[field._id] || ""}
-                  onChange={(e) => handleInputChange(e, field._id)}
+                  onChange={(e) =>
+                    handleInputChange(e, field._id, "text", field.uniqueName)
+                  }
                   style={{ width: "100%", padding: "8px", marginTop: "5px" }}
                 >
                   <option value="">Select {field.label}</option>
@@ -73,13 +123,15 @@ const SchemeForm = () => {
                 </select>
               )}
 
-              {/* Handle image input */}
+              {/* Handle file (image) input */}
               {field.type === "image" && (
                 <input
                   type="file"
                   accept="image/*"
                   required={field.required}
-                  onChange={(e) => handleInputChange(e, field._id)}
+                  onChange={(e) =>
+                    handleInputChange(e, field._id, "file", field.uniqueName)
+                  }
                   style={{ marginTop: "5px" }}
                 />
               )}

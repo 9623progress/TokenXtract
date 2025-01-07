@@ -139,49 +139,47 @@ export const getSchemeForm = async (req, res) => {
 
 export const submitForm = async (req, res) => {
   try {
-    const { schemeID, userID, responses } = req.body;
+    const { userID, schemeID } = req.body; // Extract userID and schemeID from the body
 
-    if (!schemeID || !userID || !responses) {
-      return res.status(400).json({
-        message: "All fields are required",
-      });
+    if (!userID || !schemeID) {
+      return res.status(400).json({ message: "Missing userID or schemeID" });
     }
 
-    // Process responses to handle file uploads with specific labels
-    const processedResponses = await Promise.all(
-      responses.map(async (response) => {
-        if (response.type === "file" && response.file) {
-          // Upload the file to Cloudinary
-          const uploadedFile = await cloudinary.uploader.upload(response.file, {
-            folder: "government_fund_distribution/form_upload", // Cloudinary folder
-            resource_type: "auto", // Auto-detect file type (e.g., image, PDF)
-          });
+    // Initialize responses array
+    const responses = [];
 
-          // Return the response with file metadata and label
-          return {
-            label: response.label, // Preserve the specific label
-            fileUrl: uploadedFile.secure_url, // File URL from Cloudinary
-            originalName: uploadedFile.original_filename, // Optional metadata
-          };
-        }
-
-        // Return non-file responses as-is
-        return response;
-      })
-    );
-
-    const responseEntry = new userResponse({
-      schemeID,
-      userID,
-      responses: processedResponses,
+    // Process text fields and radio buttons
+    Object.keys(req.body).forEach((key) => {
+      if (key !== "userID" && key !== "schemeID") {
+        // For text and radio values
+        responses.push({
+          key, // Field name (use the field names from the form)
+          value: req.body[key], // Value from req.body
+        });
+      }
     });
 
-    await responseEntry.save();
+    // Process file fields
+    req.files.forEach((file) => {
+      responses.push({
+        key: file.fieldname, // Field name for the file
+        value: file.path, // Path where the file is saved
+      });
+    });
 
-    res.status(201).json({ message: "Form submitted successfully!" });
+    // Save responses in the database
+    const UserResponse = new userResponse({
+      userID,
+      schemeID,
+      responses,
+    });
+
+    await UserResponse.save();
+
+    return res.status(200).json({ message: "Form submitted successfully" });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Failed to submit the form." });
+    console.error("Error submitting form", error);
+    return res.status(500).json({ message: "Error submitting form", error });
   }
 };
 
