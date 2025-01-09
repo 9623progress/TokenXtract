@@ -1,5 +1,5 @@
 import { department } from "../models/department.modal.js";
-import { scheme } from "../models/scheme.model.js";
+import { formFieldSchem, scheme } from "../models/scheme.model.js";
 import { userResponse } from "../models/user.model.js";
 
 // functions to implement
@@ -52,7 +52,16 @@ export const createScheme = async (req, res) => {
       message: "form template should not empty",
     });
   }
+  const newForm = await Promise.all(
+    form.map(async (f) => {
+      console.log(f);
+      const formField = new formFieldSchem(f);
+      await formField.save(); // Save the individual form field
+      return formField._id; // Store the reference ID
+    })
+  );
 
+  console.log(newForm);
   const newScheme = new scheme({
     departmentID,
     schemeName,
@@ -61,7 +70,7 @@ export const createScheme = async (req, res) => {
     minAge,
     maxAge,
     specialRequirement,
-    form,
+    form: newForm,
   });
 
   await newScheme.save();
@@ -125,7 +134,10 @@ export const getAllApplicationByScheme = async (req, res) => {
         message: "Invalid schemeID",
       });
     }
-    const applicants = await userResponse.find({ schemeID });
+    const applicants = await userResponse.find({ schemeID }).populate({
+      path: "responses.key",
+      select: "label type",
+    });
 
     res.status(200).json({
       applicants,

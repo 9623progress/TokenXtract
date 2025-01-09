@@ -129,7 +129,7 @@ export const getSchemeForm = async (req, res) => {
       message: "Invalid schemeID",
     });
   }
-  const form = await scheme.findById(schemeID);
+  const form = await scheme.findById(schemeID).populate("form");
 
   res.status(200).json({
     message: "success",
