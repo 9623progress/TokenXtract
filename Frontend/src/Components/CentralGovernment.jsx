@@ -28,7 +28,7 @@ const CentralGovernment = () => {
       setActive(<ViewBankRequest />);
     } else if (type == "View All Scheme") {
       setActive(<ViewAllSCheme />);
-    } else if ("create department") {
+    } else if (type == "create department") {
       setActive(<CreateDepartment />);
     } else {
       setActive(<CreateScheme />);

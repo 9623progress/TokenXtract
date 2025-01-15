@@ -4,3 +4,79 @@
     padding: 10px;
     border: 1px solid #ccc;
 }
+
+.view-application-select-div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.view-application-table {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.view-application-button {
+    padding: 8px 12px;
+    border: none;
+    background-color: #27005D;
+    color: white;
+    margin-right: 5px;
+    border-radius: 5px;
+    font-weight: 500;
+    font-size: 1.05rem;
+    margin: 10px;
+    border: 1px solid #27005D;
+    cursor: pointer;
+}
+
+
+.view-application-button:hover {
+    background-color: white;
+    color: #27005D;
+
+}
+
+.accept {
+    padding: 8px 12px;
+    border: none;
+    margin-right: 5px;
+    border-radius: 5px;
+    font-weight: 500;
+    font-size: 1.05rem;
+    margin: 10px;
+    cursor: pointer;
+    background-color: green;
+    color: white;
+    border: 1px solid green;
+}
+
+.accept:hover {
+
+    background-color: white !important;
+    color: green;
+
+}
+
+.reject {
+    padding: 8px 12px;
+    border: none;
+    margin-right: 5px;
+    border-radius: 5px;
+    font-weight: 500;
+    font-size: 1.05rem;
+    margin: 10px;
+    cursor: pointer;
+    background-color: red;
+    color: white;
+    border: 1px solid red;
+}
+
+.reject:hover {
+    background-color: white !important;
+    color: red;
+
+}

@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../style/scheme.css";
+import { formatSpecialRequirements } from "./textFormat";
 
 const Schemes = () => {
   const location = useLocation();
@@ -29,15 +30,6 @@ const Schemes = () => {
     navigate("/scheme-form", { state: { id, schemeName } });
   };
 
-  const formatSpecialRequirements = (text) => {
-    return text.split("\n").map((line, index) => (
-      <React.Fragment key={index}>
-        <span style={{ color: "red" }}> * </span>
-        {line}
-        <br />
-      </React.Fragment>
-    ));
-  };
   return (
     <div style={{ margin: "100px" }}>
       <table>
@@ -58,7 +50,7 @@ const Schemes = () => {
               <tr key={scheme._id}>
                 <td>{scheme.schemeName}</td>
                 {/* <td>₹{scheme.budget.toLocaleString()}</td> */}
-                <td>₹{scheme.amountPerUser}</td>
+                <td>₹{scheme.amountPerUser.toLocaleString()}</td>
                 <td>{scheme.minAge} years</td>
                 <td>{scheme.maxAge} years</td>
                 <td className="nowrap">

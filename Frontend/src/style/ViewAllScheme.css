@@ -1,0 +1,56 @@
+.view-scheme-top-div {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.table-head {
+    font-weight: 700;
+    color: #27005D;
+}
+
+
+.view-button {
+    padding: 8px 12px;
+    border: none;
+    margin-right: 5px;
+    border-radius: 5px;
+    font-weight: 500;
+    font-size: 1.05rem;
+    margin: 10px;
+    cursor: pointer;
+}
+
+.view-form-button {
+    background-color: #27005D;
+    color: white;
+    border: 1px solid #27005D;
+}
+
+.view-form-button:hover {
+    background-color: white;
+    color: #27005D;
+}
+
+.view-update-button {
+    background-color: green;
+    color: white;
+    border: 1px solid #005d32;
+}
+
+.view-update-button:hover {
+    background-color: white;
+    color: green;
+}
+
+.view-action-button {
+    background-color: red;
+    color: white;
+    border: 1px solid #bc0d24;
+}
+
+.view-action-button:hover {
+    background-color: white;
+    color: red;
+}

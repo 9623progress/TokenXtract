@@ -39,8 +39,8 @@ const ViewApplication = () => {
   };
 
   const HandleView = (data) => {
-    const newTab = window.open(data, "_blank"); // '_blank' opens in a new tab
-    newTab.focus(); // Focus on the new tab
+    const newTab = window.open(data, "_blank");
+    newTab.focus();
   };
 
   const fetchApplications = useCallback(async (scheme_id) => {
@@ -57,7 +57,6 @@ const ViewApplication = () => {
   }, []);
 
   const handleAccept = async (applicantId) => {};
-
   const handleReject = async (applicantId) => {};
 
   const renderTable = () => {
@@ -65,12 +64,19 @@ const ViewApplication = () => {
       return <p>No applicants found for the selected scheme.</p>;
     }
 
-    // Extract headers dynamically from the first applicant object
-    // console.log(applicants);
-    const headers = applicants[0].responses.map(
+    // Sorting responses based on key._id
+    const sortedApplicants = applicants.map((applicant) => {
+      const sortedResponses = [...applicant.responses].sort((a, b) => {
+        return a.key._id.localeCompare(b.key._id); // Ascending order
+      });
+      return { ...applicant, responses: sortedResponses };
+    });
+
+    // Extracting headers dynamically from the sorted responses
+    const headers = sortedApplicants[0]?.responses.map(
       (response) => response.key.label
     );
-    console.log(headers);
+
     return (
       <table border="1">
         <thead>
@@ -80,33 +86,34 @@ const ViewApplication = () => {
           </tr>
         </thead>
         <tbody>
-          {applicants.map((applicant) => (
+          {sortedApplicants.map((applicant) => (
             <tr key={applicant._id}>
-              {console.log(applicant)}
-              {applicant &&
-                applicant.responses.map((res) => (
-                  <td key={res.key}>
-                    {res.key.type == "image" ? (
-                      <button
-                        onClick={() => {
-                          HandleView(res.value);
-                        }}
-                      >
-                        {" "}
-                        view{" "}
-                      </button>
-                    ) : (
-                      res.value
-                    )}
-                  </td>
-                ))}
+              {applicant.responses.map((res) => (
+                <td key={res.key._id}>
+                  {res.key.type === "image" ? (
+                    <button
+                      className="view-application-button"
+                      onClick={() => HandleView(res.value)}
+                    >
+                      View
+                    </button>
+                  ) : (
+                    res.value
+                  )}
+                </td>
+              ))}
               <td>
-                <button onClick={() => handleAccept(applicant._id)}>
+                <button
+                  className=" accept"
+                  onClick={() => handleAccept(applicant._id)}
+                  style={{ backgroundColor: "green" }}
+                >
                   Accept
                 </button>
                 <button
+                  className="reject"
                   onClick={() => handleReject(applicant._id)}
-                  style={{ marginLeft: "10px" }}
+                  style={{ marginLeft: "10px", backgroundColor: "red" }}
                 >
                   Reject
                 </button>
@@ -120,27 +127,29 @@ const ViewApplication = () => {
 
   return (
     <div className="view-application-top-div">
-      <select value={selectedDepartment} onChange={HandleDepartmentChange}>
-        <option value="">Select Department</option>
-        {departments &&
-          departments.map((dep) => (
-            <option key={dep._id} value={dep._id}>
-              {dep.departmentName}
-            </option>
-          ))}
-      </select>
+      <div className="view-application-select-div">
+        <select value={selectedDepartment} onChange={HandleDepartmentChange}>
+          <option value="">Select Department</option>
+          {departments &&
+            departments.map((dep) => (
+              <option key={dep._id} value={dep._id}>
+                {dep.departmentName}
+              </option>
+            ))}
+        </select>
 
-      <select value={selectedScheme} onChange={HandleSchemeChange}>
-        <option value="">Select Scheme</option>
-        {scheme &&
-          scheme.map((sc) => (
-            <option key={sc._id} value={sc._id}>
-              {sc.schemeName}
-            </option>
-          ))}
-      </select>
+        <select value={selectedScheme} onChange={HandleSchemeChange}>
+          <option value="">Select Scheme</option>
+          {scheme &&
+            scheme.map((sc) => (
+              <option key={sc._id} value={sc._id}>
+                {sc.schemeName}
+              </option>
+            ))}
+        </select>
+      </div>
 
-      {renderTable()}
+      <div className="view-application-table">{renderTable()}</div>
     </div>
   );
 };

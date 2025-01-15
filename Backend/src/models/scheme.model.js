@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Mongoose } from "mongoose";
 
 const formFieldSchema = new mongoose.Schema({
   label: {
@@ -36,7 +36,8 @@ const formFieldSchema = new mongoose.Schema({
 
 const schemeModel = new mongoose.Schema({
   departmentID: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "department",
     required: true,
   },
   schemeName: {
@@ -59,12 +60,6 @@ const schemeModel = new mongoose.Schema({
   maxAge: {
     type: Number,
     required: true,
-    validate: {
-      validator: function (value) {
-        return value >= this.minAge; // Ensure maxAge is greater than or equal to minAge
-      },
-      message: "Maximum age must be greater than or equal to minimum age",
-    },
   },
   specialRequirement: {
     type: String,

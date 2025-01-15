@@ -5,6 +5,8 @@ import {
   getAllApplicationByScheme,
   getAllschemeByDepartment,
   getDepartment,
+  getScheme,
+  updateScheme,
 } from "../Controllers/admin.controller.js";
 import upload from "../middlewares/multer.js";
 
@@ -15,5 +17,7 @@ router.get("/get-scheme/:departmentID", getAllschemeByDepartment);
 router.post("/create-department", upload.single("image"), createDepartment);
 router.get("/get-applications/:schemeID", getAllApplicationByScheme);
 router.get("/get-departments", getDepartment);
+router.get("/get-single-scheme/:id", getScheme);
+router.put("/update-scheme/:id", updateScheme);
 
 export default router;

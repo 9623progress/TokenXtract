@@ -21,6 +21,7 @@ import validateAuth from "./utils/isValidate";
 import { useDispatch } from "react-redux";
 import { logout } from "./ReduxStore/reduxSlice/userSlice";
 import SchemeForm from "./Components/SchemeForm";
+import UpdateScheme from "./Components/UpdateScheme";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -82,6 +83,14 @@ const App = () => {
           element: (
             <PrivateRoute role="cg">
               <ViewBankRequests />
+            </PrivateRoute>
+          ),
+        },
+        {
+          path: "/update-scheme",
+          element: (
+            <PrivateRoute role={"cg"}>
+              <UpdateScheme />
             </PrivateRoute>
           ),
         },

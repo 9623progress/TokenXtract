@@ -104,3 +104,11 @@ td,
 th {
     padding: 10px;
 }
+
+
+.scheme-form-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
