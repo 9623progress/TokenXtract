@@ -50,6 +50,18 @@ const userResponseModel = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+  Accepted: {
+    type: Boolean,
+    default: false,
+  },
+  Rejected: {
+    type: Boolean,
+    default: false,
+  },
+  fundDisburst: {
+    type: Boolean,
+    default: false,
+  },
   submittedAt: {
     type: Date,
     default: Date.now,

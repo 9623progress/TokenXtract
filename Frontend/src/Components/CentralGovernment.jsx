@@ -8,6 +8,8 @@ import CreateToken from "./CreateToken";
 import ViewBankRequest from "./ViewBankRequests";
 import ViewAllSCheme from "./ViewAllSCheme";
 import CreateDepartment from "./createDepartment";
+import Accepted from "./Accepted";
+import Rejected from "./Rejected";
 
 const CentralGovernment = () => {
   //create scheme
@@ -30,7 +32,11 @@ const CentralGovernment = () => {
       setActive(<ViewAllSCheme />);
     } else if (type == "create department") {
       setActive(<CreateDepartment />);
-    } else {
+    } else if (type == "view-accepted") {
+      setActive(<Accepted />);
+    } else if (type == "view-rejected") {
+      setActive(<Rejected />);
+    } else if (type == "") {
       setActive(<CreateScheme />);
     }
   };
@@ -92,6 +98,24 @@ const CentralGovernment = () => {
               }}
             >
               <p>Add department</p>
+            </a>
+
+            <a
+              className="cg-fun-card"
+              onClick={() => {
+                HandleClick("view-accepted");
+              }}
+            >
+              <p>View Accepted </p>
+            </a>
+
+            <a
+              className="cg-fun-card"
+              onClick={() => {
+                HandleClick("view-rejected");
+              }}
+            >
+              <p>View Rejected </p>
             </a>
           </div>
         </div>

@@ -62,6 +62,7 @@ const SchemeForm = () => {
     });
 
     try {
+      setloading(true);
       const res = await axios.post(
         "http://localhost:5000/api/v1/user/submit",
         formData,
@@ -77,6 +78,8 @@ const SchemeForm = () => {
       console.log("Form submitted successfully", res.data);
     } catch (error) {
       console.error("Error submitting form", error);
+    } finally {
+      setloading(false);
     }
   };
 
@@ -135,14 +138,28 @@ const SchemeForm = () => {
                   style={{ marginTop: "5px" }}
                 />
               )}
+
+              {field.type === "date" && (
+                <input
+                  type="date"
+                  required={field.required}
+                  onChange={(e) =>
+                    handleInputChange(e, field._id, "date", field.uniqueName)
+                  }
+                  style={{ marginTop: "5px" }}
+                />
+              )}
             </div>
           ))}
-          <button
-            type="submit"
-            style={{ padding: "10px 20px", cursor: "pointer" }}
-          >
-            Submit
-          </button>
+          {!loading ? (
+            <button type="submit" className="scheme-form-submit">
+              Submit
+            </button>
+          ) : (
+            <button type="submit" className="scheme-form-submit">
+              Submitting please wait....
+            </button>
+          )}
         </form>
       </div>
     </div>

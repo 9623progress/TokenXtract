@@ -4,7 +4,7 @@ import axios from "axios";
 import "../style/ViewApplication.css";
 import { toast } from "react-toastify";
 
-const ViewApplication = () => {
+const Rejected = () => {
   const { departments } = useSelector((state) => state.departments);
   const [selectedDepartment, setSelectedDepartment] = useState("");
   const [scheme, setScheme] = useState([]);
@@ -47,7 +47,7 @@ const ViewApplication = () => {
   const fetchApplications = useCallback(async (scheme_id) => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/v1/admin/get-applications/${scheme_id}`
+        `http://localhost:5000/api/v1/admin/rejected-form/${scheme_id}`
       );
       if (response.status === 200) {
         setApplicants(response.data.applicants);
@@ -57,32 +57,32 @@ const ViewApplication = () => {
     }
   }, []);
 
-  const handleAccept = async (applicantId) => {
-    try {
-      const response = await axios.patch(
-        `http://localhost:5000/api/v1/admin/accept-form/${applicantId}`
-      );
-      if (response.status == 200) {
-        toast.success(response.data.message || "Form accepted");
-      }
-    } catch (error) {
-      console.log(error);
-      toast.error(error.data.message || "something went wrong");
-    }
-  };
-  const handleReject = async (applicantId) => {
-    try {
-      const response = await axios.patch(
-        `http://localhost:5000/api/v1/admin/reject-form/${applicantId}`
-      );
-      if (response.status == 200) {
-        toast.success(response.data.message || "Form rejected");
-      }
-    } catch (error) {
-      console.log(error);
-      toast.error(error.data.message || "something went wrong");
-    }
-  };
+  //   const handleAccept = async (applicantId) => {
+  //     try {
+  //       const response = await axios.patch(
+  //         `http://localhost:5000/api/v1/admin/accept-form/${applicantId}`
+  //       );
+  //       if (response.status == 200) {
+  //         toast.success(response.data.message || "Form accepted");
+  //       }
+  //     } catch (error) {
+  //       console.log(error);
+  //       toast.error(error.data.message || "something went wrong");
+  //     }
+  //   };
+  //   const handleReject = async (applicantId) => {
+  //     try {
+  //       const response = await axios.patch(
+  //         `http://localhost:5000/api/v1/admin/reject-form/${applicantId}`
+  //       );
+  //       if (response.status == 200) {
+  //         toast.success(response.data.message || "Form rejected");
+  //       }
+  //     } catch (error) {
+  //       console.log(error);
+  //       toast.error(error.data.message || "something went wrong");
+  //     }
+  //   };
 
   const renderTable = () => {
     if (applicants.length === 0) {
@@ -107,7 +107,7 @@ const ViewApplication = () => {
         <thead>
           <tr>
             {headers && headers.map((header) => <th key={header}>{header}</th>)}
-            <th>Actions</th>
+            {/* <th>Actions</th> */}
           </tr>
         </thead>
         <tbody>
@@ -127,7 +127,7 @@ const ViewApplication = () => {
                   )}
                 </td>
               ))}
-              <td>
+              {/* <td>
                 <button
                   className=" accept"
                   onClick={() => handleAccept(applicant._id)}
@@ -142,7 +142,7 @@ const ViewApplication = () => {
                 >
                   Reject
                 </button>
-              </td>
+              </td> */}
             </tr>
           ))}
         </tbody>
@@ -179,4 +179,4 @@ const ViewApplication = () => {
   );
 };
 
-export default ViewApplication;
+export default Rejected;

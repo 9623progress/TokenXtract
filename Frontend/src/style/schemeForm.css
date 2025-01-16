@@ -20,3 +20,22 @@ label {
     font-weight: 600;
     color: #27005D;
 }
+
+.scheme-form-submit {
+    padding: 8px 12px;
+    border: none;
+    background-color: #27005D;
+    color: white;
+    margin-right: 5px;
+    border-radius: 5px;
+    font-weight: 500;
+    font-size: 1.05rem;
+    margin: 10px;
+    border: 1px solid #27005D;
+    cursor: pointer;
+}
+
+.scheme-form-submit:hover {
+    background-color: white;
+    color: #27005D;
+}

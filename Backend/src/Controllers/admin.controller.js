@@ -136,10 +136,12 @@ export const getAllApplicationByScheme = async (req, res) => {
         message: "Invalid schemeID",
       });
     }
-    const applicants = await userResponse.find({ schemeID }).populate({
-      path: "responses.key",
-      select: "label type",
-    });
+    const applicants = await userResponse
+      .find({ schemeID, Accepted: false, Rejected: false })
+      .populate({
+        path: "responses.key",
+        select: "label type",
+      });
 
     res.status(200).json({
       applicants,
@@ -321,6 +323,132 @@ export const updateScheme = async (req, res) => {
     console.error(error);
     return res.status(500).json({
       message: error.message || "An error occurred while updating the scheme",
+    });
+  }
+};
+
+export const acceptForm = async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    // Find the user response by ID
+    const userRes = await userResponse.findById(id);
+
+    if (!userRes) {
+      return res.status(400).json({
+        message: "User Response is not found",
+      });
+    }
+
+    // Update the document to mark as accepted
+    const updatedRes = await userResponse.findByIdAndUpdate(
+      id,
+      { $set: { Accepted: true } }, // Update operation
+      { new: true } // Return the updated document
+    );
+
+    // Send success response
+    return res.status(200).json({
+      message: "Form Accepted",
+      data: updatedRes,
+    });
+  } catch (error) {
+    console.error("Error accepting form:", error);
+
+    // Send error response
+    res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+export const RejectForm = async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    // Find the user response by ID
+    const userRes = await userResponse.findById(id);
+
+    if (!userRes) {
+      return res.status(400).json({
+        message: "User Response is not found",
+      });
+    }
+
+    // Update the document to mark as accepted
+    const updatedRes = await userResponse.findByIdAndUpdate(
+      id,
+      { $set: { Rejected: true } }, // Update operation
+      { new: true } // Return the updated document
+    );
+
+    // Send success response
+    return res.status(200).json({
+      message: "Form Rejected",
+      data: updatedRes,
+    });
+  } catch (error) {
+    console.error("Error accepting form:", error);
+
+    // Send error response
+    res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+export const getAcceptedForm = async (req, res) => {
+  try {
+    const schemeID = req.params.id;
+
+    if (!schemeID) {
+      res.status(400).json({
+        message: "Invalid schemeID",
+      });
+    }
+    const applicants = await userResponse
+      .find({ schemeID, Accepted: true })
+      .populate({
+        path: "responses.key",
+        select: "label type",
+      });
+
+    res.status(200).json({
+      applicants,
+      message: "all applicants are send",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Internal Server Error",
+    });
+  }
+};
+
+export const getRejectedForm = async (req, res) => {
+  try {
+    const schemeID = req.params.id;
+
+    if (!schemeID) {
+      res.status(400).json({
+        message: "Invalid schemeID",
+      });
+    }
+    const applicants = await userResponse
+      .find({ schemeID, Rejected: true })
+      .populate({
+        path: "responses.key",
+        select: "label type",
+      });
+
+    res.status(200).json({
+      applicants,
+      message: "all applicants are send",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Internal Server Error",
     });
   }
 };
