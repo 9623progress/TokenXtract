@@ -10,6 +10,9 @@ import ViewAllSCheme from "./ViewAllSCheme";
 import CreateDepartment from "./createDepartment";
 import Accepted from "./Accepted";
 import Rejected from "./Rejected";
+import CreateContract from "./CreateContract";
+import ViewContracts from "./ViewContracts";
+import ViewTenders from "./ViewTenders";
 
 const CentralGovernment = () => {
   //create scheme
@@ -38,6 +41,12 @@ const CentralGovernment = () => {
       setActive(<Rejected />);
     } else if (type == "") {
       setActive(<CreateScheme />);
+    } else if (type == "create-contract") {
+      setActive(<CreateContract />);
+    } else if (type == "view-contracts") {
+      setActive(<ViewContracts />);
+    } else if (type == "view-Tenders") {
+      setActive(<ViewTenders />);
     }
   };
 
@@ -116,6 +125,33 @@ const CentralGovernment = () => {
               }}
             >
               <p>View Rejected </p>
+            </a>
+
+            <a
+              className="cg-fun-card"
+              onClick={() => {
+                HandleClick("create-contract");
+              }}
+            >
+              <p>Create Contract </p>
+            </a>
+
+            <a
+              className="cg-fun-card"
+              onClick={() => {
+                HandleClick("view-contracts");
+              }}
+            >
+              <p> view Contracts </p>
+            </a>
+
+            <a
+              className="cg-fun-card"
+              onClick={() => {
+                HandleClick("view-Tenders");
+              }}
+            >
+              <p>view Tenders </p>
             </a>
           </div>
         </div>

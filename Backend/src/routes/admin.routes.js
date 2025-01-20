@@ -1,11 +1,13 @@
 import express from "express";
 import {
   acceptForm,
+  createContract,
   createDepartment,
   createScheme,
   getAcceptedForm,
   getAllApplicationByScheme,
   getAllschemeByDepartment,
+  getContractByDepartment,
   getDepartment,
   getRejectedForm,
   getScheme,
@@ -27,5 +29,9 @@ router.patch("/accept-form/:id", acceptForm);
 router.patch("/reject-form/:id", RejectForm);
 router.get("/accepted-form/:id", getAcceptedForm);
 router.get("/rejected-form/:id", getRejectedForm);
-
+router.post("/create-contract", createContract);
+router.get(
+  "/get-contract-by-department/:departmentID",
+  getContractByDepartment
+);
 export default router;

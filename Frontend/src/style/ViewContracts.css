@@ -1,0 +1,26 @@
+.view-contracts-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.apply-button {
+    padding: 8px 12px;
+    border: none;
+    background-color: #27005D;
+    color: white;
+    margin-right: 5px;
+    border-radius: 5px;
+    font-weight: 500;
+    font-size: 1.05rem;
+    margin: 10px;
+    border: 1px solid #27005D;
+    cursor: pointer;
+}
+
+.apply-button:hover {
+    background-color: white;
+    color: #27005D;
+
+}

@@ -1,6 +1,7 @@
-import { department } from "../models/department.modal.js";
+import { department } from "../models/department.model.js";
 import { formFieldSchem, scheme } from "../models/scheme.model.js";
-import { userResponse } from "../models/user.model.js";
+import { User, userResponse } from "../models/user.model.js";
+import { contract, contractorApplication } from "../models/contract.model.js";
 
 // functions to implement
 //1.create scheme
@@ -449,6 +450,210 @@ export const getRejectedForm = async (req, res) => {
     console.log(error);
     res.status(500).json({
       message: "Internal Server Error",
+    });
+  }
+};
+
+// Create Contract
+export const createContract = async (req, res) => {
+  const {
+    departmentID,
+    contractName,
+    budget,
+    state,
+    district,
+    city,
+    localAddress,
+    startDate,
+    endDate,
+    legalRules,
+    stages,
+  } = req.body;
+
+  if (
+    !departmentID ||
+    !contractName ||
+    !state ||
+    !district ||
+    !city ||
+    !localAddress ||
+    !startDate ||
+    !endDate ||
+    !budget ||
+    !legalRules ||
+    !stages
+  ) {
+    return res.status(400).json({
+      message: "All fields are required",
+    });
+  }
+
+  console.log(stages);
+
+  if (
+    !Array.isArray(stages) ||
+    !stages.every(
+      (stage) =>
+        stage &&
+        typeof stage.stageName === "string" &&
+        typeof Number(stage.percentage) === "number" &&
+        !isNaN(Number(stage.percentage)) &&
+        stage.percentage >= 0 &&
+        stage.percentage <= 100
+    )
+  ) {
+    return res.status(400).json({
+      message:
+        "Stages must be an array of objects with valid stageName and percentage (0-100).",
+    });
+  }
+
+  try {
+    const newContract = new contract({
+      departmentID,
+      contractName,
+      budget,
+      state,
+      district,
+      city,
+      localAddress,
+      startDate,
+      endDate,
+      legalRules,
+      stages,
+    });
+
+    await newContract.save();
+
+    return res.status(201).json({
+      message: "Contract created successfully",
+      contract: newContract,
+    });
+  } catch (error) {
+    console.error("Error creating contract:", error.message);
+    return res.status(500).json({
+      message: "Failed to create contract",
+      error: error.message,
+    });
+  }
+};
+
+// Apply for Contract
+export const applyForContract = async (req, res) => {
+  try {
+    const { pdf, budget } = req.body;
+    const { contractId } = req.params;
+
+    if (!pdf || !budget) {
+      return res.status(400).json({
+        message: "All fields are required",
+      });
+    }
+
+    const contractExist = await contract.findById(contractId);
+
+    if (!contractExist) {
+      return res.status(404).json({
+        message: "Contract not found",
+      });
+    }
+
+    const newApplication = new contractorApplication({
+      contractId,
+      pdf,
+      budget,
+    });
+
+    await newApplication.save();
+
+    return res.status(200).json({ message: "Applied successfully" });
+  } catch (error) {
+    console.error("Error applying for contract:", error.message);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
+// Assign Contract
+export const assignContract = async (req, res) => {
+  try {
+    const { contractId } = req.params;
+    const { contractorId } = req.body;
+
+    const contractExist = await contract.findById(contractId);
+    if (!contractExist) {
+      return res.status(404).json({
+        message: "Contract does not exist",
+      });
+    }
+
+    const contractorExist = await User.findById(contractorId);
+    if (!contractorExist) {
+      return res.status(404).json({
+        message: "Contractor does not exist",
+      });
+    }
+
+    await contract.findByIdAndUpdate(contractId, {
+      $set: { contractor: contractorId },
+    });
+
+    return res.status(200).json({
+      message: "Contract assigned successfully",
+    });
+  } catch (error) {
+    console.error("Error assigning contract:", error.message);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
+// Get Contracts by Department
+export const getContractByDepartment = async (req, res) => {
+  try {
+    const { departmentID } = req.params;
+
+    const contracts = await contract.find({ departmentID });
+
+    if (contracts.length === 0) {
+      return res.status(404).json({
+        message: "No contracts found for this department",
+      });
+    }
+
+    return res.status(200).json(contracts);
+  } catch (error) {
+    console.error("Error fetching contracts by department:", error.message);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
+// View Contract Applications
+export const viewContractApplication = async (req, res) => {
+  try {
+    const { contractId } = req.params;
+
+    const applications = await contractorApplication.find({ contractId });
+
+    if (applications.length === 0) {
+      return res.status(404).json({
+        message: "No applications found for this contract",
+      });
+    }
+
+    return res.status(200).json(applications);
+  } catch (error) {
+    console.error("Error fetching contract applications:", error.message);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error.message,
     });
   }
 };
