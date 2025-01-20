@@ -1,6 +1,7 @@
 import express from "express";
 import {
   acceptForm,
+  assignContract,
   createContract,
   createDepartment,
   createScheme,
@@ -13,6 +14,7 @@ import {
   getScheme,
   RejectForm,
   updateScheme,
+  viewContractApplication,
 } from "../Controllers/admin.controller.js";
 import upload from "../middlewares/multer.js";
 
@@ -34,4 +36,6 @@ router.get(
   "/get-contract-by-department/:departmentID",
   getContractByDepartment
 );
+router.get("/get-contracts/:contractId", viewContractApplication);
+router.post("/assignContract/:contractId", assignContract);
 export default router;

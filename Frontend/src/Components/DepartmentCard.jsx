@@ -7,6 +7,10 @@ const DepartmentCard = ({ title, des, image, id }) => {
 
   const handleImageClick = () => {
     // Passing the data as state to the /scheme route
+    if (title == "Contract") {
+      navigate("/view-contracts");
+      return;
+    }
     navigate("/scheme", {
       state: { id }, // Pass the state to the SchemePage
     });

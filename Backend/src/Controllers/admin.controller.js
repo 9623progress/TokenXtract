@@ -538,50 +538,12 @@ export const createContract = async (req, res) => {
   }
 };
 
-// Apply for Contract
-export const applyForContract = async (req, res) => {
-  try {
-    const { pdf, budget } = req.body;
-    const { contractId } = req.params;
-
-    if (!pdf || !budget) {
-      return res.status(400).json({
-        message: "All fields are required",
-      });
-    }
-
-    const contractExist = await contract.findById(contractId);
-
-    if (!contractExist) {
-      return res.status(404).json({
-        message: "Contract not found",
-      });
-    }
-
-    const newApplication = new contractorApplication({
-      contractId,
-      pdf,
-      budget,
-    });
-
-    await newApplication.save();
-
-    return res.status(200).json({ message: "Applied successfully" });
-  } catch (error) {
-    console.error("Error applying for contract:", error.message);
-    return res.status(500).json({
-      message: "Internal server error",
-      error: error.message,
-    });
-  }
-};
-
 // Assign Contract
 export const assignContract = async (req, res) => {
   try {
     const { contractId } = req.params;
     const { contractorId } = req.body;
-
+    // console.log(contractorId);
     const contractExist = await contract.findById(contractId);
     if (!contractExist) {
       return res.status(404).json({
@@ -616,7 +578,6 @@ export const assignContract = async (req, res) => {
 export const getContractByDepartment = async (req, res) => {
   try {
     const { departmentID } = req.params;
-
     const contracts = await contract.find({ departmentID });
 
     if (contracts.length === 0) {
@@ -640,7 +601,9 @@ export const viewContractApplication = async (req, res) => {
   try {
     const { contractId } = req.params;
 
-    const applications = await contractorApplication.find({ contractId });
+    const applications = await contractorApplication
+      .find({ contractId })
+      .populate("userId");
 
     if (applications.length === 0) {
       return res.status(404).json({

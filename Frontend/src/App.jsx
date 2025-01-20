@@ -22,6 +22,7 @@ import { useDispatch } from "react-redux";
 import { logout } from "./ReduxStore/reduxSlice/userSlice";
 import SchemeForm from "./Components/SchemeForm";
 import UpdateScheme from "./Components/UpdateScheme";
+import ViewContracts from "./Components/ViewContracts";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -100,6 +101,10 @@ const App = () => {
         {
           path: "/scheme-form",
           element: <SchemeForm />,
+        },
+        {
+          path: "/view-contracts",
+          element: <ViewContracts />,
         },
       ],
     },

@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  applyForContract,
   getSchemeForm,
   login,
   logout,
@@ -20,5 +21,7 @@ router.get("/isAuthenticated", isAuthenticated);
 router.get("/getForm/:schemeID", getSchemeForm);
 router.post("/submit", upload.any(), submitForm);
 router.get("/profile/:id", userProfile);
+
+router.post("/fill-tender/:userId", upload.single("file"), applyForContract);
 
 export default router;

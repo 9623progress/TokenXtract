@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { scheme } from "../models/scheme.model.js";
 import cloudinary from "../config/cloudinary.js";
+import { contract, contractorApplication } from "../models/contract.model.js";
 
 export const login = async (req, res) => {
   try {
@@ -209,4 +210,54 @@ export const userProfile = async (req, res) => {
       role: user.role,
     },
   });
+};
+
+export const applyForContract = async (req, res) => {
+  try {
+    const { budget, contractId } = req.body;
+    const { userId } = req.params;
+    const pdf = req.file?.path;
+    console.log(req.file);
+    const budgetValue = parseFloat(budget);
+    // Validate required fields
+    if (!pdf || isNaN(budgetValue)) {
+      return res.status(400).json({
+        message: "Valid budget and pdf file are required",
+      });
+    }
+
+    // Check if user and contract exist
+    const userExist = await User.findById(userId);
+    const contractExist = await contract.findById(contractId);
+
+    if (!contractExist) {
+      return res.status(404).json({
+        message: "Contract not found",
+      });
+    }
+
+    if (!userExist) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    // Create a new contractor application
+    const newApplication = new contractorApplication({
+      userId,
+      contractId,
+      pdf,
+      Budget: budget,
+    });
+
+    await newApplication.save();
+
+    return res.status(200).json({ message: "Applied successfully" });
+  } catch (error) {
+    console.error("Error applying for contract:", error.message);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
 };

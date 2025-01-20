@@ -69,9 +69,13 @@ const contractSchema = new mongoose.Schema(
 );
 
 const ContractorApplicationSchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
   contractId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "contract",
+    ref: "contracts",
   },
   pdf: {
     type: String,
