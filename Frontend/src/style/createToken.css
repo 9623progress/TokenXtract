@@ -1,0 +1,42 @@
+.create-token-input {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px
+}
+
+
+.create-token-top-div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    height: 80vh;
+}
+
+.create-token-box {
+    border: 1px solid #ccc;
+    padding: 30px 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    border-radius: 10px;
+}
+
+
+.create-token-button {
+    padding: 10px;
+    border: 1px solid var(--secondary-color);
+    background-color: var(--secondary-color);
+    color: white;
+    font-weight: 500;
+    font-size: 1.1rem;
+    border-radius: 5px;
+}
+
+.create-token-button:hover {
+    background-color: white;
+    color: var(--secondary-color);
+}

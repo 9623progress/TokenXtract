@@ -5,6 +5,8 @@ import {
   createContract,
   createDepartment,
   createScheme,
+  createToken,
+  disburseFundsBulk,
   getAcceptedForm,
   getAllApplicationByScheme,
   getAllschemeByDepartment,
@@ -38,4 +40,6 @@ router.get(
 );
 router.get("/get-contracts/:contractId", viewContractApplication);
 router.post("/assignContract/:contractId", assignContract);
+router.post("/create-token", createToken);
+router.post("/fund-transfer", disburseFundsBulk);
 export default router;

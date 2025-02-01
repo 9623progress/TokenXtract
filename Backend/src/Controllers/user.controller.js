@@ -56,6 +56,7 @@ export const login = async (req, res) => {
         name: user.name,
         adhar: user.adhar,
         role: user.role,
+        Token: user.Token,
       }, // Excluding password from the response
     });
   } catch (error) {

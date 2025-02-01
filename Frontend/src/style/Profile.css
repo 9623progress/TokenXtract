@@ -1,0 +1,45 @@
+.profile-container {
+    margin: 120px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+}
+
+.profile-initial {
+    font-size: 50px;
+    font-weight: 400;
+    background-color: #f0f0f0;
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.profile-line {
+    border: 1px solid #ccc;
+}
+
+.profile-box {
+    border: 1px solid #ccc;
+    padding: 80px;
+    border-radius: 10px;
+}
+
+.profile-name {
+    font-size: 24px;
+    margin-top: 10px;
+}
+
+.profile-details {
+    font-size: 18px;
+    margin-top: 20px;
+}
+
+.profile-details span {
+    font-weight: 400;
+}

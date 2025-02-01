@@ -11,6 +11,8 @@ const Accepted = () => {
   const [selectedScheme, setSelectedScheme] = useState("");
   const [applicants, setApplicants] = useState([]);
 
+  const id = useSelector((state) => state.user.user.id);
+
   const fetch = useCallback(async (department_id) => {
     try {
       const response = await axios.get(
@@ -42,6 +44,27 @@ const Accepted = () => {
   const HandleView = (data) => {
     const newTab = window.open(data, "_blank");
     newTab.focus();
+  };
+
+  const handleDisburstFund = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/v1/admin/fund-transfer",
+        {
+          schemeId: selectedScheme,
+          adminId: id,
+        }
+      );
+
+      console.log(response);
+
+      if (response.status == 200) {
+        toast.success(response.data.success);
+        setApplicants([]);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const fetchApplications = useCallback(async (scheme_id) => {
@@ -103,31 +126,33 @@ const Accepted = () => {
     );
 
     return (
-      <table border="1">
-        <thead>
-          <tr>
-            {headers && headers.map((header) => <th key={header}>{header}</th>)}
-            {/* <th>Actions</th> */}
-          </tr>
-        </thead>
-        <tbody>
-          {sortedApplicants.map((applicant) => (
-            <tr key={applicant._id}>
-              {applicant.responses.map((res) => (
-                <td key={res.key._id}>
-                  {res.key.type === "image" ? (
-                    <button
-                      className="view-application-button"
-                      onClick={() => HandleView(res.value)}
-                    >
-                      View
-                    </button>
-                  ) : (
-                    res.value
-                  )}
-                </td>
-              ))}
-              {/* <td>
+      <div>
+        <table border="1">
+          <thead>
+            <tr>
+              {headers &&
+                headers.map((header) => <th key={header}>{header}</th>)}
+              {/* <th>Actions</th> */}
+            </tr>
+          </thead>
+          <tbody>
+            {sortedApplicants.map((applicant) => (
+              <tr key={applicant._id}>
+                {applicant.responses.map((res) => (
+                  <td key={res.key._id}>
+                    {res.key.type === "image" ? (
+                      <button
+                        className="view-application-button"
+                        onClick={() => HandleView(res.value)}
+                      >
+                        View
+                      </button>
+                    ) : (
+                      res.value
+                    )}
+                  </td>
+                ))}
+                {/* <td>
                 <button
                   className=" accept"
                   onClick={() => handleAccept(applicant._id)}
@@ -143,10 +168,13 @@ const Accepted = () => {
                   Reject
                 </button>
               </td> */}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        <button onClick={handleDisburstFund}>Disburst Fund</button>
+      </div>
     );
   };
 
