@@ -7,7 +7,7 @@ import ViewApplication from "./ViewApplication";
 import CreateToken from "./CreateToken";
 import ViewBankRequest from "./ViewBankRequests";
 import ViewAllSCheme from "./ViewAllSCheme";
-import CreateDepartment from "./createDepartment";
+import CreateDepartment from "./CreateDepartment";
 import Accepted from "./Accepted";
 import Rejected from "./Rejected";
 import CreateContract from "./CreateContract";

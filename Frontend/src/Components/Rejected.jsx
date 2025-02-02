@@ -14,7 +14,8 @@ const Rejected = () => {
   const fetch = useCallback(async (department_id) => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/v1/admin/get-scheme/${department_id}`
+        `http://localhost:5000/api/v1/admin/get-scheme/${department_id}`,
+        { withCredentials: true }
       );
 
       if (response.status === 200) {
@@ -22,6 +23,7 @@ const Rejected = () => {
       }
     } catch (error) {
       console.error("Error fetching schemes:", error);
+      toast.error(error.response.data.message);
     }
   }, []);
 
@@ -47,13 +49,15 @@ const Rejected = () => {
   const fetchApplications = useCallback(async (scheme_id) => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/v1/admin/rejected-form/${scheme_id}`
+        `http://localhost:5000/api/v1/admin/rejected-form/${scheme_id}`,
+        { withCredentials: true }
       );
       if (response.status === 200) {
         setApplicants(response.data.applicants);
       }
     } catch (error) {
       console.error("Error fetching applications:", error);
+      toast.error(error.response.data.message);
     }
   }, []);
 

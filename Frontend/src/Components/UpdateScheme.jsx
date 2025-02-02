@@ -122,10 +122,11 @@ const UpdateScheme = () => {
 
       const response = await axios.put(
         `http://localhost:5000/api/v1/admin/update-scheme/${schemeId}`,
-        payload
+        payload,
+        { withCredentials: true }
       );
 
-      console.log(response);
+      // console.log(response);
 
       toast.success(response.data.message);
     } catch (error) {

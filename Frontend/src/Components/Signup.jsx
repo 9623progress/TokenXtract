@@ -56,7 +56,8 @@ const Signup = () => {
           adhar,
           mobile,
           password,
-        }
+        },
+        { withCredentials: true }
       );
 
       if (response.status === 201) {

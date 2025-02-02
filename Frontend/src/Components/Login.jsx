@@ -50,8 +50,8 @@ const Login = () => {
         toast.warn(response.data.message || "Invalid Aadhaar or password.");
       }
     } catch (error) {
-      console.error("Login error:", error);
-      toast.error("Server error. Please try again later.");
+      console.error("Login error:", error.response.data.message);
+      toast.error(error.response.data.message);
     }
   };
 

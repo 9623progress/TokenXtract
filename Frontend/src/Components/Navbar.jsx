@@ -11,20 +11,27 @@ const Navbar = () => {
   const { user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const logoutHandler = async () => {
-    const response = await axios.post(
-      "http://localhost:5000/api/v1/user/logout",
-      {
-        withCredentials: true,
-      }
-    );
-    console.log(response);
-    if ((response.status = 200)) {
-      dispatch(logout());
-    }
 
-    navigate("./");
+  const logoutHandler = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/v1/user/logout",
+        {},
+        {
+          withCredentials: true,
+        }
+      );
+      console.log(response);
+      if (response.status === 200) {
+        dispatch(logout());
+      }
+
+      navigate("./");
+    } catch (error) {
+      console.log(error);
+    }
   };
+
   return (
     <div className="navbar-top">
       <div className="navbar-logo">

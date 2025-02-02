@@ -18,6 +18,9 @@ const CreateToken = () => {
         {
           TokenAmount: token,
           userId: id,
+        },
+        {
+          withCredentials: true,
         }
       );
 
@@ -29,6 +32,7 @@ const CreateToken = () => {
       }
     } catch (error) {
       console.log(error);
+      toast.error(error.response.data.message);
     }
   };
 

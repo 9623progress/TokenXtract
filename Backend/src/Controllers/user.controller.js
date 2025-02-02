@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import { scheme } from "../models/scheme.model.js";
 import cloudinary from "../config/cloudinary.js";
 import { contract, contractorApplication } from "../models/contract.model.js";
+import mongoose from "mongoose";
 
 export const login = async (req, res) => {
   try {
@@ -36,12 +37,11 @@ export const login = async (req, res) => {
 
     // Create a JWT token
     const token = jwt.sign(
-      { id: user._id, name: user.name, adhar: user.adhar },
+      { id: user._id, name: user.name, adhar: user.adhar, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: "5h" }
     );
 
-    // Set the token in an HTTP-only cookie
     res.cookie("auth_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -117,8 +117,9 @@ export const register = async (req, res) => {
 export const logout = (req, res) => {
   res.clearCookie("auth_token", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    secure: process.env.NODE_ENV === "production", // If you're in production, use HTTPS
+    sameSite: "Strict", // Optional, if you need stricter cookie handling
+    path: "/", // Ensure it matches the path used when setting the cookie
   });
 
   res.status(200).json({ message: "Logout successful" });
@@ -142,7 +143,8 @@ export const getSchemeForm = async (req, res) => {
 export const submitForm = async (req, res) => {
   try {
     const { userID, schemeID } = req.body; // Extract userID and schemeID from the body
-
+    // console.log(req.body);
+    // console.log(req.files);
     if (!userID || !schemeID) {
       return res.status(400).json({ message: "Missing userID or schemeID" });
     }
@@ -169,10 +171,13 @@ export const submitForm = async (req, res) => {
       });
     });
 
+    const userIDObj = new mongoose.Types.ObjectId(userID);
+    const schemeIDObj = new mongoose.Types.ObjectId(schemeID);
+
     // Save responses in the database
     const UserResponse = new userResponse({
-      userID,
-      schemeID,
+      userID: userIDObj,
+      schemeID: schemeIDObj,
       responses,
     });
 
@@ -180,8 +185,13 @@ export const submitForm = async (req, res) => {
 
     return res.status(200).json({ message: "Form submitted successfully" });
   } catch (error) {
-    console.error("Error submitting form", error);
-    return res.status(500).json({ message: "Error submitting form", error });
+    console.error(
+      "Error submitting form:",
+      error.stack || error.message || error
+    );
+    return res
+      .status(500)
+      .json({ message: "Internal Server Error", error: error.message });
   }
 };
 

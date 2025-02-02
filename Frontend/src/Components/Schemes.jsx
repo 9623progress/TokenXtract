@@ -12,7 +12,8 @@ const Schemes = () => {
   const fetch = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/v1/admin//get-scheme/${id}`
+        `http://localhost:5000/api/v1/admin//get-scheme/${id}`,
+        { withCredentials: true }
       );
       console.log(response);
       if (response.status == 200) {

@@ -2,11 +2,13 @@ import React, { useState } from "react";
 import "../style/createDepartment.css";
 import axios from "axios";
 import { toast } from "react-toastify";
+import Loader from "./Loader";
 
 const CreateDepartment = () => {
   const [departmentName, setDeapartmentName] = useState("");
   const [des, setDes] = useState("");
   const [file, setFile] = useState("");
+  const [loading, setLoading] = useState(false);
   const handleClick = () => {
     document.getElementById("dep-hidden-button").click();
   };
@@ -23,6 +25,7 @@ const CreateDepartment = () => {
 
   const handleSubmit = async () => {
     try {
+      setLoading(true);
       const formData = new FormData();
       formData.append("departmentName", departmentName);
       formData.append("image", file);
@@ -38,13 +41,18 @@ const CreateDepartment = () => {
         }
       );
 
-      if (response.data.status === 200) {
+      if (response.status == 200) {
         toast.success(response.data.message);
+        setDeapartmentName("");
+        setDes("");
+        setFile("");
       }
 
       console.log(response);
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
   return (
@@ -86,9 +94,15 @@ const CreateDepartment = () => {
           <button className="dep-button" onClick={handleClick}>
             Choose Department logo
           </button>
-          <button className="dep-button" onClick={handleSubmit}>
-            submit
-          </button>
+          {!loading ? (
+            <button className="dep-button" onClick={handleSubmit}>
+              submit
+            </button>
+          ) : (
+            <button className="dep-button">
+              <Loader />
+            </button>
+          )}
         </div>
       </div>
     </div>

@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import axios from "axios"; // For API requests
 
 import { toast } from "react-toastify";
+import Loader from "./Loader";
 
 const CreateScheme = () => {
   const [selectedDepartment, setSelectedDepartment] = useState(null);
@@ -71,12 +72,14 @@ const CreateScheme = () => {
     setMessage("");
 
     try {
-      const formTemplate = departmentFields.map((field) => ({
-        label: field.label,
-        uniqueName: field.name,
-        type: field.type,
-        options: field.type === "radio" ? field.options : undefined,
-      }));
+      const formTemplate =
+        departmentFields &&
+        departmentFields.map((field) => ({
+          label: field.label,
+          uniqueName: field.name,
+          type: field.type,
+          options: field.type === "radio" ? field.options : undefined,
+        }));
 
       const payload = {
         departmentID: selectedDepartment,
@@ -91,8 +94,13 @@ const CreateScheme = () => {
 
       const response = await axios.post(
         "http://localhost:5000/api/v1/admin/create-scheme",
-        payload
+        payload,
+        { withCredentials: true }
       );
+
+      if (response.status == 200) {
+        setDepartmentFields("");
+      }
       toast.success(response.data.message);
     } catch (error) {
       toast.error(
@@ -221,70 +229,71 @@ const CreateScheme = () => {
           />
         </div>
 
-        {departmentFields.map((field, index) => (
-          <div key={index} className="scheme-custom-field">
-            <label>Field Label:</label>
-            <input
-              type="text"
-              name="label"
-              value={field.label}
-              onChange={(e) => handleFieldChange(e, index)}
-              placeholder="Field Label"
-            />
-            <label>Field Name:</label>
-            <input
-              type="text"
-              name="name"
-              value={field.name}
-              onChange={(e) => handleFieldChange(e, index)}
-              placeholder="Field Name"
-            />
-            <label>Field Type:</label>
-            <select
-              name="type"
-              value={field.type}
-              onChange={(e) => handleFieldChange(e, index)}
-            >
-              <option value="text">Text</option>
-              <option value="number">Number</option>
-              <option value="date">Date</option>
-              <option value="image">Image</option>
-              <option value="radio">Radio</option>
-            </select>
+        {departmentFields &&
+          departmentFields.map((field, index) => (
+            <div key={index} className="scheme-custom-field">
+              <label>Field Label:</label>
+              <input
+                type="text"
+                name="label"
+                value={field.label}
+                onChange={(e) => handleFieldChange(e, index)}
+                placeholder="Field Label"
+              />
+              <label>Field Name:</label>
+              <input
+                type="text"
+                name="name"
+                value={field.name}
+                onChange={(e) => handleFieldChange(e, index)}
+                placeholder="Field Name"
+              />
+              <label>Field Type:</label>
+              <select
+                name="type"
+                value={field.type}
+                onChange={(e) => handleFieldChange(e, index)}
+              >
+                <option value="text">Text</option>
+                <option value="number">Number</option>
+                <option value="date">Date</option>
+                <option value="image">Image</option>
+                <option value="radio">Radio</option>
+              </select>
 
-            {field.type === "radio" && (
-              <div>
-                <label>Radio Options:</label>
-                {field.options.map((option, optionIndex) => (
-                  <div key={optionIndex}>
-                    <input
-                      type="text"
-                      value={option}
-                      onChange={(e) =>
-                        handleRadioOptionChange(e, index, optionIndex)
-                      }
-                      placeholder={`Option ${optionIndex + 1}`}
-                    />
-                  </div>
-                ))}
-                <button
-                  type="button"
-                  className="scheme-button"
-                  onClick={() => addRadioOption(index)}
-                >
-                  Add Option
-                </button>
-              </div>
-            )}
+              {field.type === "radio" && (
+                <div>
+                  <label>Radio Options:</label>
+                  {field.options.map((option, optionIndex) => (
+                    <div key={optionIndex}>
+                      <input
+                        type="text"
+                        value={option}
+                        onChange={(e) =>
+                          handleRadioOptionChange(e, index, optionIndex)
+                        }
+                        placeholder={`Option ${optionIndex + 1}`}
+                      />
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    className="scheme-button"
+                    onClick={() => addRadioOption(index)}
+                  >
+                    Add Option
+                  </button>
+                </div>
+              )}
 
-            <button
-              className="scheme-button"
-              onClick={() => removeField(index)}
-            >
-              Remove
-            </button>
-          </div>
-        ))}
+              <button
+                className="scheme-button"
+                onClick={() => removeField(index)}
+              >
+                Remove
+              </button>
+            </div>
+          ))}
 
         <button className="scheme-button" onClick={addField}>
           Add Custom Field
@@ -318,13 +327,14 @@ const CreateScheme = () => {
               <td>Number</td>
               <td>amountPerUser</td>
             </tr>
-            {departmentFields.map((field, index) => (
-              <tr key={index}>
-                <td>{field.label}</td>
-                <td>{field.type}</td>
-                <td>{field.name}</td>
-              </tr>
-            ))}
+            {departmentFields &&
+              departmentFields.map((field, index) => (
+                <tr key={index}>
+                  <td>{field.label}</td>
+                  <td>{field.type}</td>
+                  <td>{field.name}</td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>
@@ -335,7 +345,7 @@ const CreateScheme = () => {
         onClick={saveSchemeTemplate}
         disabled={loading}
       >
-        {loading ? "Saving..." : "Save Scheme Template"}
+        {loading ? <Loader /> : "Save Scheme Template"}
       </button>
     </div>
   );

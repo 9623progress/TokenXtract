@@ -16,7 +16,8 @@ const ViewAllSCheme = () => {
 
     if (e.target.value != "") {
       const response = await axios.get(
-        `http://localhost:5000/api/v1/admin//get-scheme/${e.target.value}`
+        `http://localhost:5000/api/v1/admin//get-scheme/${e.target.value}`,
+        { withCredentials: true }
       );
 
       if (response.status == 200) {

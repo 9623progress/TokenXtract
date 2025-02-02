@@ -14,7 +14,8 @@ const ViewApplication = () => {
   const fetch = useCallback(async (department_id) => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/v1/admin/get-scheme/${department_id}`
+        `http://localhost:5000/api/v1/admin/get-scheme/${department_id}`,
+        { withCredentials: true }
       );
 
       if (response.status === 200) {
@@ -47,7 +48,8 @@ const ViewApplication = () => {
   const fetchApplications = useCallback(async (scheme_id) => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/v1/admin/get-applications/${scheme_id}`
+        `http://localhost:5000/api/v1/admin/get-applications/${scheme_id}`,
+        { withCredentials: true }
       );
       if (response.status === 200) {
         setApplicants(response.data.applicants);
@@ -60,7 +62,9 @@ const ViewApplication = () => {
   const handleAccept = async (applicantId) => {
     try {
       const response = await axios.patch(
-        `http://localhost:5000/api/v1/admin/accept-form/${applicantId}`
+        `http://localhost:5000/api/v1/admin/accept-form/${applicantId}`,
+        {},
+        { withCredentials: true }
       );
       if (response.status == 200) {
         toast.success(response.data.message || "Form accepted");
@@ -73,7 +77,9 @@ const ViewApplication = () => {
   const handleReject = async (applicantId) => {
     try {
       const response = await axios.patch(
-        `http://localhost:5000/api/v1/admin/reject-form/${applicantId}`
+        `http://localhost:5000/api/v1/admin/reject-form/${applicantId}`,
+        {},
+        { withCredentials: true }
       );
       if (response.status == 200) {
         toast.success(response.data.message || "Form rejected");

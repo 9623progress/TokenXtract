@@ -16,7 +16,8 @@ const Accepted = () => {
   const fetch = useCallback(async (department_id) => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/v1/admin/get-scheme/${department_id}`
+        `http://localhost:5000/api/v1/admin/get-scheme/${department_id}`,
+        { withCredentials: true }
       );
 
       if (response.status === 200) {
@@ -24,6 +25,7 @@ const Accepted = () => {
       }
     } catch (error) {
       console.error("Error fetching schemes:", error);
+      toast.error(error.response.data.message);
     }
   }, []);
 
@@ -53,6 +55,9 @@ const Accepted = () => {
         {
           schemeId: selectedScheme,
           adminId: id,
+        },
+        {
+          withCredentials: true,
         }
       );
 
@@ -64,19 +69,22 @@ const Accepted = () => {
       }
     } catch (error) {
       console.log(error);
+      toast.error(error.response.data.message);
     }
   };
 
   const fetchApplications = useCallback(async (scheme_id) => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/v1/admin/accepted-form/${scheme_id}`
+        `http://localhost:5000/api/v1/admin/accepted-form/${scheme_id}`,
+        { withCredentials: true }
       );
       if (response.status === 200) {
         setApplicants(response.data.applicants);
       }
     } catch (error) {
       console.error("Error fetching applications:", error);
+      toast.error(error.response.data.message);
     }
   }, []);
 

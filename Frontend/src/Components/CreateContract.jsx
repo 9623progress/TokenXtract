@@ -80,7 +80,8 @@ const CreateContract = () => {
     try {
       const response = await axios.post(
         `http://localhost:5000/api/v1/admin/create-contract`,
-        contractData
+        contractData,
+        { withCredentials: true }
       );
 
       // console.log(response);
@@ -104,6 +105,7 @@ const CreateContract = () => {
       }
     } catch (error) {
       console.log(error);
+      toast.error(error.response.data.message);
     }
   };
 

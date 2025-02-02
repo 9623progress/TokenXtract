@@ -5,6 +5,8 @@ import "../style/Department.css";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { setDepartments } from "../ReduxStore/reduxSlice/department.js";
+import Loader from "./Loader.jsx";
+import { toast } from "react-toastify";
 
 const Department = () => {
   const dispatch = useDispatch();
@@ -23,6 +25,7 @@ const Department = () => {
       }
     } catch (error) {
       console.log(error);
+      toast.error(error.response.data.message);
     }
   };
   useEffect(() => {
@@ -30,7 +33,7 @@ const Department = () => {
   }, []);
 
   if (dep == null) {
-    return <div>Loading....</div>;
+    return <Loader></Loader>;
   }
   return (
     <div className="department">

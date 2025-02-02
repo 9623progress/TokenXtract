@@ -37,7 +37,8 @@ const ViewTenders = () => {
   const fetchTenders = async (contractId) => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/v1/admin/get-contracts/${contractId}`
+        `http://localhost:5000/api/v1/admin/get-contracts/${contractId}`,
+        { withCredentials: true }
       );
 
       // console.log(response.data);
@@ -54,13 +55,15 @@ const ViewTenders = () => {
     try {
       const response = await axios.post(
         `http://localhost:5000/api/v1/admin/assignContract/${selctedContractId}`,
-        { contractorId }
+        { contractorId },
+        { withCredentials: true }
       );
 
       if (response.status == 200) {
         toast.success(response.data.message);
       }
     } catch (error) {
+      toast.error(error.response.data.message);
       console.log(error);
     }
   };

@@ -4,19 +4,22 @@ import { useLocation } from "react-router-dom";
 import "../style/schemeForm.css";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import Loader from "./Loader";
+import Modal from "./Modal.jsx";
 
 const SchemeForm = () => {
   const location = useLocation();
   const { id, schemeName } = location.state;
   const [form, setForm] = useState([]);
   const [responses, setResponses] = useState([]); // To store user input
-  const userID = useSelector((state) => state.user.user.id);
+  const userID = useSelector((state) => state.user?.user?.id);
   const [loading, setloading] = useState(false);
 
   const fetch = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/v1/user/getForm/${id}`
+        `http://localhost:5000/api/v1/user/getForm/${id}`,
+        { withCredentials: true }
       );
       if (response.status === 200) {
         setForm(response.data.form);
@@ -46,7 +49,11 @@ const SchemeForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // if (!userID) {
+    //   toast.error("Login Please");
 
+    //   return;
+    // }
     // Prepare FormData
     const formData = new FormData();
     formData.append("userID", userID);
@@ -68,6 +75,7 @@ const SchemeForm = () => {
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
+          withCredentials: true,
         }
       );
 
@@ -77,6 +85,7 @@ const SchemeForm = () => {
 
       console.log("Form submitted successfully", res.data);
     } catch (error) {
+      toast.error(error.response.data.message);
       console.error("Error submitting form", error);
     } finally {
       setloading(false);
@@ -86,6 +95,15 @@ const SchemeForm = () => {
   useEffect(() => {
     fetch();
   }, []);
+
+  // if (loading) {
+  //   return (
+  //     <Modal>
+  //       <Loader />
+  //       <p>Wait form is submitting</p>
+  //     </Modal>
+  //   );
+  // }
 
   return (
     <div className="form-top">
@@ -157,7 +175,7 @@ const SchemeForm = () => {
             </button>
           ) : (
             <button type="submit" className="scheme-form-submit">
-              Submitting please wait....
+              <Loader />
             </button>
           )}
         </form>
