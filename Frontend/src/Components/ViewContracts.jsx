@@ -25,7 +25,8 @@ const ViewContracts = () => {
 
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/v1/admin/get-contract-by-department/${departmentId}`
+        `http://localhost:5000/api/v1/admin/get-contract-by-department/${departmentId}`,
+        { withCredentials: true }
       );
 
       console.log(response);
@@ -51,7 +52,8 @@ const ViewContracts = () => {
     try {
       const response = await axios.post(
         `http://localhost:5000/api/v1/user/fill-tender/${userId}`,
-        formData
+        formData,
+        { withCredentials: true }
       );
 
       if (response.status == 200) {
@@ -60,6 +62,7 @@ const ViewContracts = () => {
 
       console.log(response);
     } catch (error) {
+      toast.error(error.response.data.message);
       console.log(error);
     } finally {
       setLoading(false);
