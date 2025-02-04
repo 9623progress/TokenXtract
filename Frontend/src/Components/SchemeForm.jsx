@@ -108,78 +108,82 @@ const SchemeForm = () => {
   return (
     <div className="form-top">
       <h1 className="form-heading">{`${schemeName} Application Form`}</h1>
-      <div className="form-div">
-        <form onSubmit={handleSubmit}>
-          {form.map((field) => (
-            <div key={field._id} style={{ marginBottom: "15px" }}>
-              <label>{field.label}:</label>
+      {form.length > 0 ? (
+        <div className="form-div">
+          <form onSubmit={handleSubmit}>
+            {form.map((field) => (
+              <div key={field._id} style={{ marginBottom: "15px" }}>
+                <label>{field.label}:</label>
 
-              {/* Handle text input */}
-              {field.type === "text" && (
-                <input
-                  type="text"
-                  required={field.required}
-                  onChange={(e) =>
-                    handleInputChange(e, field._id, "text", field.uniqueName)
-                  }
-                  style={{ width: "100%", padding: "8px", marginTop: "5px" }}
-                />
-              )}
+                {/* Handle text input */}
+                {field.type === "text" && (
+                  <input
+                    type="text"
+                    required={field.required}
+                    onChange={(e) =>
+                      handleInputChange(e, field._id, "text", field.uniqueName)
+                    }
+                    style={{ width: "100%", padding: "8px", marginTop: "5px" }}
+                  />
+                )}
 
-              {/* Handle radio (dropdown) input */}
-              {field.type === "radio" && (
-                <select
-                  required={field.required}
-                  onChange={(e) =>
-                    handleInputChange(e, field._id, "text", field.uniqueName)
-                  }
-                  style={{ width: "100%", padding: "8px", marginTop: "5px" }}
-                >
-                  <option value="">Select {field.label}</option>
-                  {field.options.map((option, index) => (
-                    <option key={index} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              )}
+                {/* Handle radio (dropdown) input */}
+                {field.type === "radio" && (
+                  <select
+                    required={field.required}
+                    onChange={(e) =>
+                      handleInputChange(e, field._id, "text", field.uniqueName)
+                    }
+                    style={{ width: "100%", padding: "8px", marginTop: "5px" }}
+                  >
+                    <option value="">Select {field.label}</option>
+                    {field.options.map((option, index) => (
+                      <option key={index} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                )}
 
-              {/* Handle file (image) input */}
-              {field.type === "image" && (
-                <input
-                  type="file"
-                  accept="image/*"
-                  required={field.required}
-                  onChange={(e) =>
-                    handleInputChange(e, field._id, "file", field.uniqueName)
-                  }
-                  style={{ marginTop: "5px" }}
-                />
-              )}
+                {/* Handle file (image) input */}
+                {field.type === "image" && (
+                  <input
+                    type="file"
+                    accept="image/*"
+                    required={field.required}
+                    onChange={(e) =>
+                      handleInputChange(e, field._id, "file", field.uniqueName)
+                    }
+                    style={{ marginTop: "5px" }}
+                  />
+                )}
 
-              {field.type === "date" && (
-                <input
-                  type="date"
-                  required={field.required}
-                  onChange={(e) =>
-                    handleInputChange(e, field._id, "date", field.uniqueName)
-                  }
-                  style={{ marginTop: "5px" }}
-                />
-              )}
-            </div>
-          ))}
-          {!loading ? (
-            <button type="submit" className="scheme-form-submit">
-              Submit
-            </button>
-          ) : (
-            <button type="submit" className="scheme-form-submit">
-              <Loader />
-            </button>
-          )}
-        </form>
-      </div>
+                {field.type === "date" && (
+                  <input
+                    type="date"
+                    required={field.required}
+                    onChange={(e) =>
+                      handleInputChange(e, field._id, "date", field.uniqueName)
+                    }
+                    style={{ marginTop: "5px" }}
+                  />
+                )}
+              </div>
+            ))}
+            {!loading ? (
+              <button type="submit" className="scheme-form-submit">
+                Submit
+              </button>
+            ) : (
+              <button type="submit" className="scheme-form-submit">
+                <Loader />
+              </button>
+            )}
+          </form>
+        </div>
+      ) : (
+        <Loader />
+      )}
     </div>
   );
 };

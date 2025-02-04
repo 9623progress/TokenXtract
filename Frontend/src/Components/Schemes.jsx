@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../style/scheme.css";
 import { formatSpecialRequirements } from "./textFormat";
-
+import Loader from "./Loader.jsx";
 const Schemes = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -46,7 +46,7 @@ const Schemes = () => {
           </tr>
         </thead>
         <tbody>
-          {data &&
+          {data ? (
             data.map((scheme) => (
               <tr key={scheme._id}>
                 <td>{scheme.schemeName}</td>
@@ -68,7 +68,10 @@ const Schemes = () => {
                   </button>
                 </td>
               </tr>
-            ))}
+            ))
+          ) : (
+            <Loader />
+          )}
           {/* */}
         </tbody>
       </table>
