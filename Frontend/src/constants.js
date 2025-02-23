@@ -1,11 +1,8 @@
-import { ethers } from "ethers";
-import React, { useState } from "react";
-import "../style/createToken.css";
-import { useSelector } from "react-redux";
-import { toast } from "react-toastify";
+export const contractAddress = "0x9e6DEFb65e5a0c0C6Fa0eAF11CAFd05D31c5e328"; // Replace with your actual contract address
 
-const contractAddress = "0x9e6DEFb65e5a0c0C6Fa0eAF11CAFd05D31c5e328"; // ✅ UPDATE THIS AFTER DEPLOYMENT
-const contractABI = [
+export const contractABI = [
+  // Paste your contract ABI here
+
     {
       "inputs": [],
       "stateMutability": "nonpayable",
@@ -434,70 +431,3 @@ const contractABI = [
     }
   
 ];
-
-const CreateToken = () => {
-  const [token, setToken] = useState("");
-  const [account, setAccount] = useState(null);
-  const handleTokenChange = (e) => setToken(e.target.value);
-
-  const HandleCreateToken = async () => {
-    try {
-      if (!window.ethereum) {
-        toast.error("🚨 Please install MetaMask!");
-        return;
-      }
-
-      await window.ethereum.request({ method: "eth_requestAccounts" });
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
-      const userAddress = await signer.getAddress();
-      setAccount(userAddress);
-
-      const contract = new ethers.Contract(contractAddress, contractABI, signer);
-
-      // ✅ Check if user is the owner
-      const contractOwner = await contract.owner();
-      console.log("Contract Owner:", contractOwner);
-      console.log("Connected Wallet:", userAddress);
-
-      if (contractOwner.toLowerCase() !== userAddress.toLowerCase()) {
-        toast.error("❌ Only the government (contract owner) can mint tokens!");
-        return;
-      }
-
-      // ✅ Call mintTokens correctly
-      const tx = await contract.mintTokens(ethers.parseUnits(token, 0)); 
-
-      await tx.wait();
-      toast.success("✅ Tokens minted successfully!");
-      setToken("");
-
-    } catch (error) {
-      console.error("Minting error:", error);
-      toast.error(error.reason || "❌ Transaction failed!");
-    }
-  };
-
-  return (
-    <div className="create-token-top-div">
-      <div className="create-token-box">
-        <div className="create-token-input">
-          <label htmlFor="create-token">Enter Token Amount (in Rs): </label>
-          <input
-            id="create-token"
-            type="number"
-            placeholder="Enter Amount in Rs"
-            value={token}
-            onChange={handleTokenChange}
-            min="1"
-          />
-        </div>
-        <button className="create-token-button" onClick={HandleCreateToken}>
-          Create Tokens
-        </button>
-      </div>
-    </div>
-  );
-};
-
-export default CreateToken;

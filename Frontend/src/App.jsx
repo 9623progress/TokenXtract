@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import { ToastContainer } from "react-toastify"; // Import ToastContainer
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
@@ -24,18 +24,44 @@ import SchemeForm from "./Components/SchemeForm";
 import UpdateScheme from "./Components/UpdateScheme";
 import ViewContracts from "./Components/ViewContracts";
 
+// ✅ Import Blockchain Functions
+import { connectWallet, mintTokens, fetchTotalSupply } from "./Blockchain";
+
 const App = () => {
   const dispatch = useDispatch();
+  const [account, setAccount] = useState(null);
+  const [contract, setContract] = useState(null);
+  const [mintAmount, setMintAmount] = useState("");
+  const [totalSupply, setTotalSupply] = useState("");
+
+  // ✅ Handle Wallet Connection
+  const handleConnectWallet = async () => {
+    const wallet = await connectWallet();
+    if (wallet) {
+      setAccount(await wallet.signer.getAddress());
+      setContract(wallet.contract);
+    }
+  };
+
+  // ✅ Handle Minting Tokens (Government Enter Rs → Convert to Tokens)
+  const handleMintTokens = async () => {
+    await mintTokens(contract, mintAmount);
+  };
+
+  // ✅ Handle Fetching Total Supply
+  const handleFetchTotalSupply = async () => {
+    const supply = await fetchTotalSupply(contract);
+    setTotalSupply(supply);
+  };
+
+  // ✅ Add Blockchain Features to `CreateToken` Page
   const router = createBrowserRouter([
     {
       path: "/",
       element: <Layout />,
       children: [
         { path: "/", element: <Home /> },
-        {
-          path: "/login",
-          element: <Login />,
-        },
+        { path: "/login", element: <Login /> },
         { path: "/about-us", element: <AboutUs /> },
         { path: "/contact-us", element: <ContactUs /> },
         { path: "/our-services", element: <OurServices /> },
@@ -75,7 +101,14 @@ const App = () => {
           path: "/cg/create-token",
           element: (
             <PrivateRoute role="cg">
-              <CreateToken />
+              <CreateToken
+                account={account}
+                handleConnectWallet={handleConnectWallet}
+                handleMintTokens={handleMintTokens}
+                handleFetchTotalSupply={handleFetchTotalSupply}
+                totalSupply={totalSupply}
+                setMintAmount={setMintAmount}
+              />
             </PrivateRoute>
           ),
         },
@@ -98,28 +131,13 @@ const App = () => {
 
         // Other routes
         { path: "/scheme", element: <Schemes /> },
-        {
-          path: "/scheme-form",
-          element: <SchemeForm />,
-        },
-        {
-          path: "/view-contracts",
-          element: <ViewContracts />,
-        },
+        { path: "/scheme-form", element: <SchemeForm /> },
+        { path: "/view-contracts", element: <ViewContracts /> },
       ],
     },
   ]);
 
-  //for check when when website load
-  // useEffect(async () => {
-  //   const isAuthenticated = await validateAuth();
-  //   if (!isAuthenticated) {
-  //     dispatch(logout());
-  //     localStorage.removeItem("user");
-  //   }
-  // }, []);
-
-  //checking by after every 5 min is token expire
+  // ✅ Check authentication status every 5 minutes
   useEffect(() => {
     const interval = setInterval(async () => {
       const isAuthenticated = await validateAuth();
@@ -135,15 +153,15 @@ const App = () => {
     <div>
       <RouterProvider router={router} />
       <ToastContainer
-        position="top-right" // Toast position
-        autoClose={5000} // Duration in milliseconds before the toast disappears
-        hideProgressBar={false} // Show/hide progress bar
-        newestOnTop={false} // Whether to show new toast above the older ones
-        closeOnClick // Allow closing by clicking on the toast
-        rtl={false} // Right-to-left languages
-        pauseOnFocusLoss // Pause the toast when the window loses focus
-        draggable // Allow dragging the toast
-        pauseOnHover // Pause the toast when hovered over
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
       />
     </div>
   );
