@@ -1,7 +1,9 @@
 import express from "express";
 import {
   applyForContract,
+  getContractByState,
   getSchemeForm,
+  getWalleteId,
   login,
   logout,
   register,
@@ -29,5 +31,8 @@ router.post(
   upload.single("file"),
   applyForContract
 );
+
+router.get("/getContractByState/:state", getContractByState);
+router.get("/getWalleteId/:id", getWalleteId);
 
 export default router;

@@ -1,6 +1,7 @@
 export const states = [
   {
     state: "Andhra Pradesh",
+    state_id: "AP1",
     districts: [
       "Anantapur",
       "Chittoor",
@@ -19,6 +20,7 @@ export const states = [
   },
   {
     state: "Arunachal Pradesh",
+    state_id: "AP2",
     districts: [
       "Tawang",
       "West Kameng",
@@ -45,6 +47,7 @@ export const states = [
   },
   {
     state: "Assam",
+    state_id: "AS3",
     districts: [
       "Baksa",
       "Barpeta",
@@ -83,6 +86,7 @@ export const states = [
   },
   {
     state: "Bihar",
+    state_id: "BH4",
     districts: [
       "Araria",
       "Arwal",
@@ -126,10 +130,12 @@ export const states = [
   },
   {
     state: "Chandigarh (UT)",
+    state_id: "CH5",
     districts: ["Chandigarh"],
   },
   {
     state: "Chhattisgarh",
+    state_id: "CH6",
     districts: [
       "Balod",
       "Baloda Bazar",
@@ -162,14 +168,17 @@ export const states = [
   },
   {
     state: "Dadra and Nagar Haveli (UT)",
+    state_id: "DH7",
     districts: ["Dadra & Nagar Haveli"],
   },
   {
     state: "Daman and Diu (UT)",
+    state_id: "DD8",
     districts: ["Daman", "Diu"],
   },
   {
     state: "Delhi (NCT)",
+    state_id: "DL9",
     districts: [
       "Central Delhi",
       "East Delhi",
@@ -186,10 +195,12 @@ export const states = [
   },
   {
     state: "Goa",
+    state_id: "GA9",
     districts: ["North Goa", "South Goa"],
   },
   {
     state: "Gujarat",
+    state_id: "GJ10",
     districts: [
       "Ahmedabad",
       "Amreli",
@@ -228,6 +239,7 @@ export const states = [
   },
   {
     state: "Haryana",
+    state_id: "HY11",
     districts: [
       "Ambala",
       "Bhiwani",
@@ -255,6 +267,7 @@ export const states = [
   },
   {
     state: "Himachal Pradesh",
+    state_id: "HP12",
     districts: [
       "Bilaspur",
       "Chamba",
@@ -272,6 +285,7 @@ export const states = [
   },
   {
     state: "Jammu and Kashmir",
+    state_id: "JK13",
     districts: [
       "Anantnag",
       "Bandipore",
@@ -299,6 +313,7 @@ export const states = [
   },
   {
     state: "Jharkhand",
+    state_id: "JH14",
     districts: [
       "Bokaro",
       "Chatra",
@@ -328,6 +343,7 @@ export const states = [
   },
   {
     state: "Karnataka",
+    state_id: "KN15",
     districts: [
       "Bagalkot",
       "Ballari (Bellary)",
@@ -363,6 +379,7 @@ export const states = [
   },
   {
     state: "Kerala",
+    state_id: "KR16",
     districts: [
       "Alappuzha",
       "Ernakulam",
@@ -382,6 +399,7 @@ export const states = [
   },
   {
     state: "Lakshadweep (UT)",
+    state_id: "LD17",
     districts: [
       "Agatti",
       "Amini",
@@ -397,6 +415,7 @@ export const states = [
   },
   {
     state: "Madhya Pradesh",
+    state_id: "MP18",
     districts: [
       "Agar Malwa",
       "Alirajpur",
@@ -453,6 +472,7 @@ export const states = [
   },
   {
     state: "Maharashtra",
+    state_id: "MH19",
     districts: [
       "Ahmednagar",
       "Akola",
@@ -494,6 +514,7 @@ export const states = [
   },
   {
     state: "Manipur",
+    state_id: "MN20",
     districts: [
       "Bishnupur",
       "Chandel",
@@ -515,6 +536,7 @@ export const states = [
   },
   {
     state: "Meghalaya",
+    state_id: "MG21",
     districts: [
       "East Garo Hills",
       "East Jaintia Hills",
@@ -531,6 +553,7 @@ export const states = [
   },
   {
     state: "Mizoram",
+    state_id: "MZ22",
     districts: [
       "Aizawl",
       "Champhai",
@@ -544,6 +567,7 @@ export const states = [
   },
   {
     state: "Nagaland",
+    state_id: "NG23",
     districts: [
       "Dimapur",
       "Kiphire",
@@ -560,6 +584,7 @@ export const states = [
   },
   {
     state: "Odisha",
+    state_id: "OD24",
     districts: [
       "Angul",
       "Balangir",
@@ -595,10 +620,12 @@ export const states = [
   },
   {
     state: "Puducherry (UT)",
+    state_id: "PD25",
     districts: ["Karaikal", "Mahe", "Pondicherry", "Yanam"],
   },
   {
     state: "Punjab",
+    state_id: "",
     districts: [
       "Amritsar",
       "Barnala",
@@ -626,6 +653,7 @@ export const states = [
   },
   {
     state: "Rajasthan",
+    state_id: "AJ26",
     districts: [
       "Ajmer",
       "Alwar",
@@ -664,10 +692,12 @@ export const states = [
   },
   {
     state: "Sikkim",
+    state_id: "SK28",
     districts: ["East Sikkim", "North Sikkim", "South Sikkim", "West Sikkim"],
   },
   {
     state: "Tamil Nadu",
+    state_id: "TN29",
     districts: [
       "Ariyalur",
       "Chennai",
@@ -705,6 +735,7 @@ export const states = [
   },
   {
     state: "Telangana",
+    state_id: "TL30",
     districts: [
       "Adilabad",
       "Bhadradri Kothagudem",
@@ -741,6 +772,7 @@ export const states = [
   },
   {
     state: "Tripura",
+    state_id: "TR31",
     districts: [
       "Dhalai",
       "Gomati",
@@ -754,6 +786,7 @@ export const states = [
   },
   {
     state: "Uttarakhand",
+    state_id: "UT32",
     districts: [
       "Almora",
       "Bageshwar",
@@ -772,6 +805,7 @@ export const states = [
   },
   {
     state: "Uttar Pradesh",
+    state_id: "UP33",
     districts: [
       "Agra",
       "Aligarh",
@@ -852,6 +886,7 @@ export const states = [
   },
   {
     state: "West Bengal",
+    state_id: "WB34",
     districts: [
       "Alipurduar",
       "Bankura",

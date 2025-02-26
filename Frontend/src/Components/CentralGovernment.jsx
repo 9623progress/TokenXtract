@@ -1,55 +1,10 @@
 import React, { useState } from "react";
 import "../style/centralGovernment.css";
 import flag from "../assets/india-flag.png";
-import { Link } from "react-router-dom";
-import CreateScheme from "./CreateScheme";
-import ViewApplication from "./ViewApplication";
-import CreateToken from "./CreateToken";
-import ViewBankRequest from "./ViewBankRequests";
-import ViewAllSCheme from "./ViewAllSCheme";
-import CreateDepartment from "./CreateDepartment";
-import Accepted from "./Accepted";
-import Rejected from "./Rejected";
-import CreateContract from "./CreateContract";
-import ViewContracts from "./ViewContracts";
-import ViewTenders from "./ViewTenders";
+import { Link, Outlet } from "react-router-dom";
 
 const CentralGovernment = () => {
-  //create scheme
-  //view application-approve ,reject
-  // two types of application-by scheme and contractors application
-  //create Token
-  //veiw Bank request -convert Token to money
-
   const [isOpen, setOpen] = useState(false);
-  const [active, setActive] = useState(<CreateScheme />);
-
-  const HandleClick = (type) => {
-    if (type == "view Application") {
-      setActive(<ViewApplication />);
-    } else if (type == "Create Token") {
-      setActive(<CreateToken />);
-    } else if (type == "view Bank Request") {
-      setActive(<ViewBankRequest />);
-    } else if (type == "View All Scheme") {
-      setActive(<ViewAllSCheme />);
-    } else if (type == "create department") {
-      setActive(<CreateDepartment />);
-    } else if (type == "view-accepted") {
-      setActive(<Accepted />);
-    } else if (type == "view-rejected") {
-      setActive(<Rejected />);
-    } else if (type == "") {
-      setActive(<CreateScheme />);
-    } else if (type == "create-contract") {
-      setActive(<CreateContract />);
-    } else if (type == "view-contracts") {
-      setActive(<ViewContracts />);
-    } else if (type == "view-Tenders") {
-      setActive(<ViewTenders />);
-    }
-  };
-
   return (
     <div className="cg-box">
       <div className={`cg-navigation-panel ${isOpen ? "cg-nav-open" : ""}`}>
@@ -59,100 +14,42 @@ const CentralGovernment = () => {
             <h1>सत्यमेव जयते </h1>
           </div>
           <div className="cg-functions">
-            <a
-              onClick={() => {
-                HandleClick("");
-              }}
-              className="cg-fun-card"
-            >
+            <Link to={"/cg/create-scheme"} className="cg-fun-card">
               <p>Create Schemes</p>
-            </a>
-            <a
-              onClick={() => {
-                HandleClick("view Application");
-              }}
-              className="cg-fun-card"
-            >
+            </Link>
+            <Link to={"/cg/view-application"} className="cg-fun-card">
               <p>view Application</p>
-            </a>
-            <a
-              onClick={() => {
-                HandleClick("Create Token");
-              }}
-              className="cg-fun-card"
-            >
+            </Link>
+            <Link to={"/cg/create-token"} className="cg-fun-card">
               <p>Create Token</p>
-            </a>
-            <a
-              onClick={() => {
-                HandleClick("view Bank Request");
-              }}
-              className="cg-fun-card"
-            >
+            </Link>
+            <Link to={"/cg/view-bank-request"} className="cg-fun-card">
               <p>View Bank Requests</p>
-            </a>
-            <a
-              onClick={() => {
-                HandleClick("View All Scheme");
-              }}
-              className="cg-fun-card"
-            >
+            </Link>
+            <Link to={"/cg/view-all-scheme"} className="cg-fun-card">
               <p>View All Scheme</p>
-            </a>
-
-            <a
-              className="cg-fun-card"
-              onClick={() => {
-                HandleClick("create department");
-              }}
-            >
+            </Link>
+            <Link className="cg-fun-card" to={"/cg/create-department"}>
               <p>Add department</p>
-            </a>
-
-            <a
-              className="cg-fun-card"
-              onClick={() => {
-                HandleClick("view-accepted");
-              }}
-            >
+            </Link>
+            <Link className="cg-fun-card" to={"/cg/view-accepted"}>
               <p>View Accepted </p>
-            </a>
-
-            <a
-              className="cg-fun-card"
-              onClick={() => {
-                HandleClick("view-rejected");
-              }}
-            >
+            </Link>
+            <Link className="cg-fun-card" to={"/cg/view-rejected"}>
               <p>View Rejected </p>
-            </a>
-
-            <a
-              className="cg-fun-card"
-              onClick={() => {
-                HandleClick("create-contract");
-              }}
-            >
+            </Link>
+            <Link className="cg-fun-card" to={"/cg/create-contract"}>
               <p>Create Contract </p>
-            </a>
-
-            <a
-              className="cg-fun-card"
-              onClick={() => {
-                HandleClick("view-contracts");
-              }}
-            >
+            </Link>
+            <Link className="cg-fun-card" to={"/cg/view-contracts"}>
               <p> view Contracts </p>
-            </a>
-
-            <a
-              className="cg-fun-card"
-              onClick={() => {
-                HandleClick("view-Tenders");
-              }}
-            >
+            </Link>
+            <Link className="cg-fun-card" to={"/cg/view-tenders"}>
               <p>view Tenders </p>
-            </a>
+            </Link>
+            <Link to={"/cg/getPendingContracts"} className="cg-fun-card">
+              Pending Contracts
+            </Link>
           </div>
         </div>
         <div
@@ -164,7 +61,9 @@ const CentralGovernment = () => {
           <button>☰</button>
         </div>
       </div>
-      <div className="cg-action-panel">{active}</div>
+      <div className="cg-action-panel">
+        <Outlet />
+      </div>
     </div>
   );
 };

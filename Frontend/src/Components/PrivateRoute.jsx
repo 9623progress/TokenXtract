@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { Navigate, Outlet } from "react-router-dom";
 
 const PrivateRoute = ({ role, children }) => {
-  const { user, isAuthenticated } = useSelector((state) => state.user); // Get user data from localStorage
+  const { user, isAuthenticated } = useSelector((state) => state.user);
 
   if (!user) {
     // Redirect to login if the user is not logged in

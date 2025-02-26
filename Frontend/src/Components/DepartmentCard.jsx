@@ -1,12 +1,19 @@
 import React from "react";
 import "../style/Card.css";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
 const DepartmentCard = ({ title, des, image, id }) => {
   const navigate = useNavigate(); // Initializing the useHistory hook
+  const user = useSelector((state) => state.user?.user);
 
   const handleImageClick = () => {
     // Passing the data as state to the /scheme route
+    if (!user && user?.role != "user") {
+      toast.error("Please Login First as a Scheme Holder");
+      return;
+    }
     if (title == "Contract") {
       navigate("/view-contracts");
       return;

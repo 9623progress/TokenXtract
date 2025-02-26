@@ -23,6 +23,15 @@ import { logout } from "./ReduxStore/reduxSlice/userSlice";
 import SchemeForm from "./Components/SchemeForm";
 import UpdateScheme from "./Components/UpdateScheme";
 import ViewContracts from "./Components/ViewContracts";
+import StateProfile from "./Components/StateProfile";
+import ViewAllSCheme from "./Components/ViewAllSCheme";
+import CreateDepartment from "./Components/CreateDepartment";
+import Accepted from "./Components/Accepted";
+import Rejected from "./Components/Rejected";
+import ViewTenders from "./Components/ViewTenders";
+import CreateContract from "./Components/CreateContract";
+import Token from "./Components/Token";
+import ViewPendingContract from "./Components/ViewPendingContract";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -40,11 +49,7 @@ const App = () => {
         { path: "/contact-us", element: <ContactUs /> },
         { path: "/our-services", element: <OurServices /> },
         { path: "/signin", element: <Signup /> },
-
-        // User Profile Route
         { path: "/user-profile", element: <UserProfile /> },
-
-        // Central Government Route protected by role
         {
           path: "/cg",
           element: (
@@ -52,41 +57,57 @@ const App = () => {
               <CentralGovernment />
             </PrivateRoute>
           ),
+          children: [
+            { path: "/cg/create-scheme", element: <CreateScheme /> },
+            { path: "/cg/view-application", element: <ViewApplication /> },
+            { path: "/cg/create-token", element: <CreateToken /> },
+            { path: "/cg/view-bank-request", element: <ViewBankRequests /> },
+            { path: "/cg/view-all-scheme", element: <ViewAllSCheme /> },
+            { path: "/cg/create-department", element: <CreateDepartment /> },
+            { path: "/cg/view-accepted", element: <Accepted /> },
+            { path: "/cg/view-rejected", element: <Rejected /> },
+            { path: "/cg/create-contract", element: <CreateContract /> },
+            { path: "/cg/view-contracts", element: <ViewContracts /> },
+            { path: "/cg/view-tenders", element: <ViewTenders /> },
+            { path: "/cg/my-token", element: <Token /> },
+            {
+              path: "/cg/getPendingContracts",
+              element: <ViewPendingContract />,
+            },
+          ],
         },
-
-        // Central Government child routes
-        {
-          path: "/cg/create-scheme",
-          element: (
-            <PrivateRoute role="cg">
-              <CreateScheme />
-            </PrivateRoute>
-          ),
-        },
-        {
-          path: "/cg/view-application",
-          element: (
-            <PrivateRoute role="cg">
-              <ViewApplication />
-            </PrivateRoute>
-          ),
-        },
-        {
-          path: "/cg/create-token",
-          element: (
-            <PrivateRoute role="cg">
-              <CreateToken />
-            </PrivateRoute>
-          ),
-        },
-        {
-          path: "/cg/view-bank-request",
-          element: (
-            <PrivateRoute role="cg">
-              <ViewBankRequests />
-            </PrivateRoute>
-          ),
-        },
+        // {
+        //   path: "/cg/create-scheme",
+        //   element: (
+        //     <PrivateRoute role="cg">
+        //       <CreateScheme />
+        //     </PrivateRoute>
+        //   ),
+        // },
+        // {
+        //   path: "/cg/view-application",
+        //   element: (
+        //     <PrivateRoute role="cg">
+        //       <ViewApplication />
+        //     </PrivateRoute>
+        //   ),
+        // },
+        // {
+        //   path: "/cg/create-token",
+        //   element: (
+        //     <PrivateRoute role="cg">
+        //       <CreateToken />
+        //     </PrivateRoute>
+        //   ),
+        // },
+        // {
+        //   path: "/cg/view-bank-request",
+        //   element: (
+        //     <PrivateRoute role="cg">
+        //       <ViewBankRequests />
+        //     </PrivateRoute>
+        //   ),
+        // },
         {
           path: "/update-scheme",
           element: (
@@ -95,8 +116,24 @@ const App = () => {
             </PrivateRoute>
           ),
         },
-
-        // Other routes
+        {
+          path: "/state",
+          element: (
+            <PrivateRoute role="state">
+              <StateProfile />
+            </PrivateRoute>
+          ),
+          children: [
+            { path: "/state/create-scheme", element: <CreateScheme /> },
+            { path: "/state/view-application", element: <ViewApplication /> },
+            { path: "/state/view-all-scheme", element: <ViewAllSCheme /> },
+            { path: "/state/view-accepted", element: <Accepted /> },
+            { path: "/state/view-rejected", element: <Rejected /> },
+            { path: "/state/create-contract", element: <CreateContract /> },
+            { path: "/state/view-contracts", element: <ViewContracts /> },
+            { path: "/state/my-token", element: <Token /> },
+          ],
+        },
         { path: "/scheme", element: <Schemes /> },
         {
           path: "/scheme-form",

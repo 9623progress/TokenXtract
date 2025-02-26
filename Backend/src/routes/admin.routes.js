@@ -1,6 +1,8 @@
 import express from "express";
 import {
   acceptForm,
+  approveContract,
+  approveContractStage,
   assignContract,
   createContract,
   createDepartment,
@@ -12,6 +14,10 @@ import {
   getAllschemeByDepartment,
   getContractByDepartment,
   getDepartment,
+  getMyApprovedContracts,
+  getMyCreatedContract,
+  getMyPendingContracts,
+  getPendingContracts,
   getRejectedForm,
   getScheme,
   RejectForm,
@@ -23,7 +29,12 @@ import { verifyJWT, authorizeRoles } from "../middlewares/Authentication.js";
 
 const router = express.Router();
 
-router.post("/create-scheme", verifyJWT, authorizeRoles("cg"), createScheme);
+router.post(
+  "/create-scheme",
+  verifyJWT,
+  authorizeRoles("cg", "state"),
+  createScheme
+);
 router.get("/get-scheme/:departmentID", verifyJWT, getAllschemeByDepartment);
 router.post(
   "/create-department",
@@ -56,13 +67,14 @@ router.get(
   getRejectedForm
 );
 router.post(
-  "/create-contract",
+  "/create-contract/:user",
   verifyJWT,
-  authorizeRoles("cg"),
+  authorizeRoles("cg", "state"),
   createContract
 );
 router.get(
   "/get-contract-by-department/:departmentID",
+  verifyJWT,
   getContractByDepartment
 );
 router.get(
@@ -84,4 +96,17 @@ router.post(
   authorizeRoles("cg"),
   disburseFundsBulk
 );
+
+router.get(
+  "/getMyContracts/:userId",
+  // verifyJWT,
+  // authorizeRoles("cg", "state"),
+  getMyCreatedContract
+);
+
+router.get("/getPendingContract", getPendingContracts);
+router.get("/getMyApprovedContract", getMyApprovedContracts);
+router.get("/getMyPendingContract", getMyPendingContracts);
+router.post("/approvedContract", approveContract);
+router.post("/approveStage", approveContractStage);
 export default router;

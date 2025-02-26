@@ -17,9 +17,11 @@ const CreateContract = () => {
   const [legalRules, setLegalRules] = useState("");
   const [stages, setStages] = useState([{ stageName: "", percentage: 0 }]);
   const [selectedDistrict, setSelectedDistrict] = useState("");
-  const [selectedDepartment, setSelecetdDepartment] = useState("");
+
+  const [secreteKey, setSecreteKey] = useState("");
 
   const { departments } = useSelector((state) => state.departments);
+  const id = useSelector((state) => state.user?.user?.id);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -30,6 +32,7 @@ const CreateContract = () => {
     else if (name === "contract-startDate") setStartDate(value);
     else if (name === "contract-endDate") setEndDate(value);
     else if (name === "contract-legalRules") setLegalRules(value);
+    else if (name === "contract-secreteKey") setSecreteKey(value);
   };
   const removeStage = (index) => {
     setStages(stages.filter((_, i) => i !== index));
@@ -58,13 +61,8 @@ const CreateContract = () => {
     setStages(updatedStages);
   };
 
-  const handleDepartmentChange = (e) => {
-    setSelecetdDepartment(e.target.value);
-  };
-
   const HandleSubmit = async () => {
     const contractData = {
-      departmentID: selectedDepartment,
       contractName,
       budget,
       state,
@@ -75,11 +73,12 @@ const CreateContract = () => {
       endDate,
       legalRules,
       stages,
+      secreteKey,
     };
 
     try {
       const response = await axios.post(
-        `http://localhost:5000/api/v1/admin/create-contract`,
+        `http://localhost:5000/api/v1/admin/create-contract/${id}`,
         contractData,
         { withCredentials: true }
       );
@@ -99,6 +98,7 @@ const CreateContract = () => {
         setLegalRules("");
         setStages([{ stageName: "", percentage: 0 }]);
         setSelectedDistrict("");
+        setSecreteKey("");
       } else {
         // Handle error response
         console.error("Failed to create contract");
@@ -112,19 +112,6 @@ const CreateContract = () => {
   return (
     <div className="create-contract-top-div">
       <div className="create-contract-inner-div">
-        <select
-          onChange={handleDepartmentChange}
-          value={selectedDepartment || ""}
-        >
-          <option value="" disabled>
-            Select Department
-          </option>
-          {departments.map((department) => (
-            <option key={department._id} value={department._id}>
-              {department.departmentName}
-            </option>
-          ))}
-        </select>
         <div className="create-contract-input-div">
           <label htmlFor="contract-name">Contract Name</label>
           <input
@@ -209,6 +196,17 @@ const CreateContract = () => {
             id="contract-endDate"
             name="contract-endDate"
             value={endDate}
+            onChange={handleInputChange}
+          />
+        </div>
+
+        <div className="create-contract-input-div">
+          <label htmlFor="contract-secreteKey">Set Secrete key</label>
+          <input
+            type="text"
+            id="contract-secreteKey"
+            name="contract-secreteKey"
+            value={secreteKey}
             onChange={handleInputChange}
           />
         </div>

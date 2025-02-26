@@ -32,6 +32,10 @@
     margin-bottom: 15px;
 }
 
+.sign-in-select {
+    padding: 9px;
+}
+
 /* Input Field Styling */
 .signin-form-box input {
     font-size: 1rem;
@@ -41,6 +45,7 @@
     padding: 10px;
     box-sizing: border-box;
     transition: border 0.3s ease, box-shadow 0.3s ease;
+    width: 100%;
 }
 
 .signin-form-box input:focus {
@@ -49,6 +54,7 @@
 }
 
 /* Button Styling */
+.connect-wallet-btn,
 .register-button {
     padding: 10px;
     background-color: #27005D;
@@ -65,6 +71,15 @@
     background-color: white;
     color: #27005D;
     border: 1px solid #27005D;
+}
+
+.connect-wallet-btn {
+    background-color: #0dd832;
+    margin-top: 10px;
+}
+
+.connect-wallet-btn:hover {
+    background-color: #4bec68;
 }
 
 /* Password Wrapper (Input + Toggle) */
