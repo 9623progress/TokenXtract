@@ -105,7 +105,7 @@ router.get(
 );
 
 router.get("/getPendingContract", getPendingContracts);
-router.get("/getMyApprovedContract", getMyApprovedContracts);
+router.get("/getMyApprovedContract/:userId", getMyApprovedContracts);
 router.get("/getMyPendingContract", getMyPendingContracts);
 router.post("/approvedContract", approveContract);
 router.post("/approveStage", approveContractStage);

@@ -32,6 +32,8 @@ import ViewTenders from "./Components/ViewTenders";
 import CreateContract from "./Components/CreateContract";
 import Token from "./Components/Token";
 import ViewPendingContract from "./Components/ViewPendingContract";
+import ContractorProfile from "./Components/ContractorProfile";
+import GetMyApprovedContract from "./Components/getMyApproveContract";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -130,7 +132,10 @@ const App = () => {
             { path: "/state/view-accepted", element: <Accepted /> },
             { path: "/state/view-rejected", element: <Rejected /> },
             { path: "/state/create-contract", element: <CreateContract /> },
-            { path: "/state/view-contracts", element: <ViewContracts /> },
+            {
+              path: "/state/view-contracts",
+              element: <GetMyApprovedContract />,
+            },
             { path: "/state/my-token", element: <Token /> },
           ],
         },
@@ -142,6 +147,10 @@ const App = () => {
         {
           path: "/view-contracts",
           element: <ViewContracts />,
+        },
+        {
+          path: "/contractor",
+          element: <ContractorProfile />,
         },
       ],
     },

@@ -8,8 +8,13 @@ module.exports = {
   networks: {
     hardhat: {}, // Default network
 
-    mumbai: {
+    mumbai2: {
       url: process.env.POLYGON_RPC_URL, // Get from .env file
+      accounts: [process.env.PRIVATE_KEY], // Use your wallet's private key
+    },
+
+    mumbai: {
+      url: process.env.POLYGON_RPC_URL_2, // Get from .env file
       accounts: [process.env.PRIVATE_KEY], // Use your wallet's private key
     },
   },

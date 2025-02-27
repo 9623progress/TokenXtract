@@ -21,25 +21,25 @@ const StateProfile = () => {
               <p>view Application</p>
             </Link>
             <Link to={"/state/view-all-scheme"} className="cg-fun-card">
-              <p>View All My Scheme</p>
+              <p>View All Scheme</p>
             </Link>
             <Link className="cg-fun-card" to={"/state/view-accepted"}>
               <p>View Accepted </p>
             </Link>
-            <Link className="cg-fun-card" to={"/state/view-rejected"}>
+            {/* <Link className="cg-fun-card" to={"/state/view-rejected"}>
               <p>View Rejected </p>
-            </Link>
+            </Link> */}
             <Link className="cg-fun-card" to={"/state/create-contract"}>
               <p>Create Contract </p>
             </Link>
             <Link className="cg-fun-card" to={"/state/view-contracts"}>
-              <p> view Contracts </p>
+              <p> Approve Contracts </p>
             </Link>
             {/* <Link className="cg-fun-card" to={"/cg/view-tenders"}>
               <p>view Tenders </p>
             </Link> */}
             <Link className="cg-fun-card" to={"/state/my-token"}>
-              view Token Balance
+              Token Balance
             </Link>
           </div>
         </div>

@@ -81,6 +81,14 @@ const Navbar = () => {
               </Link>
             </div>
           )}
+
+          {user.role == "contractor" && (
+            <div>
+              <Link className="navbar-right-div" to={"/contractor"}>
+                Profile
+              </Link>
+            </div>
+          )}
         </div>
       ) : (
         <div>

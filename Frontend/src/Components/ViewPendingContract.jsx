@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
 const ViewPendingContract = () => {
   const [contracts, setContracts] = useState([]);
@@ -23,11 +24,28 @@ const ViewPendingContract = () => {
 
   const ApproveContract = async (creator, contract_id) => {
     try {
-      getWalleteId(creator);
-    } catch (error) {}
+      setWalleteId(creator); //for to setting the state wallete address in the variable
+      //implement metamask transaction between central gov and state
+
+      //api end point -http://localhost:5000/api/v1/admin/approvedContract
+
+      const response = await axios.post(
+        "http://localhost:5000/api/v1/admin/approvedContract",
+        {
+          contractId: contract_id,
+        },
+        { withCredentials: true }
+      );
+
+      if (response.status == 200) {
+        toast.success(response.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const getWalleteId = async (id) => {
+  const setWalleteId = async (id) => {
     try {
       const res = await axios.get(
         `http://localhost:5000/api/v1/user/getWalleteId/${id}`

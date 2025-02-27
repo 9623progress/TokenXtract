@@ -793,22 +793,25 @@ export const getMyApprovedContracts = async (req, res) => {
   try {
     const { userId } = req.params;
 
-    const myContracts = await contract.find({
-      creator: userId,
-      ApproveContract: true,
-    });
-
-    if (!myContracts.length) {
-      return res.status(404).json({
-        message: "No contracts found for this user",
+    if (!userId) {
+      return res.status(400).json({
+        message: "User ID is required",
       });
     }
 
+    const myContracts = await contract
+      .find({ creator: userId, ApproveContract: true })
+      .populate("contractor")
+      .lean();
+
     return res.status(200).json({
       data: myContracts,
+      message: myContracts.length
+        ? "Approved contracts fetched successfully"
+        : "No approved contracts found for this user",
     });
   } catch (error) {
-    console.error("Error fetching contracts:", error);
+    console.error("Error fetching approved contracts:", error);
     return res.status(500).json({
       message: "Internal Server Error",
       error: error.message,

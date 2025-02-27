@@ -269,6 +269,8 @@ export const applyForContract = async (req, res) => {
 
     // Add application ID to user's applied contracts list
     userExist.AppliedContractApplication.push(newApplication._id);
+    contractExist.contractor = userId;
+    await contractExist.save();
     await userExist.save(); // Fixed: Saving user after update
 
     return res.status(200).json({ message: "Applied successfully" });
@@ -317,5 +319,65 @@ export const getWalleteId = async (req, res) => {
     });
   }
 };
-export const getMyAppliedContract = async (req, res) => {};
+export const getMyAppliedContract = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+
+    const userData = await User.findById(id)
+      .populate({
+        path: "AppliedContractApplication",
+        populate: { path: "contractId" },
+      })
+      .select("AppliedContractApplication");
+
+    if (!userData) {
+      return res.status(404).json({ message: "User Not Found" });
+    }
+
+    return res.status(200).json({ data: userData });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Server Error", error: error.message });
+  }
+};
+
+export const uploadStageProof = async (req, res) => {
+  try {
+    const { contractId, stageId } = req.body;
+    const fileUrl = req.file?.path || req.file?.url;
+    console.log(contractId, stageId, fileUrl);
+
+    if (!contractId || !stageId || !fileUrl) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+    const contractExist = await contract.findById(contractId);
+    if (!contractExist) {
+      return res.status(404).json({ message: "Contract not found" });
+    }
+
+    const stage = contractExist.stages.find(
+      (s) => s._id.toString() === stageId
+    );
+    if (!stage) {
+      return res.status(404).json({ message: "Stage not found" });
+    }
+
+    stage.proof = fileUrl;
+    await contractExist.save();
+
+    return res.status(200).json({
+      message: "Proof uploaded successfully",
+      updatedStage: stage,
+    });
+  } catch (error) {
+    console.error("Error uploading proof:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export const getMyAppliedSchemes = async (req, res) => {};
