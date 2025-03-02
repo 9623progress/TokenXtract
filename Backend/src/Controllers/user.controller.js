@@ -78,6 +78,8 @@ export const register = async (req, res) => {
         .json({ message: "Aadhaar number must be exactly 12 digits" });
     }
 
+    console.log(walletAddress);
+
     // Validate Mobile Number (10 digits)
     const mobileRegex = /^[0-9]{10}$/;
     if (!mobileRegex.test(mobile)) {
@@ -381,3 +383,24 @@ export const uploadStageProof = async (req, res) => {
 };
 
 export const getMyAppliedSchemes = async (req, res) => {};
+
+export const getBanks = async (req, res) => {
+  try {
+    const banks = await User.find({ role: "bank" });
+
+    if (banks.length === 0) {
+      return res.status(404).json({
+        message: "No banks found",
+      });
+    }
+
+    return res.status(200).json({
+      banks,
+    });
+  } catch (error) {
+    console.error("Error fetching banks:", error);
+    return res.status(500).json({
+      message: "Internal Server Error",
+    });
+  }
+};

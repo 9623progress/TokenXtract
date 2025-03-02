@@ -848,27 +848,24 @@ export const getMyPendingContracts = async (req, res) => {
 
 export const approveContract = async (req, res) => {
   try {
-    const contractId = req.body;
+    const { contractId } = req.body; // Ensure contractId is extracted correctly
+
+    if (!contractId || contractId.length !== 24) {
+      return res.status(400).json({ message: "Invalid contract ID" });
+    }
 
     const contractToBeApprove = await contract.findById(contractId);
 
     if (!contractToBeApprove) {
-      return res.status(400).json({
-        message: "Contract not found",
-      });
+      return res.status(400).json({ message: "Contract not found" });
     }
 
-    contractToBeApprove.updateOne({ $set: { ApproveContract: true } });
-    contractToBeApprove.save();
+    await contractToBeApprove.updateOne({ $set: { ApproveContract: true } });
 
-    res.status(200).json({
-      message: "Contract Approve sucessfully",
-    });
+    res.status(200).json({ message: "Contract Approved Successfully" });
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({
-      message: "Internal server error",
-    });
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 

@@ -1,6 +1,7 @@
 import express from "express";
 import {
   applyForContract,
+  getBanks,
   getContractByState,
   getMyAppliedContract,
   getSchemeForm,
@@ -43,4 +44,5 @@ router.get("/getContractByState/:state", getContractByState);
 router.get("/getWalleteId/:id", getWalleteId);
 router.get("/myAppliedContracts/:id", getMyAppliedContract);
 router.post("/uploadStageProof", upload.single("file"), uploadStageProof);
+router.get("/getBanks", getBanks);
 export default router;

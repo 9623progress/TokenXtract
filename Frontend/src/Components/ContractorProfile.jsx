@@ -14,10 +14,26 @@ const ContractorProfile = () => {
   const [contractId, setContractId] = useState("");
   const [stageId, setStageId] = useState("");
   const [proofFile, setProofFile] = useState(null);
+  const [banks, setBanks] = useState("");
+  const [viewBank, setViewBank] = useState(false);
 
   const inputChange = (e) => {
     if (e.target.files.length > 0) {
       setProofFile(e.target.files[0]);
+    }
+  };
+
+  const getBanks = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:5000/api/v1/user/getBanks"
+      );
+      if (response.status == 200) {
+        console.log(response);
+        setBanks(response.data.banks);
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -74,6 +90,11 @@ const ContractorProfile = () => {
     } catch (error) {
       console.error("Error fetching contracts:", error);
     }
+  };
+
+  const handleBankClick = () => {
+    getBanks();
+    setBanks(true);
   };
 
   useEffect(() => {
@@ -193,6 +214,16 @@ const ContractorProfile = () => {
             </tbody>
           </table>
           <button onClick={() => setSelectedStages(null)}>Close</button>
+        </div>
+      )}
+
+      <div className="contarctor-banks">
+        <button onClick={handleBankClick}>view Banks</button>
+      </div>
+
+      {banks && (
+        <div>
+          <p>whoo this are banks</p>
         </div>
       )}
 
