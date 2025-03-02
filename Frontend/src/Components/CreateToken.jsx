@@ -64,43 +64,10 @@ import React, { useState } from "react";
 import "../style/createToken.css";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import GovTokenABI from "../../../Blockchain/artifacts/Contracts/NewToken.sol/GovToken.json"; // Import ABI
 
-const contractAddress = "0x055839a8eA4bA24EB9E9cf48BF6E537cbED48e07";
-
-const contractABI = [
-  {
-    inputs: [
-      { internalType: "uint256", name: "initialSupply", type: "uint256" },
-    ],
-    stateMutability: "nonpayable",
-    type: "constructor",
-  },
-  {
-    inputs: [],
-    name: "getTokenPriceInRs",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      { internalType: "address", name: "to", type: "address" },
-      { internalType: "uint256", name: "amountInRs", type: "uint256" },
-    ],
-    name: "mintTokensByAmountInRs",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [{ internalType: "uint256", name: "newPrice", type: "uint256" }],
-    name: "setTokenPriceInRs",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-];
-
+// const GOVTOKEN_ADDRESS = "0x87830c160Fb02f13174Bc2DBAF8A989F1584Bd8F"; // GovToken contract address
+const GOVTOKEN_ADDRESS = "0x43Dd8A1a3fB1788bfC9303e68626DBd06b06790C"; //--temporary
 const CreateToken = () => {
   const [token, setToken] = useState("");
   const id = useSelector((state) => state.user.user?.id);
@@ -111,39 +78,35 @@ const CreateToken = () => {
 
   const HandleCreateToken = async () => {
     try {
-      if (!window.ethereum) {
-        toast.error("Please install MetaMask!");
-        return;
-      }
-
       if (!token || isNaN(token) || Number(token) <= 0) {
         toast.error("Enter a valid token amount!");
         return;
       }
 
       // Request MetaMask connection
-      await window.ethereum.request({ method: "eth_requestAccounts" });
+      if (!window.ethereum) {
+        toast.error("Please install MetaMask!");
+        return;
+      }
 
-      // Initialize ethers provider and signer
       const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
-      const userAddress = await signer.getAddress();
-
-      // Connect to the contract
-      const contract = new ethers.Contract(
-        contractAddress,
-        contractABI,
+      const signer = await provider.getSigner(); // Get the connected wallet
+      console.log(signer);
+      // Connect to GovToken contract
+      const govToken = new ethers.Contract(
+        GOVTOKEN_ADDRESS,
+        GovTokenABI.abi,
         signer
       );
 
-      // Call the contract function to mint tokens
-      const tx = await contract.mintTokensByAmountInRs(
-        userAddress,
-        ethers.parseUnits(token, 0)
-      );
+      // Convert token amount to appropriate units (assuming 18 decimals)
+      const amountToMint = ethers.parseUnits(token, 18);
+
+      // Call the mint function
+      const tx = await govToken.mint(signer.address, amountToMint);
       await tx.wait();
 
-      toast.success("Tokens minted successfully!");
+      toast.success(`Successfully minted ${token} tokens!`);
       setToken("");
     } catch (error) {
       console.error("Minting error:", error);

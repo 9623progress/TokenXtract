@@ -23,34 +23,30 @@ contract SchemeHolderFund {
         address indexed receiver,
         uint256 amount,
         string schemeId,
-        string applicationId,
-        bytes32 transactionId
+        string applicationId
     );
 
-    event TokensAcknowledged(address indexed schemeHolder, uint256 amount, bytes32 transactionId);
-    event TokensReturnedToGov(address indexed bank, uint256 amount, bytes32 transactionId);
+    event TokensAcknowledged(address indexed schemeHolder, uint256 amount);
+    event TokensReturnedToGov(address indexed bank, uint256 amount);
 
     modifier onlyCentralGov() {
-        require(msg.sender == centralGovernment, "Only central government allowed");
+        require(msg.sender == centralGovernment, "SchemeHolderFund: Only central government is allowed to perform this action");
         _;
     }
 
     constructor(address _govToken) {
+        require(_govToken != address(0), "SchemeHolderFund: Invalid token contract address");
+
         govToken = GovToken(_govToken);
         centralGovernment = msg.sender;
     }
 
     function transferToState(address state, uint256 amount, string memory schemeId) external onlyCentralGov {
-        bytes32 transactionId = keccak256(abi.encodePacked(block.timestamp, msg.sender, state, amount));
+        require(state != address(0), "SchemeHolderFund: Invalid state address");
+        require(amount > 0, "SchemeHolderFund: Transfer amount must be greater than zero");
 
-        // Store transaction details
-        transactions[transactionId] = Transaction(msg.sender, state, amount, schemeId, "", block.timestamp);
-
-        // Transfer funds
         govToken.transfer(state, amount);
-
-        // Emit event
-        emit FundTransferred(msg.sender, state, amount, schemeId, "", transactionId);
+        emit FundTransferred(msg.sender, state, amount, schemeId, "N/A");
     }
 
     function transferToSchemeHolder(
@@ -58,36 +54,32 @@ contract SchemeHolderFund {
         uint256 amount,
         string memory schemeId,
         string memory applicationId
-    ) external returns (bytes32) {
-        bytes32 transactionId = keccak256(abi.encodePacked(block.timestamp, msg.sender, schemeHolder, amount));
-
-        transactions[transactionId] = Transaction(msg.sender, schemeHolder, amount, schemeId, applicationId, block.timestamp);
+    ) external {
+        require(schemeHolder != address(0), "SchemeHolderFund: Invalid scheme holder address");
+        require(amount > 0, "SchemeHolderFund: Transfer amount must be greater than zero");
 
         govToken.transfer(schemeHolder, amount);
-        emit FundTransferred(msg.sender, schemeHolder, amount, schemeId, applicationId, transactionId);
-
-        return transactionId;
+        emit FundTransferred(msg.sender, schemeHolder, amount, schemeId, applicationId);
     }
 
-    function schemeHolderToBank(address bank, uint256 amount) external returns (bytes32) {
-        bytes32 transactionId = keccak256(abi.encodePacked(block.timestamp, msg.sender, bank, amount));
+    function transferToBank(
+        address bank,
+        uint256 amount,
+        string memory schemeId,
+        string memory applicationId
+    ) external {
+        require(bank != address(0), "SchemeHolderFund: Invalid bank address");
+        require(amount > 0, "SchemeHolderFund: Transfer amount must be greater than zero");
 
-        transactions[transactionId] = Transaction(msg.sender, bank, amount, "", "", block.timestamp);
-
-        govToken.transfer(bank, amount);
-        emit TokensAcknowledged(msg.sender, amount, transactionId);
-
-        return transactionId;
+        govToken.transferFrom(msg.sender, bank, amount);
+        emit FundTransferred(msg.sender, bank, amount, schemeId, applicationId);
     }
 
-    function bankToCentralGov(uint256 amount) external returns (bytes32) {
-        bytes32 transactionId = keccak256(abi.encodePacked(block.timestamp, msg.sender, centralGovernment, amount));
+    function transferToCentralGov(address bank, uint256 amount) external {
+        require(msg.sender == bank, "SchemeHolderFund: Only bank can return funds to the central government");
+        require(amount > 0, "SchemeHolderFund: Transfer amount must be greater than zero");
 
-        transactions[transactionId] = Transaction(msg.sender, centralGovernment, amount, "", "", block.timestamp);
-
-        govToken.transfer(centralGovernment, amount);
-        emit TokensReturnedToGov(msg.sender, amount, transactionId);
-
-        return transactionId;
+        govToken.transferFrom(bank, centralGovernment, amount);
+        emit TokensReturnedToGov(bank, amount);
     }
 }
