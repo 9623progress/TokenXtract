@@ -3,6 +3,8 @@ import { useSelector } from "react-redux";
 import axios from "axios";
 import { toast } from "react-toastify";
 
+import { ethers } from "ethers";
+
 const GetMyApprovedContract = () => {
   const userId = useSelector((state) => state.user?.user?.id);
   const [contracts, setContracts] = useState([]);
@@ -10,6 +12,47 @@ const GetMyApprovedContract = () => {
   const [error, setError] = useState("");
   const [selectedStages, setSelectedStages] = useState(null);
   const [contractId, setContractId] = useState(null);
+  const [contractorID, setContractorID] = useState("");
+  const [budget, setBudget] = useState(0);
+
+  const connectWallet = async () => {
+    if (!window.ethereum) {
+      toast.error("🚨 MetaMask not installed! Please install and try again.");
+      return null;
+    }
+    try {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      await window.ethereum.request({ method: "eth_requestAccounts" });
+      return await provider.getSigner();
+    } catch (error) {
+      console.error("❌ Wallet connection failed:", error);
+      toast.error("❌ Failed to connect wallet!");
+      return null;
+    }
+  };
+
+  const shivaniAddress = "0x9e6DEFb65e5a0c0C6Fa0eAF11CAFd05D31c5e328";
+
+  // ✅ Shivani Token ABI (Minimal)
+  const shivaniAbi = [
+    {
+      inputs: [
+        { internalType: "address", name: "recipient", type: "address" },
+        { internalType: "uint256", name: "amount", type: "uint256" },
+      ],
+      name: "transfer",
+      outputs: [{ internalType: "bool", name: "", type: "bool" }],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [{ internalType: "address", name: "account", type: "address" }],
+      name: "balanceOf",
+      outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+      stateMutability: "view",
+      type: "function",
+    },
+  ];
 
   // Fetch approved contracts
   useEffect(() => {
@@ -32,25 +75,67 @@ const GetMyApprovedContract = () => {
   }, [userId]);
 
   // Show Stages of a Contract
-  const handleShowStages = (stages, conId) => {
+  const handleShowStages = (stages, conId, contractor_id, budget) => {
     setSelectedStages(stages);
     setContractId(conId);
+    setContractorID(contractor_id);
+    setBudget(budget);
   };
 
   // Approve a Stage
-  const handleApproveStage = async (
-    contractStageId,
-    proof,
-    budget,
-    percentage
-  ) => {
+  const handleApproveStage = async (contractStageId, proof, percentage) => {
     const tokenAmount = (budget * percentage) / 100;
     //implement the logic of metamsk token transfer and get transaction id
-    const transactionId = "";
+    console.log(budget, percentage);
+    console.log(tokenAmount);
+
+    const { data, status } = await axios.get(
+      `http://localhost:5000/api/v1/user/getWalleteId/${contractorID}`
+    );
+
+    if (status !== 200 || !data.walletAddress) {
+      toast.error("❌ Receiver wallet address not found!");
+      return;
+    }
+
+    const receiver = data.walletAddress.trim(); // Ensure no spaces
+    console.log("✅ Receiver Wallet:", receiver);
+
+    if (!ethers.isAddress(receiver)) {
+      toast.error("❌ Invalid receiver address!");
+      return;
+    }
+
+    // ✅ Step 2: Connect Wallet
+    const signer = await connectWallet();
+    if (!signer) return;
+
+    // ✅ Step 3: Get contract instance
+    const contract = new ethers.Contract(shivaniAddress, shivaniAbi, signer);
+    console.log("✅ Contract Instance Loaded:", contract);
+
+    // ✅ Step 4: Convert budget to correct BigInt units
+    const amountToSend = ethers.parseUnits(tokenAmount.toString(), 18);
+    console.log("🔸 Amount to Send:", amountToSend.toString());
+
+    // ✅ Step 5: Execute transfer
+    let tx;
+    try {
+      tx = await contract.transfer(receiver, amountToSend);
+      console.log("⏳ Transaction Pending...");
+      await tx.wait();
+      console.log("✅ Tokens Sent Successfully!");
+    } catch (txError) {
+      console.error("❌ Transaction failed:", txError);
+      // toast.error(txError.reason || txError.message || "Transaction failed!");
+      toast.error("network full please try again");
+      return;
+    }
+
     try {
       const response = await axios.post(
         `http://localhost:5000/api/v1/admin/approveStage/`,
-        { contractId, contractStageId, proof, transactionId }
+        { contractId, contractStageId, proof }
       );
       toast.success(response.data.message || "Stage approved successfully!");
 
@@ -105,7 +190,12 @@ const GetMyApprovedContract = () => {
                 <td>
                   <button
                     onClick={() =>
-                      handleShowStages(contract.stages, contract._id)
+                      handleShowStages(
+                        contract.stages,
+                        contract._id,
+                        contract.contractor._id,
+                        contract.budget
+                      )
                     }
                     style={{ marginLeft: "10px" }}
                   >
@@ -158,7 +248,6 @@ const GetMyApprovedContract = () => {
                           handleApproveStage(
                             stage._id,
                             stage.proof,
-                            stage.budget,
                             stage.percentage
                           )
                         }

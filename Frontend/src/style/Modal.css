@@ -18,6 +18,9 @@
     max-width: 500px;
     width: 100%;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    gap: 10px
 }
 
 .open-modal-btn,

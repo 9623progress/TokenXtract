@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import "../style/ContractorProfile.css";
 import Modal from "./Modal";
 import { toast } from "react-toastify";
+import { ethers } from "ethers";
 
 const ContractorProfile = () => {
   const user = useSelector((state) => state.user?.user);
@@ -14,12 +15,68 @@ const ContractorProfile = () => {
   const [contractId, setContractId] = useState("");
   const [stageId, setStageId] = useState("");
   const [proofFile, setProofFile] = useState(null);
-  const [banks, setBanks] = useState("");
+  const [banks, setBanks] = useState([]);
   const [viewBank, setViewBank] = useState(false);
+  const [isBankModalOpen, setIsBankModalOpen] = useState(false);
+  const [accountNo, setAccountNo] = useState("");
+  const [ifsc, setIFsc] = useState("");
+  const [tokenAmount, setTokenAmount] = useState(0);
+  const [bank_id, setBank_id] = useState("");
+
+  const connectWallet = async () => {
+    if (!window.ethereum) {
+      toast.error("🚨 MetaMask not installed! Please install and try again.");
+      return null;
+    }
+    try {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      await window.ethereum.request({ method: "eth_requestAccounts" });
+      return await provider.getSigner();
+    } catch (error) {
+      console.error("❌ Wallet connection failed:", error);
+      toast.error("❌ Failed to connect wallet!");
+      return null;
+    }
+  };
+
+  const shivaniAddress = "0x9e6DEFb65e5a0c0C6Fa0eAF11CAFd05D31c5e328";
+
+  // ✅ Shivani Token ABI (Minimal)
+  const shivaniAbi = [
+    {
+      inputs: [
+        { internalType: "address", name: "recipient", type: "address" },
+        { internalType: "uint256", name: "amount", type: "uint256" },
+      ],
+      name: "transfer",
+      outputs: [{ internalType: "bool", name: "", type: "bool" }],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [{ internalType: "address", name: "account", type: "address" }],
+      name: "balanceOf",
+      outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+      stateMutability: "view",
+      type: "function",
+    },
+  ];
 
   const inputChange = (e) => {
     if (e.target.files.length > 0) {
       setProofFile(e.target.files[0]);
+    }
+  };
+
+  const HanndleBankInputChange = (e) => {
+    const name = e.target.name;
+    const value = e.target.value;
+    if (name == "account-no") {
+      setAccountNo(value);
+    } else if (name == "IFSC-code") {
+      setIFsc(value);
+    } else if (name == "token-Amount") {
+      setTokenAmount(value);
     }
   };
 
@@ -35,6 +92,10 @@ const ContractorProfile = () => {
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const closeBankModal = () => {
+    setIsBankModalOpen(false);
   };
 
   const closeModal = () => {
@@ -79,6 +140,11 @@ const ContractorProfile = () => {
     setIsModalOpen(true);
   };
 
+  const OpenBankModal = (bank_id) => {
+    setIsBankModalOpen(true);
+    setBank_id(bank_id);
+  };
+
   const fetchMyAppliedContract = async () => {
     try {
       const response = await axios.get(
@@ -107,6 +173,61 @@ const ContractorProfile = () => {
     setSelectedStages(stages);
     setBudget(budget);
     setContractId(id);
+  };
+
+  const sendTokenToBank = async () => {
+    try {
+      // ✅ Step 1: Fetch receiver wallet address
+      const { data, status } = await axios.get(
+        `http://localhost:5000/api/v1/user/getWalleteId/${bank_id}`
+      );
+
+      if (status !== 200 || !data.walletAddress) {
+        toast.error("❌ Receiver wallet address not found!");
+        return;
+      }
+
+      const receiver = data.walletAddress.trim(); // Ensure no spaces
+      console.log("✅ Receiver Wallet:", receiver);
+
+      if (!ethers.isAddress(receiver)) {
+        toast.error("❌ Invalid receiver address!");
+        return;
+      }
+
+      // ✅ Step 2: Connect Wallet
+      const signer = await connectWallet();
+      if (!signer) return;
+
+      // ✅ Step 3: Get contract instance
+      const contract = new ethers.Contract(shivaniAddress, shivaniAbi, signer);
+      console.log("✅ Contract Instance Loaded:", contract);
+
+      // ✅ Step 4: Convert budget to correct BigInt units
+      const amountToSend = ethers.parseUnits(tokenAmount.toString(), 18);
+      console.log("🔸 Amount to Send:", amountToSend.toString());
+
+      // ✅ Step 5: Execute transfer
+      let tx;
+      try {
+        tx = await contract.transfer(receiver, amountToSend);
+        console.log("⏳ Transaction Pending...");
+        await tx.wait();
+        closeBankModal();
+        console.log("✅ Tokens Sent Successfully!");
+        toast.success("Token Send Sucessfully");
+      } catch (txError) {
+        console.error("❌ Transaction failed:", txError);
+        // toast.error(txError.reason || txError.message || "Transaction failed!");
+        toast.error("network full please try again");
+        return;
+      }
+
+      // ✅ Step 6: Update contract status in DB
+    } catch (error) {
+      console.error("❌ Unexpected Error:", error);
+      toast.error("🚨 Unexpected error occurred. Please try again.");
+    }
   };
 
   return (
@@ -221,10 +342,52 @@ const ContractorProfile = () => {
         <button onClick={handleBankClick}>view Banks</button>
       </div>
 
-      {banks && (
-        <div>
-          <p>whoo this are banks</p>
+      {banks && banks.length > 0 && (
+        <div className="contractr-banks" onCli>
+          {banks.map((bank) => (
+            <div
+              onClick={() => {
+                OpenBankModal(bank._id);
+              }}
+              className="contractor-bank-button"
+            >
+              {bank.name}
+            </div>
+          ))}
         </div>
+      )}
+
+      {isBankModalOpen && (
+        <Modal closeModal={closeBankModal}>
+          <label htmlFor="account-no">Bank Account No. :</label>
+          <input
+            type="text"
+            name="account-no"
+            value={accountNo}
+            onChange={HanndleBankInputChange}
+            id="account-no"
+          />
+
+          <label htmlFor="IFSC-code">IFSC code :</label>
+          <input
+            type="text"
+            name="IFSC-code"
+            value={ifsc}
+            onChange={HanndleBankInputChange}
+            id="IFSC-code"
+          />
+
+          <label htmlFor="token-Amount">Token Amount</label>
+          <input
+            type="number"
+            name="token-Amount"
+            value={tokenAmount}
+            onChange={HanndleBankInputChange}
+            id="token-Amount"
+          />
+
+          <button onClick={sendTokenToBank}>send Token</button>
+        </Modal>
       )}
 
       {isModalOpen && (

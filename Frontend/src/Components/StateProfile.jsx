@@ -18,7 +18,7 @@ const StateProfile = () => {
               <p>Create Schemes</p>
             </Link>
             <Link to={"/state/view-application"} className="cg-fun-card">
-              <p>view Application</p>
+              <p>View Application</p>
             </Link>
             <Link to={"/state/view-all-scheme"} className="cg-fun-card">
               <p>View All Scheme</p>

@@ -43,6 +43,8 @@ const Login = () => {
           navigate("/cg");
         } else if (role === "user") {
           navigate("/user-profile");
+        } else if (role === "bank") {
+          navigate("/bank");
         } else {
           navigate("/"); // Default redirect if no role match
         }

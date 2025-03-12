@@ -34,6 +34,8 @@ import Token from "./Components/Token";
 import ViewPendingContract from "./Components/ViewPendingContract";
 import ContractorProfile from "./Components/ContractorProfile";
 import GetMyApprovedContract from "./Components/getMyApproveContract";
+import BankProfile from "./Components/BankProfile";
+import CentralFront from "./Components/CentralFront";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -60,6 +62,7 @@ const App = () => {
             </PrivateRoute>
           ),
           children: [
+            { path: "/cg/", element: <CentralFront /> },
             { path: "/cg/create-scheme", element: <CreateScheme /> },
             { path: "/cg/view-application", element: <ViewApplication /> },
             { path: "/cg/create-token", element: <CreateToken /> },
@@ -151,6 +154,10 @@ const App = () => {
         {
           path: "/contractor",
           element: <ContractorProfile />,
+        },
+        {
+          path: "/bank",
+          element: <BankProfile />,
         },
       ],
     },

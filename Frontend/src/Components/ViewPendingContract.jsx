@@ -120,7 +120,8 @@ const ViewPendingContract = () => {
         console.log("✅ Tokens Sent Successfully!");
       } catch (txError) {
         console.error("❌ Transaction failed:", txError);
-        toast.error(txError.reason || txError.message || "Transaction failed!");
+        // toast.error(txError.reason || txError.message || "Transaction failed!");
+        toast.error("network full please try again");
         return;
       }
 

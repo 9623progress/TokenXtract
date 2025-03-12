@@ -6,3 +6,15 @@
     justify-content: center; */
     margin: auto;
 }
+
+.contractor-bank-button {
+    padding: 10px;
+    font-size: 1.2rem;
+    border: 1px solid #ccc;
+}
+
+.contractr-banks {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

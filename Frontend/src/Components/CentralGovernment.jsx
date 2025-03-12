@@ -4,7 +4,7 @@ import flag from "../assets/india-flag.png";
 import { Link, Outlet } from "react-router-dom";
 
 const CentralGovernment = () => {
-  const [isOpen, setOpen] = useState(false);
+  const [isOpen, setOpen] = useState(true);
   return (
     <div className="cg-box">
       <div className={`cg-navigation-panel ${isOpen ? "cg-nav-open" : ""}`}>
@@ -14,11 +14,14 @@ const CentralGovernment = () => {
             <h1>सत्यमेव जयते </h1>
           </div>
           <div className="cg-functions">
+            <Link to={"/cg/"} className="cg-fun-card">
+              <p>Home</p>
+            </Link>
             <Link to={"/cg/create-scheme"} className="cg-fun-card">
               <p>Create Schemes</p>
             </Link>
             <Link to={"/cg/view-application"} className="cg-fun-card">
-              <p>view Application</p>
+              <p>View Application</p>
             </Link>
             <Link to={"/cg/create-token"} className="cg-fun-card">
               <p>Create Token</p>
@@ -30,7 +33,7 @@ const CentralGovernment = () => {
               <p>View All Scheme</p>
             </Link>
             <Link className="cg-fun-card" to={"/cg/create-department"}>
-              <p>Add department</p>
+              <p>Add Department</p>
             </Link>
             <Link className="cg-fun-card" to={"/cg/view-accepted"}>
               <p>View Accepted </p>
@@ -42,10 +45,10 @@ const CentralGovernment = () => {
               <p>Create Contract </p>
             </Link>
             <Link className="cg-fun-card" to={"/cg/view-contracts"}>
-              <p> view Contracts </p>
+              <p> View Contracts </p>
             </Link>
             <Link className="cg-fun-card" to={"/cg/view-tenders"}>
-              <p>view Tenders </p>
+              <p>View Tenders </p>
             </Link>
             <Link to={"/cg/getPendingContracts"} className="cg-fun-card">
               Pending Contracts

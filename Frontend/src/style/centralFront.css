@@ -1,0 +1,43 @@
+.central-Front-container {
+    width: 100%;
+    padding: 10px;
+    text-align: center;
+    background-color: #E4F1FF;
+    height: 100%;
+
+}
+
+.central-front-div2 h1 {
+    color: #27005D;
+    font-size: 2rem;
+}
+
+.cg-Front-option-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+a {
+    text-decoration: none;
+}
+
+
+.cg-main-buttons {
+
+    padding: 20px 15px;
+    background-color: white;
+    border-radius: 10px;
+    text-align: center;
+    color: #767575;
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+
+}
+
+.cg-main-buttons-heading {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #27005D;
+}

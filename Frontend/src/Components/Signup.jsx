@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { ethers } from "ethers";
 
 const Signup = () => {
   const [name, setName] = useState("");
@@ -39,9 +40,11 @@ const Signup = () => {
         const accounts = await window.ethereum.request({
           method: "eth_requestAccounts",
         });
-        setWalletAddress(accounts[0]);
-        toast.success(`Connected: ${accounts[0]}`);
+        const formattedAddress = ethers.utils.getAddress(accounts[0]); // Convert to checksum format
+        setWalletAddress(formattedAddress);
+        toast.success(`Connected: ${formattedAddress}`);
       } catch (error) {
+        console.log(error);
         toast.error("Failed to connect MetaMask.");
       }
     } else {

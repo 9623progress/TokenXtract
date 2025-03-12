@@ -871,8 +871,8 @@ export const approveContract = async (req, res) => {
 
 export const approveContractStage = async (req, res) => {
   try {
-    const { contractId, contractStageId, proof, transactionId } = req.body;
-    if (!contractId || !contractStageId || !proof || !transactionId) {
+    const { contractId, contractStageId, proof } = req.body;
+    if (!contractId || !contractStageId || !proof) {
       return res.status(400).json({
         message: "All fields are necessary",
       });
@@ -895,7 +895,6 @@ export const approveContractStage = async (req, res) => {
 
     stage.approve = true;
     stage.proof = proof;
-    stage.transactionId = transactionId;
 
     await contractToBeApprove.save();
     return res.status(200).json({
