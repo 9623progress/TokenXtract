@@ -16,7 +16,7 @@ const CentralFront = () => {
             <p className="cg-main-buttons-heading">Create Contract</p>
             <p>Set up project agreements</p>
           </Link>
-          <Link to={"/cg/my-token"} className="cg-main-buttons">
+          <Link to={"/cg/create-token"} className="cg-main-buttons">
             <p className="cg-main-buttons-heading">Create Token</p>
             <p> Generate and allocate tokens.</p>
           </Link>
