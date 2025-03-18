@@ -1,0 +1,19 @@
+.exit
+console.log(is);
+const is = await contract.authorizedContracts("0x08Ce9BFb1707baC98492A7aD4E3A1839aa6a856a");
+const contract = await ethers.getContractAt("GovToken", "0x7E842Ef130d6ac6e1eBA25205B288d7C0F9Eeb63");
+.exit
+console.log(is);
+const is = await contract.authorizedContracts("0x08Ce9BFb1707baC98492A7aD4E3A1839aa6a856a");
+const isAuth = await contract.authorizedContracts("0x08Ce9BFb1707baC98492A7aD4E3A1839aa6a856a");
+console.log(isAuth);
+const isAuth = await contract.authorizedContracts("0x080efa3F797e9E6f0620608ff13030eE64d93754");
+const contract = await ethers.getContractAt("GovToken", "0x7E842Ef130d6ac6e1eBA25205B288d7C0F9Eeb63");
+.exit
+const contract = await ethers.getContractAt("GovToken", "0x7E842Ef130d6ac6e1eBA25205B288d7C0F9Eeb63");
+console.log(isAuth);
+const isAuth = awa);
+const contract = await ethers.getContractAt("GovToken", "0xYourContractAddress");
+.exit
+yield
+await contractorFundContract.transferToContractor(contractor, amount, contractId, proof, stageId, applicationId);

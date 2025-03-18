@@ -1,5 +1,5 @@
 table {
-    width: 80%;
+    /* width: 80%; */
     border-collapse: collapse;
     margin: 20px 0;
     align-self: center;
@@ -15,11 +15,12 @@ td {
 th {
 
     font-weight: bold;
-    color: #27005D;
+    color: white;
+    background-color: #27005D;
 }
 
 tr:hover {
-    background-color: #f1f9ff;
+    background-color: #c4ace4;
 }
 
 .nowrap {

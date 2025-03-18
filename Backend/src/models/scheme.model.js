@@ -63,12 +63,16 @@ const schemeModel = new mongoose.Schema({
   },
   specialRequirement: {
     type: String,
-    default: "", // Default to empty string if not provided
+    default: "",
   },
-  form: [{ type: mongoose.Schema.Types.ObjectId, ref: "formFieldSchema" }], // Use the formFieldSchema for consistency
+  form: [{ type: mongoose.Schema.Types.ObjectId, ref: "formFieldSchema" }],
   active: {
     type: Boolean,
-    default: true, // Default to inactive
+    default: true,
+  },
+  creator: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
   },
 });
 

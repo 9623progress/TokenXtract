@@ -57,6 +57,7 @@ export const login = async (req, res) => {
         adhar: user.adhar,
         role: user.role,
         Token: user.Token,
+        walletAddress: user.walletAddress,
       }, // Excluding password from the response
     });
   } catch (error) {
@@ -67,7 +68,7 @@ export const login = async (req, res) => {
 
 export const register = async (req, res) => {
   try {
-    const { name, adhar, mobile, password } = req.body;
+    const { name, adhar, mobile, password, walletAddress, role } = req.body;
 
     // Validate Aadhaar (12 digits)
     const adharRegex = /^[0-9]{12}$/;
@@ -76,6 +77,8 @@ export const register = async (req, res) => {
         .status(400)
         .json({ message: "Aadhaar number must be exactly 12 digits" });
     }
+
+    console.log(walletAddress);
 
     // Validate Mobile Number (10 digits)
     const mobileRegex = /^[0-9]{10}$/;
@@ -102,6 +105,8 @@ export const register = async (req, res) => {
       adhar,
       mobile,
       password: hashedPassword, // Store hashed password
+      walletAddress,
+      role,
     });
 
     await newUser.save();
@@ -149,6 +154,7 @@ export const submitForm = async (req, res) => {
       return res.status(400).json({ message: "Missing userID or schemeID" });
     }
 
+    const ExistingUser = User.findById(userID);
     // Initialize responses array
     const responses = [];
 
@@ -182,6 +188,7 @@ export const submitForm = async (req, res) => {
     });
 
     await UserResponse.save();
+    ExistingUser.AppliedSchemesApplication.push(userResponse._id);
 
     return res.status(200).json({ message: "Form submitted successfully" });
   } catch (error) {
@@ -225,32 +232,30 @@ export const userProfile = async (req, res) => {
 
 export const applyForContract = async (req, res) => {
   try {
-    const { budget, contractId } = req.body;
+    const { budget, contractId, secreteKey } = req.body;
     const { userId } = req.params;
     const pdf = req.file?.path;
-    console.log(req.file);
+    console.log("Uploaded File:", req.file);
+
     const budgetValue = parseFloat(budget);
+
     // Validate required fields
     if (!pdf || isNaN(budgetValue)) {
       return res.status(400).json({
-        message: "Valid budget and pdf file are required",
+        message: "Valid budget and PDF file are required",
       });
     }
 
     // Check if user and contract exist
     const userExist = await User.findById(userId);
-    const contractExist = await contract.findById(contractId);
+    const contractExist = await contract.findById(contractId); // Fixed: Model name
 
-    if (!contractExist) {
-      return res.status(404).json({
-        message: "Contract not found",
-      });
+    if (!contractExist || contractExist.secreteKey !== secreteKey) {
+      return res.status(404).json({ message: "Contract not found" });
     }
 
     if (!userExist) {
-      return res.status(404).json({
-        message: "User not found",
-      });
+      return res.status(404).json({ message: "User not found" });
     }
 
     // Create a new contractor application
@@ -258,17 +263,144 @@ export const applyForContract = async (req, res) => {
       userId,
       contractId,
       pdf,
-      Budget: budget,
+      Budget: budgetValue,
+      secreteKey,
     });
 
     await newApplication.save();
 
+    // Add application ID to user's applied contracts list
+    userExist.AppliedContractApplication.push(newApplication._id);
+    contractExist.contractor = userId;
+    await contractExist.save();
+    await userExist.save(); // Fixed: Saving user after update
+
     return res.status(200).json({ message: "Applied successfully" });
   } catch (error) {
-    console.error("Error applying for contract:", error.message);
+    console.error("Error applying for contract:", error);
     return res.status(500).json({
       message: "Internal server error",
       error: error.message,
+    });
+  }
+};
+
+export const getContractByState = async (req, res) => {
+  try {
+    const { state } = req.params;
+    // console.log(state);
+
+    const data = await contract
+      .find({ state, ApproveContract: true })
+      .select("-secreteKey");
+
+    return res.status(200).json({
+      data,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+export const getWalleteId = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const userExist = await User.findById(id);
+    if (!userExist) {
+      return res.status(400).json({
+        message: "user not found",
+      });
+    }
+
+    return res.status(200).json({
+      walletAddress: userExist.walletAddress,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal Server Error",
+    });
+  }
+};
+export const getMyAppliedContract = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+
+    const userData = await User.findById(id)
+      .populate({
+        path: "AppliedContractApplication",
+        populate: { path: "contractId" },
+      })
+      .select("AppliedContractApplication");
+
+    if (!userData) {
+      return res.status(404).json({ message: "User Not Found" });
+    }
+
+    return res.status(200).json({ data: userData });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Server Error", error: error.message });
+  }
+};
+
+export const uploadStageProof = async (req, res) => {
+  try {
+    const { contractId, stageId } = req.body;
+    const fileUrl = req.file?.path || req.file?.url;
+    console.log(contractId, stageId, fileUrl);
+
+    if (!contractId || !stageId || !fileUrl) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+    const contractExist = await contract.findById(contractId);
+    if (!contractExist) {
+      return res.status(404).json({ message: "Contract not found" });
+    }
+
+    const stage = contractExist.stages.find(
+      (s) => s._id.toString() === stageId
+    );
+    if (!stage) {
+      return res.status(404).json({ message: "Stage not found" });
+    }
+
+    stage.proof = fileUrl;
+    await contractExist.save();
+
+    return res.status(200).json({
+      message: "Proof uploaded successfully",
+      updatedStage: stage,
+    });
+  } catch (error) {
+    console.error("Error uploading proof:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getMyAppliedSchemes = async (req, res) => {};
+
+export const getBanks = async (req, res) => {
+  try {
+    const banks = await User.find({ role: "bank" });
+
+    if (banks.length === 0) {
+      return res.status(404).json({
+        message: "No banks found",
+      });
+    }
+
+    return res.status(200).json({
+      banks,
+    });
+  } catch (error) {
+    console.error("Error fetching banks:", error);
+    return res.status(500).json({
+      message: "Internal Server Error",
     });
   }
 };

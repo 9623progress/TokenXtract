@@ -60,15 +60,38 @@ const Navbar = () => {
               Logout
             </a>
           </div>
-          {user.role === "cg" ? (
+          {user.role === "cg" && (
             <div>
               <Link className="navbar-right-div" to={"/cg"}>
                 Profile
               </Link>
             </div>
-          ) : (
+          )}
+          {user.role == "user" && (
             <div>
               <Link className="navbar-right-div" to={"/user-profile"}>
+                Profile
+              </Link>
+            </div>
+          )}
+          {user.role == "state" && (
+            <div>
+              <Link className="navbar-right-div" to={"/state"}>
+                Profile
+              </Link>
+            </div>
+          )}
+          {user.role == "bank" && (
+            <div>
+              <Link className="navbar-right-div" to={"/bank"}>
+                Profile
+              </Link>
+            </div>
+          )}
+
+          {user.role == "contractor" && (
+            <div>
+              <Link className="navbar-right-div" to={"/contractor"}>
                 Profile
               </Link>
             </div>

@@ -4,7 +4,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: transparent;
+    background: rgba(0, 0, 0, 0.4);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -18,19 +18,28 @@
     max-width: 500px;
     width: 100%;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: relative
 }
 
 .open-modal-btn,
 .close-modal-btn {
-    padding: 10px 20px;
-    background: #007bff;
+    padding: 10px 15px;
+    background: #6b479e;
     color: #fff;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    position: absolute;
+    top: 0px;
+    right: 10px;
+    font-size: 1.2rem;
+
 }
 
 .open-modal-btn:hover,
 .close-modal-btn:hover {
-    background: #0056b3;
+    background: #9776c5;
 }

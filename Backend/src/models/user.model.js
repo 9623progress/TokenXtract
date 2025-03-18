@@ -21,13 +21,30 @@ const UserSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    default: "user",
+    enum: ["user", "contractor", "state", "cg", "auditTeam", "bank"],
+    required: true,
   },
-  Token: {
+  Rupees: {
     type: Number,
     default: 0,
   },
+  AppliedSchemesApplication: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "userResponse",
+    },
+  ],
+  AppliedContractApplication: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "contractorApplications",
+    },
+  ],
   password: {
+    type: String,
+    required: true,
+  },
+  walletAddress: {
     type: String,
     required: true,
   },

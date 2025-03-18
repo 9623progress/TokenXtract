@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
-import React, { useState } from "react";
+import { useState } from "react";
 import "../style/createToken.css";
-import { useSelector } from "react-redux";
+// import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
 const contractAddress = "0x9e6DEFb65e5a0c0C6Fa0eAF11CAFd05D31c5e328"; // ✅ UPDATE THIS AFTER DEPLOYMENT

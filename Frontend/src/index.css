@@ -2,7 +2,8 @@ body {
   margin: 0px;
   padding: 0px;
   box-sizing: border-box;
-  font-family: "Roboto Slab", serif
+  font-family: "Roboto Slab", serif;
+  /* background-color: #110227; */
 }
 
 
@@ -17,7 +18,7 @@ body {
 
 :root {
   --primary-color: #007bff;
-  --primary-hover-color: #0056b3;
+  --primary-hover-color: #AED2FF;
   --secondary-color: #302e7d;
   --secondary-hover-color: #0056b3;
   --danger-color: #dc3545;

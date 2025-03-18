@@ -3,10 +3,6 @@ import mongoose from "mongoose";
 // name of contract, department under it, area of work, like state, district, city, local address, timeline, budget, legal consequences, stages of monitoring
 const contractSchema = new mongoose.Schema(
   {
-    departmentID: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "department",
-    },
     contractName: {
       type: String,
       required: true,
@@ -20,7 +16,6 @@ const contractSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-
     district: {
       type: String,
       required: true,
@@ -45,6 +40,10 @@ const contractSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    secreteKey: {
+      type: String,
+      required: true,
+    },
     stages: [
       {
         stageName: {
@@ -57,10 +56,29 @@ const contractSchema = new mongoose.Schema(
           min: 0,
           max: 100,
         },
+        approve: {
+          type: Boolean,
+          default: false,
+        },
+        proof: {
+          type: String,
+          default: "",
+        },
+        transactionId: {
+          type: String,
+          default: "",
+        },
       },
     ],
-
+    ApproveContract: {
+      type: Boolean,
+      default: false,
+    },
     contractor: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    creator: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
@@ -76,6 +94,10 @@ const ContractorApplicationSchema = new mongoose.Schema({
   contractId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "contracts",
+  },
+  secreteKey: {
+    type: String,
+    required: true,
   },
   pdf: {
     type: String,

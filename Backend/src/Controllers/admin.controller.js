@@ -25,6 +25,7 @@ export const createScheme = async (req, res) => {
     minAge,
     maxAge,
     specialRequirement,
+    UserId,
   } = req.body;
 
   if (
@@ -34,10 +35,18 @@ export const createScheme = async (req, res) => {
     !amountPerUser ||
     !form ||
     !minAge ||
-    !maxAge
+    !maxAge ||
+    !UserId
   ) {
     return res.status(400).json({
       message: "fill all fields",
+    });
+  }
+
+  const userExist = User.findById(UserId);
+  if (!userExist) {
+    return res.status(400).json({
+      message: "Invalid User",
     });
   }
 
@@ -73,6 +82,7 @@ export const createScheme = async (req, res) => {
     maxAge,
     specialRequirement,
     form: newForm,
+    creator: UserId,
   });
 
   await newScheme.save();
@@ -458,7 +468,6 @@ export const getRejectedForm = async (req, res) => {
 // Create Contract
 export const createContract = async (req, res) => {
   const {
-    departmentID,
     contractName,
     budget,
     state,
@@ -469,10 +478,12 @@ export const createContract = async (req, res) => {
     endDate,
     legalRules,
     stages,
+    secreteKey,
   } = req.body;
 
+  const { user } = req.params;
+
   if (
-    !departmentID ||
     !contractName ||
     !state ||
     !district ||
@@ -482,7 +493,8 @@ export const createContract = async (req, res) => {
     !endDate ||
     !budget ||
     !legalRules ||
-    !stages
+    !stages ||
+    !secreteKey
   ) {
     return res.status(400).json({
       message: "All fields are required",
@@ -511,7 +523,6 @@ export const createContract = async (req, res) => {
 
   try {
     const newContract = new contract({
-      departmentID,
       contractName,
       budget,
       state,
@@ -522,6 +533,8 @@ export const createContract = async (req, res) => {
       endDate,
       legalRules,
       stages,
+      secreteKey,
+      creator: user,
     });
 
     await newContract.save();
@@ -661,89 +674,6 @@ export const createToken = async (req, res) => {
   }
 };
 
-// by session for atomicity
-
-// export const disburseFundsBulk = async (req, res) => {
-//   try {
-//     const { schemeId, adminId } = req.body;
-
-//     // Fetch admin details
-//     const admin = await User.findById(adminId);
-//     if (!admin) {
-//       return res.status(400).json({ message: "Admin not found" });
-//     }
-
-//     // Fetch scheme applications where `Accepted` is true
-//     const schemeApplications = await userResponse
-//       .find({
-//         schemeID: schemeId,
-//         Accepted: true, // Ensure only accepted applications are fetched
-//       })
-//       .populate("schemeID");
-
-//     if (!schemeApplications || schemeApplications.length === 0) {
-//       return res
-//         .status(400)
-//         .json({ message: "No accepted applications found for this scheme" });
-//     }
-
-//     // Calculate total funds required for all accepted applications
-//     const totalAmount = schemeApplications.reduce(
-//       (sum, application) => sum + application.schemeID.amountPerUser,
-//       0
-//     );
-
-//     // Check if admin has sufficient funds
-//     if (admin.balance < totalAmount) {
-//       return res.status(400).json({ message: "Insufficient funds" });
-//     }
-
-//     // Start a bulk transaction
-//     const session = await mongoose.startSession();
-//     session.startTransaction();
-
-//     try {
-//       // Deduct funds from admin
-//       admin.balance -= totalAmount;
-//       await admin.save({ session });
-
-//       // Disburse funds to users in accepted applications
-//       await Promise.all(
-//         schemeApplications.map(async (application) => {
-//           const user = await User.findById(application.userID).session(session);
-//           if (user) {
-//             user.Token = (user.Token || 0) + application.schemeID.amountPerUser; // Ensure `Token` field is handled
-//             await user.save({ session });
-//           }
-//         })
-//       );
-
-//       // Commit transaction
-//       await session.commitTransaction();
-//       session.endSession();
-
-//       return res.status(200).json({
-//         message: "Funds disbursed successfully to accepted applications",
-//         disbursedDetails: schemeApplications.map((app) => ({
-//           userId: app.userID,
-//           amount: app.schemeID.amountPerUser,
-//         })),
-//       });
-//     } catch (error) {
-//       // Rollback transaction in case of error
-//       await session.abortTransaction();
-//       session.endSession();
-//       console.error("Error in transaction:", error.message);
-//       return res
-//         .status(500)
-//         .json({ error: "Transaction failed. Please try again." });
-//     }
-//   } catch (error) {
-//     console.error("Error in bulk fund disbursement:", error.message);
-//     return res.status(500).json({ error: "Internal server error" });
-//   }
-// };
-
 export const disburseFundsBulk = async (req, res) => {
   try {
     const { schemeId, adminId } = req.body;
@@ -815,5 +745,165 @@ export const disburseFundsBulk = async (req, res) => {
   } catch (error) {
     console.error("Error in bulk fund disbursement:", error.message);
     return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const getMyCreatedContract = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const myContracts = await contract.find({ creator: userId });
+
+    if (!myContracts.length) {
+      return res.status(404).json({
+        message: "No contracts found for this user",
+      });
+    }
+
+    return res.status(200).json({
+      data: myContracts,
+    });
+  } catch (error) {
+    console.error("Error fetching contracts:", error);
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
+
+export const getPendingContracts = async (req, res) => {
+  try {
+    const PendingContracts = await contract
+      .find({ ApproveContract: false })
+      .select("-secreteKey");
+
+    return res.status(200).json({
+      data: PendingContracts,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Internal Server Error",
+    });
+  }
+};
+
+export const getMyApprovedContracts = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    if (!userId) {
+      return res.status(400).json({
+        message: "User ID is required",
+      });
+    }
+
+    const myContracts = await contract
+      .find({ creator: userId, ApproveContract: true })
+      .populate("contractor")
+      .lean();
+
+    return res.status(200).json({
+      data: myContracts,
+      message: myContracts.length
+        ? "Approved contracts fetched successfully"
+        : "No approved contracts found for this user",
+    });
+  } catch (error) {
+    console.error("Error fetching approved contracts:", error);
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
+
+export const getMyPendingContracts = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const myContracts = await contract.find({
+      creator: userId,
+      ApproveContract: false,
+    });
+
+    if (!myContracts.length) {
+      return res.status(404).json({
+        message: "No contracts found for this user",
+      });
+    }
+
+    return res.status(200).json({
+      data: myContracts,
+    });
+  } catch (error) {
+    console.error("Error fetching contracts:", error);
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
+
+export const approveContract = async (req, res) => {
+  try {
+    const { contractId } = req.body; // Ensure contractId is extracted correctly
+
+    if (!contractId || contractId.length !== 24) {
+      return res.status(400).json({ message: "Invalid contract ID" });
+    }
+
+    const contractToBeApprove = await contract.findById(contractId);
+
+    if (!contractToBeApprove) {
+      return res.status(400).json({ message: "Contract not found" });
+    }
+
+    await contractToBeApprove.updateOne({ $set: { ApproveContract: true } });
+
+    res.status(200).json({ message: "Contract Approved Successfully" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const approveContractStage = async (req, res) => {
+  try {
+    const { contractId, contractStageId, proof } = req.body;
+    if (!contractId || !contractStageId || !proof) {
+      return res.status(400).json({
+        message: "All fields are necessary",
+      });
+    }
+
+    // Find the contract document
+    const contractToBeApprove = await contract.findById(contractId);
+
+    if (!contractToBeApprove) {
+      return res.status(400).json({ message: "Contract not found" });
+    }
+
+    const stage = contractToBeApprove.stages.find(
+      (stage) => stage._id.toString() === contractStageId
+    );
+
+    if (!stage) {
+      return res.status(400).json({ message: "Stage not found" });
+    }
+
+    stage.approve = true;
+    stage.proof = proof;
+
+    await contractToBeApprove.save();
+    return res.status(200).json({
+      message: "Stage approved successfully",
+      updatedContract: contractToBeApprove,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Server error", error: error.message });
   }
 };
