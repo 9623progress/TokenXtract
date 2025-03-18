@@ -3,7 +3,7 @@ import { Link, Outlet } from "react-router-dom";
 import flag from "../assets/india-flag.png";
 
 const StateProfile = () => {
-  const [isOpen, setOpen] = useState(false);
+  const [isOpen, setOpen] = useState(true);
   return (
     <div className="cg-box">
       <div className={`cg-navigation-panel ${isOpen ? "cg-nav-open" : ""}`}>

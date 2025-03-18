@@ -1,6 +1,12 @@
 .create-contract-top-div {
     padding: 20px;
+
+
     /* background-color: #f9f9f9; */
+}
+
+.create-tagline {
+    text-align: center;
 }
 
 .create-contract-inner-div {

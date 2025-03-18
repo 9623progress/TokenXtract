@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { states } from "../utils/State-District-data";
-import "../style/cresteContract.css";
+import "../style/createContract.css";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
@@ -111,6 +111,9 @@ const CreateContract = () => {
 
   return (
     <div className="create-contract-top-div">
+      <div className="create-tagline">
+        <h2>Craft Your Contract with Confidence</h2>
+      </div>
       <div className="create-contract-inner-div">
         <div className="create-contract-input-div">
           <label htmlFor="contract-name">Contract Name</label>
@@ -134,7 +137,7 @@ const CreateContract = () => {
           />
         </div>
 
-        <div>
+        <div className="create-contract-input-div">
           <select name="state" onChange={handleStateChange}>
             <option value="">Select State</option>
             {states.map((s) => (
@@ -145,7 +148,7 @@ const CreateContract = () => {
           </select>
         </div>
 
-        <div>
+        <div className="create-contract-input-div">
           <select name="district" onChange={handleDistrictChange}>
             <option value="">Select District</option>
             {district.map((d) => (
@@ -225,6 +228,9 @@ const CreateContract = () => {
 
         <div>
           <label>Stages:</label>
+          <div className="stages-headding">
+            <p>Stage Name & Percentage of amount</p>
+          </div>
           {stages.map((s, index) => (
             <div key={index}>
               <input
@@ -233,6 +239,7 @@ const CreateContract = () => {
                 onChange={(e) =>
                   HandleStageChange(index, "stageName", e.target.value)
                 }
+                placeholder="Stage Name"
               />
               <input
                 type="number"
@@ -240,6 +247,7 @@ const CreateContract = () => {
                 onChange={(e) =>
                   HandleStageChange(index, "percentage", e.target.value)
                 }
+                placeholder="Percentage"
               />
               <button
                 className="create-contract-remove-stage-button"

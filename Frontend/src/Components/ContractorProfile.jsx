@@ -16,12 +16,13 @@ const ContractorProfile = () => {
   const [stageId, setStageId] = useState("");
   const [proofFile, setProofFile] = useState(null);
   const [banks, setBanks] = useState([]);
-  const [viewBank, setViewBank] = useState(false);
+  const [viewBanksModal, setViewBanksModal] = useState(false);
   const [isBankModalOpen, setIsBankModalOpen] = useState(false);
   const [accountNo, setAccountNo] = useState("");
   const [ifsc, setIFsc] = useState("");
   const [tokenAmount, setTokenAmount] = useState(0);
   const [bank_id, setBank_id] = useState("");
+  const [currentStageName, setCurrentStageName] = useState("");
 
   const connectWallet = async () => {
     if (!window.ethereum) {
@@ -161,6 +162,7 @@ const ContractorProfile = () => {
   const handleBankClick = () => {
     getBanks();
     setBanks(true);
+    setViewBanksModal(true);
   };
 
   useEffect(() => {
@@ -169,10 +171,11 @@ const ContractorProfile = () => {
     }
   }, [user?.id]);
 
-  const handleViewStages = (stages, budget, id) => {
+  const handleViewStages = (stages, budget, id, name) => {
     setSelectedStages(stages);
     setBudget(budget);
     setContractId(id);
+    setCurrentStageName(name);
   };
 
   const sendTokenToBank = async () => {
@@ -230,16 +233,39 @@ const ContractorProfile = () => {
     }
   };
 
+  const closeViewBankModal = () => {
+    setViewBanksModal(false);
+  };
+
   return (
     <div className="contract-profile-containers">
-      <div>
-        <p>Name: {user?.name}</p>
-        <p>Adhar Number: {user?.adhar}</p>
-        <p>Role: {user?.role}</p>
-        <p>Wallet Address: {user?.walletAddress}</p>
+      <div className="contractor-details">
+        <div className="contractor-details-box">
+          <p>
+            <span>Name:</span> {user?.name}
+          </p>
+          <p>
+            <span>Adhar Number:</span> {user?.adhar}
+          </p>
+          <p>
+            <span>Role:</span> {user?.role}
+          </p>
+          <p>
+            <span>Wallet Address:</span> {user?.walletAddress}
+          </p>
+
+          <div className="contarctor-banks">
+            <button onClick={handleBankClick}>Convert Tokens to money</button>
+          </div>
+        </div>
       </div>
 
-      <div>
+      {/* <div className="contractor-choose-option">
+        <p>View Contracts</p>
+        <p>View Banks</p>
+      </div> */}
+
+      <div className="contractor-contracts">
         <h1>Your Applied Contracts</h1>
         {contractData.length > 0 ? (
           <table border="1" cellPadding="5">
@@ -275,9 +301,11 @@ const ContractorProfile = () => {
                         handleViewStages(
                           contract.contractId?.stages,
                           contract.contractId?.budget,
-                          contract.contractId?._id
+                          contract.contractId?._id,
+                          contract.contractId.contractName
                         )
                       }
+                      className="View-stages-button"
                     >
                       View Stages
                     </button>
@@ -292,69 +320,78 @@ const ContractorProfile = () => {
       </div>
 
       {selectedStages && (
-        <div>
-          <h2>Stages</h2>
-          <table border="1" cellPadding="5">
-            <thead>
-              <tr>
-                <th>Stage Name</th>
-                <th>Percentage</th>
-                <th>Approval Status</th>
-                <th>Proof</th>
-                <th>Amount Send</th>
-              </tr>
-            </thead>
-            <tbody>
-              {selectedStages.map((stage) => (
-                <tr key={stage._id}>
-                  <td>{stage.stageName}</td>
-                  <td>{stage.percentage}%</td>
-                  <td>{stage.approve ? "Approved" : "Pending"}</td>
-                  <td>
-                    {(stage.proof && (
-                      <a href={stage.proof} target="blank">
-                        View proof
-                      </a>
-                    )) || (
-                      <button
-                        onClick={() => {
-                          handleStage(stage._id);
-                        }}
-                      >
-                        Request Fund
-                      </button>
-                    )}
-                  </td>
-                  <td>
-                    {stage.approve
-                      ? (budget * stage.percentage) / 100
-                      : "Pending"}
-                  </td>
+        <div className="view-stages-table-container">
+          <h2>Stages of {currentStageName}</h2>
+          <div className="view-stages-table">
+            <button
+              className="close-stages-btn"
+              onClick={() => setSelectedStages(null)}
+            >
+              close
+            </button>
+            <table border="1" cellPadding="5">
+              <thead>
+                <tr>
+                  <th>Stage Name</th>
+                  <th>Percentage</th>
+                  <th>Approval Status</th>
+                  <th>Proof</th>
+                  <th>Amount Send</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-          <button onClick={() => setSelectedStages(null)}>Close</button>
+              </thead>
+              <tbody>
+                {selectedStages.map((stage) => (
+                  <tr key={stage._id}>
+                    <td>{stage.stageName}</td>
+                    <td>{stage.percentage}%</td>
+                    <td>{stage.approve ? "Approved" : "Pending"}</td>
+                    <td>
+                      {(stage.proof && (
+                        <a href={stage.proof} target="blank">
+                          View proof
+                        </a>
+                      )) || (
+                        <button
+                          onClick={() => {
+                            handleStage(stage._id);
+                          }}
+                          className="request-fund-button"
+                        >
+                          Request Fund
+                        </button>
+                      )}
+                    </td>
+                    <td>
+                      {stage.approve
+                        ? (budget * stage.percentage) / 100
+                        : "Pending"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
-      <div className="contarctor-banks">
-        <button onClick={handleBankClick}>view Banks</button>
-      </div>
-
-      {banks && banks.length > 0 && (
-        <div className="contractr-banks" onCli>
-          {banks.map((bank) => (
-            <div
-              onClick={() => {
-                OpenBankModal(bank._id);
-              }}
-              className="contractor-bank-button"
-            >
-              {bank.name}
+      {viewBanksModal && (
+        <Modal closeModal={closeViewBankModal}>
+          {banks && banks.length > 0 && (
+            <div className="contractr-banks" onCli>
+              {banks.map((bank) => (
+                <div
+                  onClick={() => {
+                    OpenBankModal(bank._id);
+                  }}
+                  className="contractor-bank-button"
+                >
+                  {"\u{1F3E6} "}
+                  {bank.name}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          )}
+        </Modal>
       )}
 
       {isBankModalOpen && (
@@ -386,7 +423,9 @@ const ContractorProfile = () => {
             id="token-Amount"
           />
 
-          <button onClick={sendTokenToBank}>send Token</button>
+          <button className="send-token-btn" onClick={sendTokenToBank}>
+            Send Token
+          </button>
         </Modal>
       )}
 
@@ -394,7 +433,9 @@ const ContractorProfile = () => {
         <Modal closeModal={closeModal}>
           <label htmlFor="proof-file">Upload the work done details file</label>
           <input type="file" name="proof-file" onChange={inputChange} />
-          <button onClick={uploadFile}>Submit</button>
+          <button className="submit-proof-btn" onClick={uploadFile}>
+            Submit
+          </button>
         </Modal>
       )}
     </div>
