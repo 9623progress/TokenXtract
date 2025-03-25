@@ -1,8 +1,32 @@
 import React, { useCallback, useState } from "react";
 import { useSelector } from "react-redux";
+import {ethers} from 'ethers'
 import axios from "axios";
 import "../style/ViewApplication.css";
 import { toast } from "react-toastify";
+
+const shivaniAddress = "0x9e6DEFb65e5a0c0C6Fa0eAF11CAFd05D31c5e328";
+
+// ✅ Shivani Token ABI (Minimal)
+const shivaniAbi = [
+  {
+    inputs: [
+      { internalType: "address", name: "recipient", type: "address" },
+      { internalType: "uint256", name: "amount", type: "uint256" },
+    ],
+    name: "transfer",
+    outputs: [{ internalType: "bool", name: "", type: "bool" }],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "address", name: "account", type: "address" }],
+    name: "balanceOf",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+];
 
 const Accepted = () => {
   const { departments } = useSelector((state) => state.departments);
@@ -48,35 +72,127 @@ const Accepted = () => {
     newTab.focus();
   };
 
+  // const handleDisburstFund = async () => {
+  //   try {
+  //     const response = await axios.post(
+  //       "http://localhost:5000/api/v1/admin/fund-transfer",
+  //       {
+  //         schemeId: selectedScheme,
+  //         adminId: id,
+  //       },
+  //       {
+  //         withCredentials: true,
+  //       }
+  //     );
+
+  //     console.log(response);
+
+  //     if (response.status == 200) {
+  //       toast.success(response.data.success);
+  //       setApplicants([]);
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //     toast.error(error.response.data.message);
+  //   }
+  // };
+
+
   const handleDisburstFund = async () => {
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/v1/admin/fund-transfer",
-        {
-          schemeId: selectedScheme,
-          adminId: id,
-        },
-        {
-          withCredentials: true,
-        }
+      // 1️⃣ Fetch applicants' wallet addresses
+      console.log(selectedScheme);
+      const response = await axios.get(
+        `http://localhost:5000/api/v1/admin/getAcceptedApplicantsWallet/${selectedScheme}`
       );
-
+      
       console.log(response);
-
-      if (response.status == 200) {
-        toast.success(response.data.success);
-        setApplicants([]);
+      if (response.status !== 200 || response.data.length===0) {
+        toast.error("❌ No applicants found or wallet addresses missing!");
+        return;
       }
+  
+      const applicantsWallets = response.data.data; // Array of { walletAddress, amount }
+      // const amt=response.data.amountPerUser;
+
+      console.log(applicantsWallets);
+      
+      // 2️⃣ Connect to MetaMask
+      if (!window.ethereum) {
+        toast.error("🚨 MetaMask is not installed!");
+        return;
+      }
+  
+      const connectWallet = async () => {
+         if (!window.ethereum) {
+           toast.error("🚨 MetaMask not installed! Please install and try again.");
+           return null;
+         }
+         try {
+           const provider = new ethers.BrowserProvider(window.ethereum);
+           await window.ethereum.request({ method: "eth_requestAccounts" });
+           return await provider.getSigner();
+         } catch (error) {
+           console.error("❌ Wallet connection failed:", error);
+           toast.error("❌ Failed to connect wallet!");
+           return null;
+         }
+       };
+  
+       const signer=await connectWallet();
+      // 3️⃣ Load the Token Contract
+      const tokenContract = new ethers.Contract(shivaniAddress, shivaniAbi, signer);
+  
+      // 4️⃣ Transfer tokens to each applicant
+      for (let applicant of applicantsWallets) {
+        const { walletAddress, amountPerUser } = applicant;
+        
+        if (!ethers.isAddress(walletAddress)) {
+          toast.error(`❌ Invalid wallet address: ${walletAddress}`);
+          continue;
+        }
+  
+        const amountToSend = ethers.parseUnits((amountPerUser || "0").toString(), 18);
+
+  
+        try {
+          const tx = await tokenContract.transfer(walletAddress, amountToSend);
+          console.log(`⏳ Transaction Sent to ${walletAddress} - TX Hash:`, tx.hash);
+          await tx.wait();
+          console.log(`✅ Tokens Transferred to ${walletAddress}`);
+        } catch (txError) {
+          console.error(`❌ Failed for ${walletAddress}:`, txError);
+          toast.error(`❌ Transaction failed for ${walletAddress}`);
+        }
+      }
+  
+      // 5️⃣ Update the backend after successful disbursement
+      await axios.post(
+        "http://localhost:5000/api/v1/admin/fund-transfer",
+        { schemeID: selectedScheme, adminId: id },
+        { withCredentials: true }
+      );
+  
+      toast.success("🎉 Fund disbursed successfully!");
+      setApplicants([]); // Clear the table after successful disbursement
+  
     } catch (error) {
-      console.log(error);
-      toast.error(error.response.data.message);
+        console.error("❌ Error during fund disbursement:", error);
+        if (error.response) {
+          console.log("Error Response Data:", error.response.data);
+          console.log("Error Status:", error.response.status);
+          console.log("Error Headers:", error.response.headers);
+        }
+        toast.error("🚨 Unexpected error occurred. Please try again.");
+      toast.error("🚨 Unexpected error occurred. Please try again.");
     }
   };
 
-  const fetchApplications = useCallback(async (scheme_id) => {
+  
+  const fetchApplications = useCallback(async (schemeID) => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/v1/admin/accepted-form/${scheme_id}`,
+        `http://localhost:5000/api/v1/admin/accepted-form/${schemeID}`,
         { withCredentials: true }
       );
       if (response.status === 200) {
@@ -91,7 +207,7 @@ const Accepted = () => {
   //   const handleAccept = async (applicantId) => {
   //     try {
   //       const response = await axios.patch(
-  //         `http://localhost:5000/api/v1/admin/accept-form/${applicantId}`
+  //         http://localhost:5000/api/v1/admin/accept-form/${applicantId}
   //       );
   //       if (response.status == 200) {
   //         toast.success(response.data.message || "Form accepted");
@@ -104,7 +220,7 @@ const Accepted = () => {
   //   const handleReject = async (applicantId) => {
   //     try {
   //       const response = await axios.patch(
-  //         `http://localhost:5000/api/v1/admin/reject-form/${applicantId}`
+  //         http://localhost:5000/api/v1/admin/reject-form/${applicantId}
   //       );
   //       if (response.status == 200) {
   //         toast.success(response.data.message || "Form rejected");
@@ -216,3 +332,4 @@ const Accepted = () => {
 };
 
 export default Accepted;
+

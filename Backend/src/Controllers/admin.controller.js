@@ -465,6 +465,43 @@ export const getRejectedForm = async (req, res) => {
   }
 };
 
+export const getAcceptedApplicantsWallet = async (req, res) => {
+  try {
+      const { schemeID } = req.params;
+
+      // Fetch users where accepted is true for a specific scheme
+      const acceptedApplicants = await userResponse.find({
+          schemeID: schemeID,
+          Accepted: true // Only fetch users who are accepted
+      })
+      .populate({
+          path: "userID",
+          select: "walletAddress",// Fetch only walletAddress
+          // select:"name" 
+      })
+      .populate({
+          path: "schemeID",
+          select: "amountPerUser" // Fetch amountPerUser
+      });
+
+      if (!acceptedApplicants.length) {
+          return res.status(404).json({ success: false, message: "No accepted applicants found." });
+      }
+
+      // Extract necessary data
+      const formattedResponse = acceptedApplicants.map(applicant => ({
+          walletAddress: applicant.userID.walletAddress,
+          // name: applicant.userID.name,
+          amountPerUser: applicant.schemeID.amountPerUser
+      }));
+
+      res.status(200).json({ success: true, data: formattedResponse });
+  } catch (error) {
+      console.error("Error fetching accepted applicants:", error);
+      res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
 // Create Contract
 export const createContract = async (req, res) => {
   const {
@@ -676,7 +713,7 @@ export const createToken = async (req, res) => {
 
 export const disburseFundsBulk = async (req, res) => {
   try {
-    const { schemeId, adminId } = req.body;
+    const { schemeID, adminId } = req.body;
 
     // Fetch admin details
     const admin = await User.findById(adminId);
@@ -687,7 +724,7 @@ export const disburseFundsBulk = async (req, res) => {
     // Fetch scheme applications where `accepted` is true
     const schemeApplications = await userResponse
       .find({
-        schemeID: schemeId,
+        schemeID: schemeID,
         Accepted: true,
       })
       .populate("schemeID");

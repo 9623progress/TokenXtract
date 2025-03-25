@@ -154,7 +154,12 @@ export const submitForm = async (req, res) => {
       return res.status(400).json({ message: "Missing userID or schemeID" });
     }
 
-    const ExistingUser = User.findById(userID);
+    const ExistingUser = await User.findById(userID);
+
+    if(!ExistingUser)
+    {
+      return res.status(400).json({ message: "Missing user" });
+    }
     // Initialize responses array
     const responses = [];
 

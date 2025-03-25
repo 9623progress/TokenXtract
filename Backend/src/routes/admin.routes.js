@@ -9,6 +9,7 @@ import {
   createScheme,
   createToken,
   disburseFundsBulk,
+  getAcceptedApplicantsWallet,
   getAcceptedForm,
   getAllApplicationByScheme,
   getAllschemeByDepartment,
@@ -60,6 +61,20 @@ router.get(
   authorizeRoles("cg"),
   getAcceptedForm
 );
+
+router.post("/fund-transfer",
+  disburseFundsBulk
+);
+
+// getAcceptedApplicantsWallet
+
+router.get(
+  "/getAcceptedApplicantsWallet/:schemeID",
+  // verifyJWT,
+  // authorizeRoles("cg"),
+  getAcceptedApplicantsWallet
+);
+
 router.get(
   "/rejected-form/:id",
   verifyJWT,
