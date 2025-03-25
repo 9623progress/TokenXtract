@@ -5,10 +5,10 @@ import { toast } from "react-toastify";
 import { ethers } from "ethers";
 
 // ✅ Import ABIs
-import newTempAbi from "../../../Blockchain/artifacts/Contracts/newTempTokenContract.sol/MyToken.json";
+// import newTempAbi from "../../../Blockchain/artifacts/Contracts/newTempTokenContract.sol/MyToken.json";
 
 // ✅ Contract Addresses
-const newTempContract_Address = "0x43Dd8A1a3fB1788bfC9303e68626DBd06b06790C";
+// const newTempContract_Address = "0x43Dd8A1a3fB1788bfC9303e68626DBd06b06790C";
 const shivaniAddress = "0x9e6DEFb65e5a0c0C6Fa0eAF11CAFd05D31c5e328";
 
 // ✅ Shivani Token ABI (Minimal)
