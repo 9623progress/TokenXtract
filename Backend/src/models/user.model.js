@@ -48,6 +48,22 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+
+  totalTokensReceived: { 
+    type: Number, 
+    default: 0 
+  }, // Total tokens received by the user
+
+  tokenHistory: [
+    {
+      schemeID: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "schemeForm",
+      }, // Scheme the tokens came from
+      amount: { type: Number, required: true }, // Tokens credited
+      date: { type: Date, default: Date.now }, // Date of transaction
+    },
+  ]
 });
 
 const userResponseModel = new mongoose.Schema({
@@ -82,6 +98,10 @@ const userResponseModel = new mongoose.Schema({
   fundDisburst: {
     type: Boolean,
     default: false,
+  },
+  tokensReceived: {
+    type: Number,
+    default: 0, // Tokens credited for this scheme's disbursement cycle
   },
   submittedAt: {
     type: Date,

@@ -208,32 +208,57 @@ export const submitForm = async (req, res) => {
 };
 
 export const userProfile = async (req, res) => {
-  const { id } = req.params;
+  try {
+    const { id } = req.params;
 
-  if (!id) {
-    res.status(400).json({
-      message: "invalid id",
+    if (!id) {
+      return res.status(400).json({
+        message: "Invalid ID",
+      });
+    }
+
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(400).json({
+        message: "Sorry, user not found",
+      });
+    }
+
+    // Fetch all user responses where fund has been disbursed
+    const applications = await userResponse.find({ userID: id, 
+      fundDisburst: true }).populate("schemeID");
+
+    // Calculate total tokens received
+    const totalTokensReceived = applications.reduce(
+      (sum, app) => sum + app.schemeID.amountPerUser,
+      0
+    );
+
+    // Create token history
+    const tokenHistory = applications.map((app) => ({
+      schemeID: app.schemeID._id.toString(),
+      amount: app.schemeID.amountPerUser,
+      // date: app.submittedAt,
+    }));
+
+    res.status(200).json({
+      message: `Welcome ${user.name}`,
+      user: {
+        id: user._id,
+        name: user.name,
+        adhar: user.adhar,
+        role: user.role,
+        totalTokensReceived,
+        tokenHistory,
+      },
     });
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
-
-  const user = await User.findById(id);
-
-  if (!user) {
-    res.status(400).json({
-      message: "sorry user not found",
-    });
-  }
-
-  res.status(200).json({
-    message: `welcome ${user.name}`,
-    user: {
-      id: user._id,
-      name: user.name,
-      adhar: user.adhar,
-      role: user.role,
-    },
-  });
 };
+
 
 export const applyForContract = async (req, res) => {
   try {
@@ -306,6 +331,7 @@ export const getContractByState = async (req, res) => {
     console.log(error);
   }
 };
+
 export const getWalleteId = async (req, res) => {
   try {
     const { id } = req.params;

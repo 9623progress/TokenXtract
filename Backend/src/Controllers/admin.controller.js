@@ -711,37 +711,100 @@ export const createToken = async (req, res) => {
   }
 };
 
+// export const disburseFundsBulk = async (req, res) => {
+//   try {
+//     const { schemeID, adminId } = req.body;
+
+//     // Fetch admin details
+//     const admin = await User.findById(adminId);
+//     if (!admin) {
+//       return res.status(400).json({ message: "Admin not found" });
+//     }
+
+//     // Fetch scheme applications where `accepted` is true
+//     const schemeApplications = await userResponse
+//       .find({
+//         schemeID: schemeID,
+//         Accepted: true,
+//       })
+//       .populate("schemeID");
+
+//     if (!schemeApplications || schemeApplications.length === 0) {
+//       return res
+//         .status(400)
+//         .json({ message: "No accepted applications found for this scheme" });
+//     }
+
+//     // Calculate total funds required for all accepted applications
+//     const totalAmount = schemeApplications.reduce(
+//       (sum, application) => sum + application.schemeID.amountPerUser,
+//       0
+//     );
+
+//     // Check if admin has sufficient funds
+//     if (admin.Token < totalAmount) {
+//       return res.status(400).json({ message: "Insufficient funds" });
+//     }
+
+//     // Deduct total funds from admin
+//     admin.Token -= totalAmount;
+//     await admin.save();
+
+//     // Disburse funds to each user
+//     const failedDisbursements = [];
+//     for (const application of schemeApplications) {
+//       try {
+//         const user = await User.findById(application.userID);
+//         if (user) {
+//           user.Token += application.schemeID.amountPerUser;
+
+//           await user.save();
+//           application.fundDisburst = true;
+//           application.save();
+//         } else {
+//           failedDisbursements.push(application.userID);
+//         }
+//       } catch (error) {
+//         console.error(
+//           `Error disbursing funds to user ${application.userID}:`,
+//           error.message
+//         );
+//         failedDisbursements.push(application.userID);
+//       }
+//     }
+
+//     // Respond with the result
+//     return res.status(200).json({
+//       message: "Funds disbursed successfully",
+//       failedDisbursements:
+//         failedDisbursements.length > 0 ? failedDisbursements : null,
+//     });
+//   } catch (error) {
+//     console.error("Error in bulk fund disbursement:", error.message);
+//     return res.status(500).json({ error: "Internal server error" });
+//   }
+// };
+
+
 export const disburseFundsBulk = async (req, res) => {
   try {
     const { schemeID, adminId } = req.body;
 
     // Fetch admin details
     const admin = await User.findById(adminId);
-    if (!admin) {
-      return res.status(400).json({ message: "Admin not found" });
-    }
+    if (!admin) return res.status(400).json({ message: "Admin not found" });
 
-    // Fetch scheme applications where `accepted` is true
-    const schemeApplications = await userResponse
-      .find({
-        schemeID: schemeID,
-        Accepted: true,
-      })
-      .populate("schemeID");
+    // Fetch scheme applications where `Accepted` is true
+    const schemeApplications = await userResponse.find({ schemeID, Accepted: true }).populate("schemeID");
 
     if (!schemeApplications || schemeApplications.length === 0) {
-      return res
-        .status(400)
-        .json({ message: "No accepted applications found for this scheme" });
+      return res.status(400).json({ message: "No accepted applications found for this scheme" });
     }
 
-    // Calculate total funds required for all accepted applications
-    const totalAmount = schemeApplications.reduce(
-      (sum, application) => sum + application.schemeID.amountPerUser,
-      0
-    );
+    // Calculate total funds required
+    const totalAmount = schemeApplications.reduce((sum, app) => sum + app.schemeID.amountPerUser, 0);
 
-    // Check if admin has sufficient funds
+    // Check if admin has enough funds
     if (admin.Token < totalAmount) {
       return res.status(400).json({ message: "Insufficient funds" });
     }
@@ -750,34 +813,33 @@ export const disburseFundsBulk = async (req, res) => {
     admin.Token -= totalAmount;
     await admin.save();
 
-    // Disburse funds to each user
+    // Disburse funds & update database
     const failedDisbursements = [];
     for (const application of schemeApplications) {
       try {
         const user = await User.findById(application.userID);
         if (user) {
-          user.Token += application.schemeID.amountPerUser;
-
+          const amount = application.schemeID.amountPerUser;
+          user.Token += amount;
+          user.totalTokensReceived += amount; // ✅ Update total tokens received
+          user.tokenHistory.push({ schemeID, amount, date: new Date() }); // ✅ Add to transaction history
           await user.save();
-          application.fundDisburst = true;
-          application.save();
+
+          application.fundDisburst = true; // ✅ Mark funds as disbursed
+          application.tokensReceived += amount; // ✅ Track tokens received per scheme
+          await application.save();
         } else {
           failedDisbursements.push(application.userID);
         }
       } catch (error) {
-        console.error(
-          `Error disbursing funds to user ${application.userID}:`,
-          error.message
-        );
+        console.error(`Error disbursing funds to user ${application.userID}:`, error.message);
         failedDisbursements.push(application.userID);
       }
     }
 
-    // Respond with the result
     return res.status(200).json({
       message: "Funds disbursed successfully",
-      failedDisbursements:
-        failedDisbursements.length > 0 ? failedDisbursements : null,
+      failedDisbursements: failedDisbursements.length > 0 ? failedDisbursements : null,
     });
   } catch (error) {
     console.error("Error in bulk fund disbursement:", error.message);

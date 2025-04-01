@@ -1,45 +1,86 @@
+/* Disable vertical scrolling */
+html, body {
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    /* overflow: hidden; Prevents vertical scrolling */
+    background-color: white; /* Keeps background clean */
+}
+
+/* Profile Container */
 .profile-container {
-    margin: 120px;
-    text-align: center;
     display: flex;
     align-items: center;
     justify-content: center;
-
+    text-align: center;
+    height: calc(100vh - 80px); /* Adjust height to include navbar */
+    padding: 30px;
 }
 
+/* Profile Box */
+.profile-box {
+    background: white;
+    border: 2px solid #ddd;
+    padding: 50px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    width: 350px; /* Adjust width as needed */
+    text-align: left; /* Align content to the left */
+}
+
+.profile-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Profile Initial */
 .profile-initial {
     font-size: 50px;
-    font-weight: 400;
-    background-color: #f0f0f0;
+    font-weight: 600;
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    color: white;
     border-radius: 50%;
     width: 100px;
     height: 100px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto;
+    margin: 0 auto 10px auto;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
 }
 
-.profile-line {
-    border: 1px solid #ccc;
-}
-
-.profile-box {
-    border: 1px solid #ccc;
-    padding: 80px;
-    border-radius: 10px;
-}
-
+/* Profile Name */
 .profile-name {
-    font-size: 24px;
+    font-size: 26px;
+    font-weight: 600;
+    color: #333;
     margin-top: 10px;
+    text-align: center; /* Keep name centered */
 }
 
+/* Profile Details */
 .profile-details {
     font-size: 18px;
     margin-top: 20px;
+    color: #555;
+}
+
+.profile-details p {
+    margin: 10px 0;
+    text-align: left; /* Align text to the left */
+    display: flex;
+    /* justify-content:; Align label and value properly */
 }
 
 .profile-details span {
-    font-weight: 400;
+    font-weight: 500;
+    color: #222;
+}
+
+/* Profile Line */
+.profile-line {
+    width: 100%;
+    margin: 10px auto;
+    border: 1px solid #ddd;
 }

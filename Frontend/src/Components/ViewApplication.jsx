@@ -134,20 +134,32 @@ const ViewApplication = () => {
                 </td>
               ))}
               <td>
-                <button
-                  className=" accept"
-                  onClick={() => handleAccept(applicant._id)}
-                  style={{ backgroundColor: "green" }}
-                >
-                  Accept
+              {applicant.applicantIdccepted ? (
+                <button className="accepted" disabled style={{ backgroundColor: "gray" }}>
+                  Accepted
                 </button>
-                <button
-                  className="reject"
-                  onClick={() => handleReject(applicant._id)}
-                  style={{ marginLeft: "10px", backgroundColor: "red" }}
-                >
-                  Reject
+              ) : applicant.Rejected ? (
+                <button className="rejected" disabled style={{ backgroundColor: "gray" }}>
+                  Rejected
                 </button>
+              ) : (
+                <>
+                  <button
+                    className="accept"
+                    onClick={() => handleAccept(applicant._id)}
+                    style={{ backgroundColor: "green" }}
+                  >
+                    Accept
+                  </button>
+                  <button
+                    className="reject"
+                    onClick={() => handleReject(applicant._id)}
+                    style={{ marginLeft: "10px", backgroundColor: "red" }}
+                  >
+                    Reject
+                  </button>
+                </>
+              )}
               </td>
             </tr>
           ))}
