@@ -118,6 +118,14 @@ const GetMyApprovedContract = () => {
     const amountToSend = ethers.parseUnits(tokenAmount.toString(), 18);
     console.log("🔸 Amount to Send:", amountToSend.toString());
 
+    
+    const senderBalance = await contract.balanceOf(await signer.getAddress());
+    console.log("Sender Balance:", senderBalance.toString());
+    if (senderBalance < amountToSend) {
+      toast.error("❌ Insufficient token balance!");
+      return;
+    }
+
     // ✅ Step 5: Execute transfer
     let tx;
     try {

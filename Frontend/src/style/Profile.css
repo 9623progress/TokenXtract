@@ -1,86 +1,128 @@
-/* Disable vertical scrolling */
-html, body {
-    height: 100vh;
-    margin: 0;
-    padding: 0;
-    /* overflow: hidden; Prevents vertical scrolling */
-    background-color: white; /* Keeps background clean */
-}
-
 /* Profile Container */
 .profile-container {
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f4f4f4;
+    padding: 20px;
+  }
+  
+  .profile-box {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     text-align: center;
-    height: calc(100vh - 80px); /* Adjust height to include navbar */
-    padding: 30px;
-}
-
-/* Profile Box */
-.profile-box {
-    background: white;
-    border: 2px solid #ddd;
-    padding: 50px;
-    border-radius: 12px;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    width: 350px; /* Adjust width as needed */
-    text-align: left; /* Align content to the left */
-}
-
-.profile-box:hover {
-    transform: translateY(-5px);
-    box-shadow: 0px 6px 16px rgba(0, 0, 0, 0.15);
-}
-
-/* Profile Initial */
-.profile-initial {
-    font-size: 50px;
-    font-weight: 600;
-    background: linear-gradient(135deg, #6a11cb, #2575fc);
-    color: white;
+    width: 400px;
+  }
+  
+  .profile-initial {
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
-    width: 100px;
-    height: 100px;
+    background: #007bff;
+    color: white;
+    font-size: 32px;
+    font-weight: bold;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 10px auto;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-/* Profile Name */
-.profile-name {
-    font-size: 26px;
-    font-weight: 600;
-    color: #333;
-    margin-top: 10px;
-    text-align: center; /* Keep name centered */
-}
-
-/* Profile Details */
-.profile-details {
-    font-size: 18px;
-    margin-top: 20px;
-    color: #555;
-}
-
-.profile-details p {
+    margin: 0 auto;
+  }
+  
+  .profile-name {
     margin: 10px 0;
-    text-align: left; /* Align text to the left */
-    display: flex;
-    /* justify-content:; Align label and value properly */
-}
-
-.profile-details span {
-    font-weight: 500;
-    color: #222;
-}
-
-/* Profile Line */
-.profile-line {
-    width: 100%;
+    font-size: 22px;
+    color: #333;
+  }
+  
+  .profile-line {
+    height: 2px;
+    background: #007bff;
+    width: 50%;
     margin: 10px auto;
+  }
+  
+  .profile-details p {
+    font-size: 16px;
+    color: #555;
+    margin: 5px 0;
+  }
+  
+  /* Transaction History */
+  .profile-details ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .profile-details ul li {
+    background: #f9f9f9;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 5px 0;
+    font-size: 14px;
+  }
+  
+  /* Table Styling */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  table th, table td {
     border: 1px solid #ddd;
-}
+    padding: 10px;
+    text-align: left;
+  }
+  
+  table th {
+    background: #007bff;
+    color: white;
+  }
+  
+  table tr:nth-child(even) {
+    background: #f9f9f9;
+  }
+  
+  /* Buttons */
+  button {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 5px;
+  }
+  
+  button:hover {
+    background: #0056b3;
+  }
+  
+  button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+  
+  /* Form Styling */
+  input {
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  /* Reapply Section */
+  .reapply-section {
+    background: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+  }

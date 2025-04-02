@@ -78,7 +78,7 @@ export const register = async (req, res) => {
         .json({ message: "Aadhaar number must be exactly 12 digits" });
     }
 
-    console.log(walletAddress);
+    // console.log(walletAddress);
 
     // Validate Mobile Number (10 digits)
     const mobileRegex = /^[0-9]{10}$/;
@@ -265,7 +265,7 @@ export const applyForContract = async (req, res) => {
     const { budget, contractId, secreteKey } = req.body;
     const { userId } = req.params;
     const pdf = req.file?.path;
-    console.log("Uploaded File:", req.file);
+    // console.log("Uploaded File:", req.file);
 
     const budgetValue = parseFloat(budget);
 
@@ -383,7 +383,7 @@ export const uploadStageProof = async (req, res) => {
   try {
     const { contractId, stageId } = req.body;
     const fileUrl = req.file?.path || req.file?.url;
-    console.log(contractId, stageId, fileUrl);
+    // console.log(contractId, stageId, fileUrl);
 
     if (!contractId || !stageId || !fileUrl) {
       return res.status(400).json({ message: "Missing required fields" });
@@ -413,7 +413,39 @@ export const uploadStageProof = async (req, res) => {
   }
 };
 
-export const getMyAppliedSchemes = async (req, res) => {};
+// import UserResponse from "../models/UserResponse.js"; // Import the UserResponse model
+
+export const getMyAppliedSchemes = async (req, res) => {
+  try {
+    const userId = req.user.id; // Get user ID from request (assumed from authentication middleware)
+    // console.log(userId);
+    // Fetch all schemes the user has applied for
+    const applications = await userResponse.find({ userID: userId }).populate(
+      "schemeID", // Populate scheme details
+      "schemeName" // Fetch only the scheme name
+    );
+
+    if (!applications || applications.length === 0) {
+      return res.status(404).json({ message: "No applied schemes found." });
+    }
+
+    // Format response
+    const appliedSchemes = applications.map((app) => ({
+      schemeName: app.schemeID.schemeName,
+      accepted: app.Accepted, // Boolean (true/false)
+      rejected: app.Rejected, // Boolean (true/false)
+      fundDisbursed: app.fundDisburst, // Boolean (true/false)
+      tokensReceived: app.tokensReceived, // Number
+      dateApplied: app.submittedAt, // Application submission date
+    }));
+
+    return res.status(200).json({ appliedSchemes });
+  } catch (error) {
+    console.error("Error fetching applied schemes:", error);
+    return res.status(500).json({ message: "Server Error" });
+  }
+};
+
 
 export const getBanks = async (req, res) => {
   try {
@@ -433,5 +465,51 @@ export const getBanks = async (req, res) => {
     return res.status(500).json({
       message: "Internal Server Error",
     });
+  }
+};
+
+
+export const reapplyForScheme = async (req, res) => {
+  try {
+    const { schemeID } = req.params;
+    const { updatedResponses } = req.body;
+    const userID = req.user._id; // Ensure user is authenticated
+
+    // Check if the scheme exists
+    const scheme = await scheme.findById(schemeID);
+    if (!scheme) {
+      return res.status(404).json({ message: "Scheme not found" });
+    }
+
+    // Find the existing application
+    const userApplication = await userResponse.findOne({
+      schemeID,
+      "responses.userID": userID,
+    });
+
+    if (!userApplication) {
+      return res.status(404).json({ message: "Application not found" });
+    }
+
+    // Update responses with new details
+    userApplication.responses = userApplication.responses.map((response) => ({
+      ...response,
+      value: updatedResponses[response.key] || response.value,
+    }));
+
+    // Reset approval status for re-evaluation
+    userApplication.Accepted = false;
+    userApplication.Rejected = false;
+    userApplication.fundDisburst = false;
+
+    await userApplication.save();
+
+    res.status(200).json({
+      message: "Application updated and sent for approval.",
+      userApplication,
+    });
+  } catch (error) {
+    console.error("Reapply error:", error);
+    res.status(500).json({ message: "Server error. Try again later." });
   }
 };

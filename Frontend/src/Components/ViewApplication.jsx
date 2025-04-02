@@ -66,14 +66,24 @@ const ViewApplication = () => {
         {},
         { withCredentials: true }
       );
-      if (response.status == 200) {
+      if (response.status === 200) {
         toast.success(response.data.message || "Form accepted");
+  
+        // Update state immediately
+        setApplicants((prevApplicants) =>
+          prevApplicants.map((applicant) =>
+            applicant._id === applicantId
+              ? { ...applicant, Accepted: true, Rejected: false }
+              : applicant
+          )
+        );
       }
     } catch (error) {
       console.log(error);
-      toast.error(error.data.message || "something went wrong");
+      toast.error(error?.response?.data?.message || "Something went wrong");
     }
   };
+  
   const handleReject = async (applicantId) => {
     try {
       const response = await axios.patch(
@@ -81,14 +91,24 @@ const ViewApplication = () => {
         {},
         { withCredentials: true }
       );
-      if (response.status == 200) {
+      if (response.status === 200) {
         toast.success(response.data.message || "Form rejected");
+  
+        // Update state immediately
+        setApplicants((prevApplicants) =>
+          prevApplicants.map((applicant) =>
+            applicant._id === applicantId
+              ? { ...applicant, Accepted: false, Rejected: true }
+              : applicant
+          )
+        );
       }
     } catch (error) {
       console.log(error);
-      toast.error(error.data.message || "something went wrong");
+      toast.error(error?.response?.data?.message || "Something went wrong");
     }
   };
+  
 
   const renderTable = () => {
     if (applicants.length === 0) {
@@ -119,6 +139,7 @@ const ViewApplication = () => {
         <tbody>
           {sortedApplicants.map((applicant) => (
             <tr key={applicant._id}>
+              {console.log("applicants",applicant)}
               {applicant.responses.map((res) => (
                 <td key={res.key._id}>
                   {res.key.type === "image" ? (
@@ -134,32 +155,59 @@ const ViewApplication = () => {
                 </td>
               ))}
               <td>
-              {applicant.applicantIdccepted ? (
-                <button className="accepted" disabled style={{ backgroundColor: "gray" }}>
-                  Accepted
-                </button>
-              ) : applicant.Rejected ? (
-                <button className="rejected" disabled style={{ backgroundColor: "gray" }}>
-                  Rejected
-                </button>
-              ) : (
                 <>
-                  <button
-                    className="accept"
-                    onClick={() => handleAccept(applicant._id)}
-                    style={{ backgroundColor: "green" }}
-                  >
-                    Accept
-                  </button>
-                  <button
-                    className="reject"
-                    onClick={() => handleReject(applicant._id)}
-                    style={{ marginLeft: "10px", backgroundColor: "red" }}
-                  >
-                    Reject
-                  </button>
+                  {/* {stage.approve ? (
+                      <span>✅ Approved</span>
+                    ) : (
+                      <button
+                        onClick={() =>
+                          handleApproveStage(
+                            stage._id,
+                            stage.proof,
+                            stage.percentage
+                          )
+                        }
+                      >
+                        Approve Stage
+                      </button>
+                    )} */}
+                  {console.log("app.accepted",applicant.Accepted)}
+                  {applicant.Accepted ? (
+                    
+                    <button
+                      className="accept"
+                      onClick={() => handleAccept(applicant._id)}
+                      style={{ backgroundColor: "green" }}
+                    >
+                      Accepted
+                    </button>
+                  ) : (
+                    <button
+                      className="accept"
+                      onClick={() => handleAccept(applicant._id)}
+                      style={{ backgroundColor: "green" }}
+                    >
+                      Accept
+                    </button>
+                  )}
+                  {applicant.Rejected ? (
+                    <button
+                      className="reject"
+                      onClick={() => handleReject(applicant._id)}
+                      style={{ marginLeft: "10px", backgroundColor: "red" }}
+                    >
+                      Rejected
+                    </button>
+                  ) : (
+                    <button
+                      className="reject"
+                      onClick={() => handleReject(applicant._id)}
+                      style={{ marginLeft: "10px", backgroundColor: "red" }}
+                    >
+                      Reject
+                    </button>
+                  )}
                 </>
-              )}
               </td>
             </tr>
           ))}
