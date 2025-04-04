@@ -8,25 +8,14 @@ const UserProfile = () => {
   const [appliedSchemes, setAppliedSchemes] = useState([]);
   const [editingScheme, setEditingScheme] = useState(null);
   const [updatedResponses, setUpdatedResponses] = useState({});
-  // const { user } = useSelector((state) => state.auth);
+
   const user = useSelector((state) => state.user.user);
 
-  console.log("Redux State:", user); // Debugging Redux State
-
   if (!user) {
-    console.warn("User data is undefined or not loaded yet.");
     return <p>Loading user data...</p>;
   }
 
-  if (!user.name) {
-    console.warn("User name is missing in the user object.");
-  }
-
-  if (!user.tokenHistory) {
-    console.warn("User tokenHistory is undefined.");
-  }
-
-  const firstLetter = user.name?.charAt(0)?.toUpperCase() || "U"; // Handle undefined cases
+  const firstLetter = user.name?.charAt(0)?.toUpperCase() || "U";
 
   useEffect(() => {
     fetchAppliedSchemes();
@@ -42,37 +31,61 @@ const UserProfile = () => {
         setAppliedSchemes(response.data.appliedSchemes);
       }
     } catch (error) {
-      toast.error("Error fetching applied schemes", error);
+      console.error("Error fetching applied schemes:", error);
+      toast.error("Error fetching applied schemes");
     }
   };
 
   const handleReapplyClick = (scheme) => {
+    console.log("Selected Scheme:", scheme);
+    if (!scheme.responses || scheme.responses.length === 0) {
+      console.warn("No responses found for this scheme.");
+      return;
+    }
+
     setEditingScheme(scheme);
     setUpdatedResponses(
       scheme.responses.reduce((acc, response) => {
-        acc[response.key._id] = response.value;
+        acc[response.key] = response.value || "";
         return acc;
       }, {})
     );
   };
-  
+
   const handleInputChange = (e, key) => {
     setUpdatedResponses({ ...updatedResponses, [key]: e.target.value });
   };
 
   const handleSubmit = async () => {
+    console.log("Fetched Scheme Data:", appliedSchemes);
+    console.log("Editing Scheme:", editingScheme);
+
+    // Use the _id instead of schemeID
+    if (!editingScheme || !editingScheme._id) {
+      console.error("Error: Application ID (_id) is missing!");
+      return;
+    }
+
+    const applicationId = editingScheme._id; // <-- fixed
+
+    console.log(
+      "Submitting Reapplication to:",
+      `http://localhost:5000/api/v1/user/reapply/${applicationId}`
+    );
+    console.log("Request Data:", { updatedResponses });
+
     try {
-      await axios.put(
-        `http://localhost:5000/api/v1/user/reapply/${editingScheme._id}`,
+      const response = await axios.put(
+        `http://localhost:5000/api/v1/user/reapply/${applicationId}`,
         { updatedResponses },
         { withCredentials: true }
       );
 
-      toast.success("Application resubmitted for approval!");
-      setEditingScheme(null);
-      fetchAppliedSchemes(); // Refresh the list
+      if (response.status === 200) {
+        alert("Reapplied successfully!");
+      }
     } catch (error) {
-      toast.error("Failed to resubmit application");
+      console.error("Failed to resubmit application:", error);
     }
   };
 
@@ -85,7 +98,7 @@ const UserProfile = () => {
           <div className="profile-line" />
           <div className="profile-details">
             <p>
-              Adhar : <span>{user.adhar || "Not Available"}</span>
+              Aadhar: <span>{user.adhar || "Not Available"}</span>
             </p>
             <p>
               Role: <span>{user.role || "Unknown"}</span>
@@ -113,65 +126,68 @@ const UserProfile = () => {
         </div>
       </div>
 
-
-
       <div>
-      <h2>{user?.name}'s Applied Schemes</h2>
-      <table border="1">
-        <thead>
-          <tr>
-            <th>Scheme Name</th>
-            <th>Status</th>
-            <th>Fund Disbursed</th>
-            <th>Tokens Received</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {appliedSchemes.length > 0 ? (
-            appliedSchemes.map((scheme) => (
-              <tr key={scheme._id}>
-                <td>{scheme.schemeName}</td>
-                <td>
-                  {scheme.accepted ? "✅ Accepted" : scheme.rejected ? "❌ Rejected" : "⏳ Pending"}
-                </td>
-                <td>{scheme.fundDisburst ? "Yes" : "No"}</td>
-                <td>{scheme.tokensReceived}</td>
-                <td>
-                  {scheme.rejected && (
-                    <button onClick={() => handleReapplyClick(scheme)}>
-                      Reapply
-                    </button>
-                  )}
-                </td>
+        <div className="applied-schemes-container">
+          <h2>{user?.name}'s Applied Schemes</h2>
+          <table border="1">
+            <thead>
+              <tr>
+                <th>Scheme Name</th>
+                <th>Status</th>
+                <th>Fund Disbursed</th>
+                <th>Tokens Received</th>
+                <th>Actions</th>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="5">No schemes applied yet.</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-
-      {editingScheme && (
-        <div>
-          <h3>Update Your Application for {editingScheme.schemeName}</h3>
-          {editingScheme?.responses?.map((response) => (
-            <div key={response.key._id}>
-              <label>{response.key.label}:</label>
-              <input
-                type="text"
-                value={updatedResponses[response.key._id] || ""}
-                onChange={(e) => handleInputChange(e, response.key._id)}
-              />
-            </div>
-          ))}
-          <button onClick={handleSubmit}>Submit Reapplication</button>
-          <button onClick={() => setEditingScheme(null)}>Cancel</button>
+            </thead>
+            <tbody>
+              {appliedSchemes.length > 0 ? (
+                appliedSchemes.map((scheme) => (
+                  <tr key={scheme._id}>
+                    <td>{scheme.schemeName}</td>
+                    <td>
+                      {scheme.accepted
+                        ? "✅ Accepted"
+                        : scheme.rejected
+                        ? "❌ Rejected"
+                        : "⏳ Pending"}
+                    </td>
+                    <td>{scheme.fundDisbursed ? "Yes" : "No"}</td>
+                    <td>{scheme.tokensReceived}</td>
+                    <td>
+                      {scheme.rejected && (
+                        <button onClick={() => handleReapplyClick(scheme)}>
+                          Reapply
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5">No schemes applied yet.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
-      )}
-    </div>
+        {editingScheme && (
+          <div className="resubmission-form">
+            <h3>Update Your Application for {editingScheme.schemeName}</h3>
+            {editingScheme?.responses?.map((response) => (
+              <div key={response.key}>
+                <label>{response.label || "Unknown Field"}:</label>
+                <input
+                  type="text"
+                  value={updatedResponses[response.key] || ""}
+                  onChange={(e) => handleInputChange(e, response.key)}
+                />
+              </div>
+            ))}
+            <button onClick={handleSubmit}>Submit Reapplication</button>
+            <button onClick={() => setEditingScheme(null)}>Cancel</button>
+          </div>
+        )}
+      </div>
     </>
   );
 };

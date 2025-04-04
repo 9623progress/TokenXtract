@@ -156,8 +156,7 @@ export const submitForm = async (req, res) => {
 
     const ExistingUser = await User.findById(userID);
 
-    if(!ExistingUser)
-    {
+    if (!ExistingUser) {
       return res.status(400).json({ message: "Missing user" });
     }
     // Initialize responses array
@@ -226,8 +225,9 @@ export const userProfile = async (req, res) => {
     }
 
     // Fetch all user responses where fund has been disbursed
-    const applications = await userResponse.find({ userID: id, 
-      fundDisburst: true }).populate("schemeID");
+    const applications = await userResponse
+      .find({ userID: id, fundDisburst: true })
+      .populate("schemeID");
 
     // Calculate total tokens received
     const totalTokensReceived = applications.reduce(
@@ -258,7 +258,6 @@ export const userProfile = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
-
 
 export const applyForContract = async (req, res) => {
   try {
@@ -417,35 +416,51 @@ export const uploadStageProof = async (req, res) => {
 
 export const getMyAppliedSchemes = async (req, res) => {
   try {
-    const userId = req.user.id; // Get user ID from request (assumed from authentication middleware)
-    // console.log(userId);
-    // Fetch all schemes the user has applied for
-    const applications = await userResponse.find({ userID: userId }).populate(
-      "schemeID", // Populate scheme details
-      "schemeName" // Fetch only the scheme name
-    );
+    const userId = req.user.id; // Get user ID from request
+
+    // Fetch user responses and populate scheme details
+    const applications = await userResponse
+      .find({ userID: userId })
+      .populate({
+        path: "schemeID",
+        select: "schemeName form", // Also fetch 'form' which links to formFieldScheme
+        populate: {
+          path: "form",
+          select: "label", // Populate from formFieldScheme to get labels
+        },
+      })
+      .populate({
+        path: "responses.key",
+        select: "label", // Get labels from formFieldScheme
+      });
 
     if (!applications || applications.length === 0) {
       return res.status(404).json({ message: "No applied schemes found." });
     }
 
-    // Format response
+    // Format response to send proper labels
     const appliedSchemes = applications.map((app) => ({
+      _id: app._id,
       schemeName: app.schemeID.schemeName,
-      accepted: app.Accepted, // Boolean (true/false)
-      rejected: app.Rejected, // Boolean (true/false)
-      fundDisbursed: app.fundDisburst, // Boolean (true/false)
-      tokensReceived: app.tokensReceived, // Number
-      dateApplied: app.submittedAt, // Application submission date
+      accepted: app.Accepted,
+      rejected: app.Rejected,
+      fundDisbursed: app.fundDisburst,
+      tokensReceived: app.tokensReceived,
+      dateApplied: app.submittedAt,
+      responses: app.responses.map((response) => ({
+        key: response.key._id,
+        label: response.key.label || "Unknown Field", // Now correctly fetching label
+        value: response.value,
+      })),
     }));
-
+    // console.log(appliedSchemes);
+    // console.log(appliedSchemes);
     return res.status(200).json({ appliedSchemes });
   } catch (error) {
     console.error("Error fetching applied schemes:", error);
     return res.status(500).json({ message: "Server Error" });
   }
 };
-
 
 export const getBanks = async (req, res) => {
   try {
@@ -468,48 +483,101 @@ export const getBanks = async (req, res) => {
   }
 };
 
-
 export const reapplyForScheme = async (req, res) => {
   try {
-    const { schemeID } = req.params;
+    console.log("Reapply API Called");
+    console.log("Request Params:", req.params);
+    console.log("Request Body:", req.body);
+
+    const applicationId = req.params.schemeId || req.params.id; // Fix here
+
+    if (!applicationId) {
+      console.error("Error: Application ID is missing.");
+      return res.status(400).json({ message: "Application ID is required." });
+    }
+
     const { updatedResponses } = req.body;
-    const userID = req.user._id; // Ensure user is authenticated
 
-    // Check if the scheme exists
-    const scheme = await scheme.findById(schemeID);
-    if (!scheme) {
-      return res.status(404).json({ message: "Scheme not found" });
+    if (!updatedResponses) {
+      console.error("Error: Missing updated responses in request body.");
+      return res
+        .status(400)
+        .json({ message: "Updated responses are required." });
     }
 
-    // Find the existing application
-    const userApplication = await userResponse.findOne({
-      schemeID,
-      "responses.userID": userID,
-    });
+    // Find the application in DB
+    const application = await userResponse.findById(applicationId); // ✅ this matches the _id
 
-    if (!userApplication) {
-      return res.status(404).json({ message: "Application not found" });
+    if (!application) {
+      console.error("Error: Application not found.");
+      return res.status(404).json({ message: "Application not found." });
     }
 
-    // Update responses with new details
-    userApplication.responses = userApplication.responses.map((response) => ({
-      ...response,
-      value: updatedResponses[response.key] || response.value,
-    }));
-
-    // Reset approval status for re-evaluation
-    userApplication.Accepted = false;
-    userApplication.Rejected = false;
-    userApplication.fundDisburst = false;
-
-    await userApplication.save();
-
-    res.status(200).json({
-      message: "Application updated and sent for approval.",
-      userApplication,
+    application.responses.forEach((r) => {
+      console.log("Key Type:", r.key, "typeof:", typeof r.key);
     });
+
+    console.log("Updated Responses:", updatedResponses);
+    console.log("Before update:", application.responses);
+
+    // Update responses
+    application.responses = application.responses.map((resp) => {
+      const key =
+        resp.key && typeof resp.key === "object" && resp.key.toString
+          ? resp.key.toString()
+          : resp.key;
+
+      return {
+        ...resp,
+        value: updatedResponses[key] || resp.value,
+      };
+    });
+    // Reset status fields
+    application.Accepted = false;
+    application.Rejected = false;
+    application.fundDisbursed = false; // optional: reset only if needed
+    application.tokensReceived = 0; // optional: reset if needed
+
+    await application.save();
+    console.log("After update:", application.responses);
+
+    return res.status(200).json({ message: "Reapplied successfully!" });
   } catch (error) {
     console.error("Reapply error:", error);
-    res.status(500).json({ message: "Server error. Try again later." });
+    return res.status(500).json({ message: "Server Error" });
+  }
+};
+
+// const User = require("../models/User"); // Import User model
+
+export const reapply = async (req, res) => {
+  try {
+    const { userId } = req.params; // Get user ID from params
+    console.log(userId);
+
+    if (!userId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "User ID is required" });
+    }
+
+    // Find the user by ID
+    const user = await User.findById(userId);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    // Update application status
+    user.applicationStatus = "Reapplied"; // Adjust based on your schema
+    await user.save();
+
+    res
+      .status(200)
+      .json({ success: true, message: "Reapplied successfully", user });
+  } catch (error) {
+    console.error("Reapply Error:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };

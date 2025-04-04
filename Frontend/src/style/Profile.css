@@ -126,3 +126,47 @@
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     margin-top: 20px;
   }
+
+  /* Add this to your existing Profile.css */
+
+.applied-schemes-container {
+  margin: 0 40px;
+  padding-top: 20px;
+}
+
+.resubmission-form {
+  margin: 20px 40px;
+  padding: 20px;
+  background-color: #f8f8f8;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.resubmission-form label {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.resubmission-form input {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.resubmission-form button {
+  margin-right: 10px;
+  padding: 8px 16px;
+  border: none;
+  background-color: #1d72b8;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.resubmission-form button:hover {
+  background-color: #155a94;
+}

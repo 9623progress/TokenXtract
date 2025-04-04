@@ -9,6 +9,7 @@ import {
   getWalleteId,
   login,
   logout,
+  reapply,
   reapplyForScheme,
   register,
   submitForm,
@@ -34,7 +35,8 @@ router.get("/getForm/:schemeID", getSchemeForm);
 router.post("/submit", verifyJWT, upload.any(), submitForm);
 router.get("/profile/:id", verifyJWT, userProfile);
 router.get('/getMyAppliedSchemes',verifyJWT,getMyAppliedSchemes);
-router.put("/reapply/:schemeID", reapplyForScheme);
+router.put("/reapply/:schemeId",verifyJWT, reapplyForScheme);
+router.put("/reapply/:userId",verifyJWT, reapply);
 
 
 router.post(
