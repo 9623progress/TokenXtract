@@ -37,7 +37,7 @@ const UserProfile = () => {
   };
 
   const handleReapplyClick = (scheme) => {
-    console.log("Selected Scheme:", scheme);
+    // console.log("Selected Scheme:", scheme);
     if (!scheme.responses || scheme.responses.length === 0) {
       console.warn("No responses found for this scheme.");
       return;
@@ -57,8 +57,8 @@ const UserProfile = () => {
   };
 
   const handleSubmit = async () => {
-    console.log("Fetched Scheme Data:", appliedSchemes);
-    console.log("Editing Scheme:", editingScheme);
+    // console.log("Fetched Scheme Data:", appliedSchemes);
+    // console.log("Editing Scheme:", editingScheme);
 
     // Use the _id instead of schemeID
     if (!editingScheme || !editingScheme._id) {
@@ -68,11 +68,11 @@ const UserProfile = () => {
 
     const applicationId = editingScheme._id; // <-- fixed
 
-    console.log(
-      "Submitting Reapplication to:",
-      `http://localhost:5000/api/v1/user/reapply/${applicationId}`
-    );
-    console.log("Request Data:", { updatedResponses });
+    // console.log(
+    //   "Submitting Reapplication to:",
+    //   `http://localhost:5000/api/v1/user/reapply/${applicationId}`
+    // );
+    // console.log("Request Data:", { updatedResponses });
 
     try {
       const response = await axios.put(

@@ -485,9 +485,9 @@ export const getBanks = async (req, res) => {
 
 export const reapplyForScheme = async (req, res) => {
   try {
-    console.log("Reapply API Called");
-    console.log("Request Params:", req.params);
-    console.log("Request Body:", req.body);
+    // console.log("Reapply API Called");
+    // console.log("Request Params:", req.params);
+    // console.log("Request Body:", req.body);
 
     const applicationId = req.params.schemeId || req.params.id; // Fix here
 
@@ -513,12 +513,12 @@ export const reapplyForScheme = async (req, res) => {
       return res.status(404).json({ message: "Application not found." });
     }
 
-    application.responses.forEach((r) => {
-      console.log("Key Type:", r.key, "typeof:", typeof r.key);
-    });
+    // application.responses.forEach((r) => {
+    //   console.log("Key Type:", r.key, "typeof:", typeof r.key);
+    // });
 
-    console.log("Updated Responses:", updatedResponses);
-    console.log("Before update:", application.responses);
+    // console.log("Updated Responses:", updatedResponses);
+    // console.log("Before update:", application.responses);
 
     // Update responses
     application.responses = application.responses.map((resp) => {
@@ -539,7 +539,7 @@ export const reapplyForScheme = async (req, res) => {
     application.tokensReceived = 0; // optional: reset if needed
 
     await application.save();
-    console.log("After update:", application.responses);
+    // console.log("After update:", application.responses);
 
     return res.status(200).json({ message: "Reapplied successfully!" });
   } catch (error) {
@@ -553,7 +553,7 @@ export const reapplyForScheme = async (req, res) => {
 export const reapply = async (req, res) => {
   try {
     const { userId } = req.params; // Get user ID from params
-    console.log(userId);
+    // console.log(userId);
 
     if (!userId) {
       return res

@@ -139,7 +139,7 @@ const ViewApplication = () => {
         <tbody>
           {sortedApplicants.map((applicant) => (
             <tr key={applicant._id}>
-              {console.log("applicants",applicant)}
+              {/* {console.log("applicants",applicant)} */}
               {applicant.responses.map((res) => (
                 <td key={res.key._id}>
                   {res.key.type === "image" ? (
@@ -171,7 +171,7 @@ const ViewApplication = () => {
                         Approve Stage
                       </button>
                     )} */}
-                  {console.log("app.accepted",applicant.Accepted)}
+                  {/* {console.log("app.accepted",applicant.Accepted)} */}
                   {applicant.Accepted ? (
                     
                     <button
