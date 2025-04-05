@@ -20,6 +20,17 @@ app.use(cookieParse());
 app.use(express.json());
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/admin", adminRoute);
+
+
+app._router.stack.forEach((r) => {
+  if (r.route && r.route.path) {
+    console.log("Registered Route:", r.route.path);
+  }
+});
+
+
+
+
 app.listen(port, () => {
   connect();
   console.log(`listening on port ${port}`);

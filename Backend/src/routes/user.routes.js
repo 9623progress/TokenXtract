@@ -6,6 +6,7 @@ import {
   getMyAppliedContract,
   getMyAppliedSchemes,
   getSchemeForm,
+  getTokenStats,
   getWalleteId,
   login,
   logout,
@@ -37,6 +38,7 @@ router.get("/profile/:id", verifyJWT, userProfile);
 router.get('/getMyAppliedSchemes',verifyJWT,getMyAppliedSchemes);
 router.put("/reapply/:schemeId",verifyJWT, reapplyForScheme);
 router.put("/reapply/:userId",verifyJWT, reapply);
+router.get("/getTokenStats ", getTokenStats);
 
 
 router.post(

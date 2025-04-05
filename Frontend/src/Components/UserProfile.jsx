@@ -8,6 +8,8 @@ const UserProfile = () => {
   const [appliedSchemes, setAppliedSchemes] = useState([]);
   const [editingScheme, setEditingScheme] = useState(null);
   const [updatedResponses, setUpdatedResponses] = useState({});
+  const [totalTokensReceived, setTotalTokensReceived] = useState(0);
+  // const [currentTokenBalance, setCurrentTokenBalance] = useState(0);
 
   const user = useSelector((state) => state.user.user);
 
@@ -19,8 +21,34 @@ const UserProfile = () => {
 
   useEffect(() => {
     fetchAppliedSchemes();
-  }, []);
+    calculateTokenStats();
+    fetchTokenStats();
+  }, [user]);
 
+  const fetchTokenStats = async () => {
+    try {
+      console.log("Fetching token stats..."); // Debug log
+      const response = await axios.get(
+        "http://localhost:5000/api/v1/user/getTokenStats",
+        { withCredentials: true }
+      );
+  
+      console.log("Response received:", response.data); // Debug log
+  
+      if (response.data.success) {
+        setTotalTokensReceived(response.data.totalTokensReceived);
+      } else {
+        console.error("Failed to fetch token stats:", response.data.message);
+      }
+    } catch (error) {
+      console.error("Error fetching token stats:", error.response?.data || error);
+      // toast.error("Error fetching token stats");
+    }
+  };
+  
+  // Fetch on mount
+
+  
   const fetchAppliedSchemes = async () => {
     try {
       const response = await axios.get(
@@ -36,8 +64,31 @@ const UserProfile = () => {
     }
   };
 
+  const calculateTokenStats = () => {
+    if (!user.tokenHistory || user.tokenHistory.length === 0) {
+      setTotalTokensReceived(0);
+      // setCurrentTokenBalance(0);
+      return;
+    }
+
+    let totalReceived = 0;
+    // let currentBalance = 0;
+
+    user.tokenHistory.forEach((txn) => {
+      const amount = Number(txn.amount || 0);
+
+      if (amount > 0) {
+        totalReceived += amount;
+      }
+
+      // currentBalance += amount;
+    });
+
+    setTotalTokensReceived(totalReceived);
+    // setCurrentTokenBalance(currentBalance);
+  };
+
   const handleReapplyClick = (scheme) => {
-    // console.log("Selected Scheme:", scheme);
     if (!scheme.responses || scheme.responses.length === 0) {
       console.warn("No responses found for this scheme.");
       return;
@@ -57,22 +108,12 @@ const UserProfile = () => {
   };
 
   const handleSubmit = async () => {
-    // console.log("Fetched Scheme Data:", appliedSchemes);
-    // console.log("Editing Scheme:", editingScheme);
-
-    // Use the _id instead of schemeID
     if (!editingScheme || !editingScheme._id) {
       console.error("Error: Application ID (_id) is missing!");
       return;
     }
 
-    const applicationId = editingScheme._id; // <-- fixed
-
-    // console.log(
-    //   "Submitting Reapplication to:",
-    //   `http://localhost:5000/api/v1/user/reapply/${applicationId}`
-    // );
-    // console.log("Request Data:", { updatedResponses });
+    const applicationId = editingScheme._id;
 
     try {
       const response = await axios.put(
@@ -104,24 +145,11 @@ const UserProfile = () => {
               Role: <span>{user.role || "Unknown"}</span>
             </p>
             <p>
-              Total Tokens Received:{" "}
-              <span>{user.totalTokensReceived ?? "0"}</span>
+              {/* Total Tokens Received: <span>{totalTokensReceived ?? "00"}</span> */}
             </p>
-            <h3>Transaction History</h3>
-            <ul>
-              {Array.isArray(user.tokenHistory) &&
-              user.tokenHistory.length > 0 ? (
-                user.tokenHistory.map((tx, index) => (
-                  <li key={index}>
-                    Scheme ID: {tx.schemeID || "Unknown"}, Amount:{" "}
-                    {tx.amount || "N/A"}, Date:{" "}
-                    {tx.date ? new Date(tx.date).toLocaleDateString() : "N/A"}
-                  </li>
-                ))
-              ) : (
-                <p>No transactions available</p>
-              )}
-            </ul>
+            {/* <p>
+              Available Wallet Balance: <span>{currentTokenBalance}</span>
+            </p> */}
           </div>
         </div>
       </div>
@@ -170,6 +198,7 @@ const UserProfile = () => {
             </tbody>
           </table>
         </div>
+
         {editingScheme && (
           <div className="resubmission-form">
             <h3>Update Your Application for {editingScheme.schemeName}</h3>

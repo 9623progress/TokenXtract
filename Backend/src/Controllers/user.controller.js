@@ -581,3 +581,37 @@ export const reapply = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
+
+
+// GET /api/v1/user/tokenStats
+// import User from "../models/user.model.js"; // make sure you're importing this
+
+export const getTokenStats = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    // Calculate total tokens received from tokenHistory
+    let totalTokensReceived = 0;
+
+    if (user.tokenHistory && user.tokenHistory.length > 0) {
+      totalTokensReceived = user.tokenHistory
+        .filter(txn => txn.amount > 0) // Count only positive transactions
+        .reduce((sum, txn) => sum + txn.amount, 0);
+    }
+
+    return res.status(200).json({
+      success: true,
+      totalTokensReceived,
+      tokenHistory: user.tokenHistory || [],
+    });
+  } catch (error) {
+    console.error("Error in getTokenStats:", error);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
