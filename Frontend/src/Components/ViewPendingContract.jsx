@@ -3,15 +3,10 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { ethers } from "ethers";
+import '../style/ViewPendingContract.css';
 
-// ✅ Import ABIs
-// import newTempAbi from "../../../Blockchain/artifacts/Contracts/newTempTokenContract.sol/MyToken.json";
-
-// ✅ Contract Addresses
-// const newTempContract_Address = "0x43Dd8A1a3fB1788bfC9303e68626DBd06b06790C";
 const shivaniAddress = "0x9e6DEFb65e5a0c0C6Fa0eAF11CAFd05D31c5e328";
 
-// ✅ Shivani Token ABI (Minimal)
 const shivaniAbi = [
   {
     inputs: [
@@ -34,16 +29,18 @@ const shivaniAbi = [
 
 const ViewPendingContract = () => {
   const [contracts, setContracts] = useState([]);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [showApproveModal, setShowApproveModal] = useState(false);
+  const [selectedContractId, setSelectedContractId] = useState(null);
+  const [selectedApproveContract, setSelectedApproveContract] = useState(null);
+  const [rejectionReason, setRejectionReason] = useState("");
   const sender = useSelector((state) => state.user?.user?.walletAddress);
 
-  /** ✅ Fetch pending contracts */
   const getPendingContract = useCallback(async () => {
     try {
-      console.log("Fetching pending contracts...");
       const response = await axios.get(
         "http://localhost:5000/api/v1/admin/getPendingContract"
       );
-
       if (response.status === 200) {
         setContracts(response.data.data);
       } else {
@@ -59,7 +56,6 @@ const ViewPendingContract = () => {
     getPendingContract();
   }, [getPendingContract]);
 
-  /** ✅ Connect Wallet */
   const connectWallet = async () => {
     if (!window.ethereum) {
       toast.error("🚨 MetaMask not installed! Please install and try again.");
@@ -76,59 +72,44 @@ const ViewPendingContract = () => {
     }
   };
 
-  /** ✅ Approve contract & transfer funds */
-  const ApproveContract = async (creator, contract_id, budget) => {
+  const handleApproveContract = async () => {
+    if (!selectedApproveContract) return;
+
+    const { _id, budget, creator } = selectedApproveContract;
+
+    if (!creator || !creator.walletAddress) {
+      toast.error("❌ Creator's wallet address not found!");
+      return;
+    }
+
+    const receiver = creator.walletAddress.trim();
+
+    if (!ethers.isAddress(receiver)) {
+      toast.error("❌ Invalid receiver address!");
+      return;
+    }
+
+    const signer = await connectWallet();
+    if (!signer) return;
+
+    const contract = new ethers.Contract(shivaniAddress, shivaniAbi, signer);
+    const amountToSend = ethers.parseUnits(budget.toString(), 18);
+
+    let tx;
     try {
-      console.log("🔹 Approving contract:", { creator, contract_id, budget });
+      tx = await contract.transfer(receiver, amountToSend);
+      await tx.wait();
+      console.log("✅ Tokens Sent Successfully!");
+    } catch (txError) {
+      console.error("❌ Transaction failed:", txError);
+      toast.error("Network full, please try again");
+      return;
+    }
 
-      // ✅ Step 1: Fetch receiver wallet address
-      const { data, status } = await axios.get(
-        `http://localhost:5000/api/v1/user/getWalleteId/${creator}`
-      );
-
-      if (status !== 200 || !data.walletAddress) {
-        toast.error("❌ Receiver wallet address not found!");
-        return;
-      }
-
-      const receiver = data.walletAddress.trim(); // Ensure no spaces
-      console.log("✅ Receiver Wallet:", receiver);
-
-      if (!ethers.isAddress(receiver)) {
-        toast.error("❌ Invalid receiver address!");
-        return;
-      }
-
-      // ✅ Step 2: Connect Wallet
-      const signer = await connectWallet();
-      if (!signer) return;
-
-      // ✅ Step 3: Get contract instance
-      const contract = new ethers.Contract(shivaniAddress, shivaniAbi, signer);
-      console.log("✅ Contract Instance Loaded:", contract);
-
-      // ✅ Step 4: Convert budget to correct BigInt units
-      const amountToSend = ethers.parseUnits(budget.toString(), 18);
-      console.log("🔸 Amount to Send:", amountToSend.toString());
-
-      // ✅ Step 5: Execute transfer
-      let tx;
-      try {
-        tx = await contract.transfer(receiver, amountToSend);
-        console.log("⏳ Transaction Pending...");
-        await tx.wait();
-        console.log("✅ Tokens Sent Successfully!");
-      } catch (txError) {
-        console.error("❌ Transaction failed:", txError);
-        // toast.error(txError.reason || txError.message || "Transaction failed!");
-        toast.error("network full please try again");
-        return;
-      }
-
-      // ✅ Step 6: Update contract status in DB
+    try {
       const dbResponse = await axios.post(
         "http://localhost:5000/api/v1/admin/approvedContract",
-        { contractId: contract_id },
+        { contractId: _id },
         { withCredentials: true }
       );
 
@@ -137,12 +118,44 @@ const ViewPendingContract = () => {
         return;
       }
 
-      console.log("✅ Contract marked as approved in DB.");
       toast.success("🎉 Contract approved successfully!");
-      getPendingContract(); // Refresh pending contract list
+      setShowApproveModal(false);
+      setSelectedApproveContract(null);
+      getPendingContract();
     } catch (error) {
       console.error("❌ Unexpected Error:", error);
       toast.error("🚨 Unexpected error occurred. Please try again.");
+    }
+  };
+
+  const handleRejectContract = async () => {
+    if (!selectedContractId || rejectionReason.trim() === "") {
+      toast.error("Please provide a reason for rejection.");
+      return;
+    }
+
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/v1/admin/rejectContract",
+        {
+          contractId: selectedContractId,
+          reason: rejectionReason,
+        },
+        { withCredentials: true }
+      );
+
+      if (res.status === 200) {
+        toast.success("Contract rejected successfully!");
+        setShowRejectModal(false);
+        setSelectedContractId(null);
+        setRejectionReason("");
+        getPendingContract();
+      } else {
+        toast.error("Failed to reject contract.");
+      }
+    } catch (err) {
+      console.error("Reject contract error:", err);
+      toast.error("Server error while rejecting contract.");
     }
   };
 
@@ -187,18 +200,26 @@ const ViewPendingContract = () => {
                   </ul>
                 </td>
                 <td>
-                  <button
-                    className="apply-button"
-                    onClick={() =>
-                      ApproveContract(
-                        contract.creator,
-                        contract._id,
-                        contract.budget
-                      )
-                    }
-                  >
-                    Approve
-                  </button>
+                  <ul>
+                    <button
+                      className="apply-button"
+                      onClick={() => {
+                        setSelectedApproveContract(contract);
+                        setShowApproveModal(true);
+                      }}
+                    >
+                      Approve
+                    </button>
+                    <button
+                      className="apply-button"
+                      onClick={() => {
+                        setSelectedContractId(contract._id);
+                        setShowRejectModal(true);
+                      }}
+                    >
+                      Reject
+                    </button>
+                  </ul>
                 </td>
               </tr>
             ))}
@@ -206,6 +227,53 @@ const ViewPendingContract = () => {
         </table>
       ) : (
         <p>No Pending contracts found for the state.</p>
+      )}
+
+      {/* Reject Modal */}
+      {showRejectModal && (
+  <div className="reject-modal-overlay">
+    <div className="reject-modal-box">
+      <h2>Reject Contract</h2>
+      <textarea
+        rows={4}
+        placeholder="Enter reason for rejection"
+        value={rejectionReason}
+        onChange={(e) => setRejectionReason(e.target.value)}
+      ></textarea>
+      <div className="modal-actions">
+        <button onClick={() => setShowRejectModal(false)}>Cancel</button>
+        <button onClick={handleRejectContract}>Reject</button>
+      </div>
+    </div>
+  </div>
+)}
+
+
+      {/* Approve Modal */}
+      {showApproveModal && selectedApproveContract && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+          <div className="bg-white p-6 rounded shadow-md w-[400px]">
+            <h2 className="text-xl font-semibold mb-4">Approve Contract</h2>
+            <p className="mb-4">
+              Are you sure you want to approve contract:{" "}
+              <strong>{selectedApproveContract.contractName}</strong>?
+            </p>
+            <div className="flex justify-end gap-2">
+              <button
+                className="px-4 py-1 border rounded"
+                onClick={() => setShowApproveModal(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="bg-green-600 text-white px-4 py-1 rounded"
+                onClick={handleApproveContract}
+              >
+                Approve
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

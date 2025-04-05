@@ -21,7 +21,9 @@ import {
   getPendingContracts,
   getRejectedForm,
   getScheme,
+  rejectContract,
   RejectForm,
+  resubmitContract,
   updateScheme,
   viewContractApplication,
 } from "../Controllers/admin.controller.js";
@@ -124,4 +126,10 @@ router.get("/getMyApprovedContract/:userId", getMyApprovedContracts);
 router.get("/getMyPendingContract", getMyPendingContracts);
 router.post("/approvedContract", approveContract);
 router.post("/approveStage", approveContractStage);
+
+
+router.post("/rejectContract", rejectContract); // Central Gov
+router.post("/resubmitContract", resubmitContract); // State Gov
+
+
 export default router;

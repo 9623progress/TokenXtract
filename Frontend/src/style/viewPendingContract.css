@@ -1,0 +1,135 @@
+.view-contracts-container {
+    margin: 2rem auto;
+    padding: 1rem;
+    max-width: 95%;
+    overflow-x: auto;
+  }
+  
+  .contracts-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .contracts-table th,
+  .contracts-table td {
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+  }
+  
+  .contracts-table thead {
+    background-color: #f5f5f5;
+  }
+  
+  .contracts-table tbody tr:hover {
+    background-color: #f9f9f9;
+  }
+  
+  .apply-button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+    margin-bottom: 5px;
+    width: 100px;
+  }
+  
+  .apply-button:first-child {
+    background-color: #4caf50;
+    color: white;
+    margin-bottom: 6px;
+  }
+  
+  .apply-button:first-child:hover {
+    background-color: #43a047;
+  }
+  
+  .apply-button:last-child {
+    background-color: #f44336;
+    color: white;
+  }
+  
+  .apply-button:last-child:hover {
+    background-color: #e53935;
+  }
+  
+  td ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  /* Fullscreen background overlay for modal */
+.reject-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Modal box styling */
+.reject-modal-box {
+  background-color: #ffffff;
+  padding: 24px;
+  border-radius: 8px;
+  width: 400px;
+  box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.2);
+  font-family: Arial, sans-serif;
+}
+
+/* Modal title */
+.reject-modal-box h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+/* Textarea for rejection reason */
+.reject-modal-box textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  resize: vertical;
+  font-size: 14px;
+  margin-bottom: 16px;
+  font-family: inherit;
+}
+
+/* Action buttons (Cancel / Reject) */
+.reject-modal-box .modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.reject-modal-box .modal-actions button {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+}
+
+.reject-modal-box .modal-actions button:first-child {
+  background-color: #eeeeee;
+  color: #333;
+}
+
+.reject-modal-box .modal-actions button:last-child {
+  background-color: #f44336;
+  color: white;
+}
+
+.reject-modal-box .modal-actions button:last-child:hover {
+  background-color: #d32f2f;
+}

@@ -65,14 +65,14 @@ export const createScheme = async (req, res) => {
   }
   const newForm = await Promise.all(
     form.map(async (f) => {
-      console.log(f);
+      // console.log(f);
       const formField = new formFieldSchem(f);
       await formField.save(); // Save the individual form field
       return formField._id; // Store the reference ID
     })
   );
 
-  console.log(newForm);
+  // console.log(newForm);
   const newScheme = new scheme({
     departmentID,
     schemeName,
@@ -538,7 +538,7 @@ export const createContract = async (req, res) => {
     });
   }
 
-  console.log(stages);
+  // console.log(stages);
 
   if (
     !Array.isArray(stages) ||
@@ -873,20 +873,22 @@ export const getMyCreatedContract = async (req, res) => {
 
 export const getPendingContracts = async (req, res) => {
   try {
-    const PendingContracts = await contract
+    const pendingContracts = await contract
       .find({ ApproveContract: false })
-      .select("-secreteKey");
+      .select("-secreteKey")
+      .populate("creator", "walletAddress name email"); // populate wallet address + basic info
 
     return res.status(200).json({
-      data: PendingContracts,
+      data: pendingContracts,
     });
   } catch (error) {
-    console.log(error);
+    console.log("Error fetching pending contracts:", error);
     res.status(500).json({
       message: "Internal Server Error",
     });
   }
 };
+
 
 export const getMyApprovedContracts = async (req, res) => {
   try {
@@ -967,6 +969,64 @@ export const approveContract = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+export const rejectContract = async (req, res) => {
+  const { contractId, reason } = req.body;
+
+  if (!contractId || !reason) {
+    return res.status(400).json({ message: "Contract ID and reason required" });
+  }
+
+  try {
+    const updatedContract = await contract.findByIdAndUpdate(
+      contractId,
+      {
+        approvalStatus: "rejected",
+        rejectionReason: reason,
+      },
+      { new: true, runValidators: false } // 🛑 disables full schema validation
+    );
+
+    if (!updatedContract) {
+      return res.status(404).json({ message: "Contract not found" });
+    }
+
+    res.status(200).json({
+      message: "Contract rejected successfully",
+      contract: updatedContract,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+export const resubmitContract = async (req, res) => {
+  const { contractId, updatedData } = req.body;
+
+  try {
+    const existingContract = await contract.findById(contractId);
+    if (!existingContract) {
+      return res.status(404).json({ message: "Contract not found" });
+    }
+
+    // Only allow resubmission if it was previously rejected
+    if (existingContract.approvalStatus !== "rejected") {
+      return res.status(400).json({ message: "Contract is not in rejected state" });
+    }
+
+    // Update contract with new data
+    await existingContract.updateOne({
+      ...updatedData,
+      approvalStatus: "pending",
+      rejectionReason: "", // Clear old reason
+    });
+
+    res.status(200).json({ message: "Contract resubmitted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error while resubmitting", error: error.message });
+  }
+};
+
 
 export const approveContractStage = async (req, res) => {
   try {
