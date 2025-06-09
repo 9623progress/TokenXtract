@@ -582,7 +582,6 @@ export const reapply = async (req, res) => {
   }
 };
 
-
 // GET /api/v1/user/tokenStats
 // import User from "../models/user.model.js"; // make sure you're importing this
 
@@ -593,7 +592,9 @@ export const getTokenStats = async (req, res) => {
     const user = await User.findById(userId);
 
     if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
 
     // Calculate total tokens received from tokenHistory
@@ -601,7 +602,7 @@ export const getTokenStats = async (req, res) => {
 
     if (user.tokenHistory && user.tokenHistory.length > 0) {
       totalTokensReceived = user.tokenHistory
-        .filter(txn => txn.amount > 0) // Count only positive transactions
+        .filter((txn) => txn.amount > 0) // Count only positive transactions
         .reduce((sum, txn) => sum + txn.amount, 0);
     }
 
@@ -613,5 +614,52 @@ export const getTokenStats = async (req, res) => {
   } catch (error) {
     console.error("Error in getTokenStats:", error);
     return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+export const updateMoney = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { amount } = req.body;
+
+    if (amount == null || isNaN(amount)) {
+      return res.status(400).json({
+        message: "Amount is required and must be a number",
+      });
+    }
+
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    user.Rupees += amount;
+    await user.save();
+
+    return res.status(200).json({
+      message: "Amount updated",
+      newBalance: user.Rupees,
+    });
+  } catch (error) {
+    console.error("Update Error:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const getMoney = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({
+      data: user.Rupees,
+      message: "success",
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Server error" });
   }
 };

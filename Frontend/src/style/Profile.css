@@ -1,172 +1,202 @@
 /* Profile Container */
 .profile-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: #f4f4f4;
-    padding: 20px;
-  }
-  
-  .profile-box {
-    background: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    width: 400px;
-  }
-  
-  .profile-initial {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background: #007bff;
-    color: white;
-    font-size: 32px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto;
-  }
-  
-  .profile-name {
-    margin: 10px 0;
-    font-size: 22px;
-    color: #333;
-  }
-  
-  .profile-line {
-    height: 2px;
-    background: #007bff;
-    width: 50%;
-    margin: 10px auto;
-  }
-  
-  .profile-details p {
-    font-size: 16px;
-    color: #555;
-    margin: 5px 0;
-  }
-  
-  /* Transaction History */
-  .profile-details ul {
-    list-style: none;
-    padding: 0;
-  }
-  
-  .profile-details ul li {
-    background: #f9f9f9;
-    padding: 10px;
-    border-radius: 5px;
-    margin: 5px 0;
-    font-size: 14px;
-  }
-  
-  /* Table Styling */
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    background: #fff;
-    border-radius: 8px;
-    overflow: hidden;
-  }
-  
-  table th, table td {
-    border: 1px solid #ddd;
-    padding: 10px;
-    text-align: left;
-  }
-  
-  table th {
-    background: #007bff;
-    color: white;
-  }
-  
-  table tr:nth-child(even) {
-    background: #f9f9f9;
-  }
-  
-  /* Buttons */
-  button {
-    background: #007bff;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 5px;
-    cursor: pointer;
-    margin: 5px;
-  }
-  
-  button:hover {
-    background: #0056b3;
-  }
-  
-  button:disabled {
-    background: #ccc;
-    cursor: not-allowed;
-  }
-  
-  /* Form Styling */
-  input {
-    width: 100%;
-    padding: 8px;
-    margin: 5px 0;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-  }
-  
-  /* Reapply Section */
-  .reapply-section {
-    background: #fff;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    margin-top: 20px;
-  }
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 100px;
+  background-color: var(--light-bg);
+  padding: 40px 20px;
+}
 
-  /* Add this to your existing Profile.css */
+.profile-box {
+  background: var(--card-bg);
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  width: 100%;
+  max-width: 480px;
+  transition: transform 0.3s ease;
+}
 
+.profile-box:hover {
+  transform: translateY(-4px);
+}
+
+.profile-initial {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  color: white;
+  font-size: 36px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 15px;
+}
+
+.profile-name {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin: 12px 0;
+}
+
+.profile-line {
+  height: 3px;
+  width: 60px;
+  background: var(--primary-color);
+  margin: 12px auto;
+  border-radius: 2px;
+}
+
+.profile-details p {
+  font-size: 16px;
+  color: var(--text-light);
+  margin: 6px 0;
+}
+
+/* Transaction History */
+.profile-details ul {
+  list-style: none;
+  padding: 0;
+  margin: 15px 0;
+}
+
+.profile-details ul li {
+  background: #eef2f7;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  font-size: 15px;
+}
+
+/* Table Styling */
+table {
+  width: 90%;
+  border-collapse: collapse;
+  margin-top: 24px;
+  background: var(--card-bg);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+table th,
+table td {
+  padding: 14px 12px;
+  border: 1px solid #ccc;
+  text-align: left;
+  font-size: 15px;
+  margin: 50px;
+}
+
+table th {
+  background: var(--primary-color);
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+
+
+button {
+  background-color: var(--primary-color);
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  outline: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+button:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-1px);
+  color: var(--primary-color);
+}
+
+button:focus {
+  box-shadow: 0 0 0 3px rgba(100, 150, 250, 0.5);
+  /* visible keyboard focus */
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+
+/* Form Styling */
+input {
+  width: 100%;
+  padding: 10px;
+  margin: 6px 0 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 15px;
+}
+
+/* Reapply Section */
+.reapply-section {
+  background: var(--card-bg);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  margin-top: 24px;
+}
+
+/* Applied Schemes */
 .applied-schemes-container {
   margin: 0 40px;
   padding-top: 20px;
 }
 
+/* Resubmission Form */
 .resubmission-form {
   margin: 20px 40px;
-  padding: 20px;
-  background-color: #f8f8f8;
-  border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  background-color: #f8f9fb;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
 }
 
 .resubmission-form label {
   display: block;
-  margin-top: 10px;
-  font-weight: bold;
+  margin-top: 12px;
+  font-weight: 600;
+  color: var(--text-dark);
+  font-size: 15px;
 }
 
 .resubmission-form input {
   width: 100%;
-  padding: 8px;
-  margin-top: 5px;
-  margin-bottom: 15px;
-  border-radius: 5px;
+  padding: 10px;
+  margin-top: 6px;
+  margin-bottom: 16px;
+  border-radius: 6px;
   border: 1px solid #ccc;
+  font-size: 15px;
 }
 
 .resubmission-form button {
-  margin-right: 10px;
-  padding: 8px 16px;
+  padding: 10px 18px;
   border: none;
-  background-color: #1d72b8;
+  background-color: var(--primary-color);
   color: white;
-  border-radius: 5px;
+  border-radius: 6px;
   cursor: pointer;
+  font-size: 14px;
+  transition: background 0.3s ease;
 }
 
 .resubmission-form button:hover {
-  background-color: #155a94;
+  background-color: var(--primary-dark);
 }

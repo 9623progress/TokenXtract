@@ -1,0 +1,127 @@
+.update-scheme {
+    padding: 40px 20px;
+    background-color: #f9f9f9;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    margin-top: 50px;
+}
+
+.update-tittle {
+    text-align: center;
+}
+
+.update-scheme__form-wrapper {
+    width: 100%;
+    max-width: 1000px;
+    background-color: #fff;
+    padding: 30px 40px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+}
+
+.update-scheme__form {
+    display: flex;
+    flex-direction: column;
+}
+
+.update-scheme__heading {
+    font-size: 24px;
+    margin-bottom: 20px;
+    font-weight: 600;
+    color: #333;
+}
+
+.update-scheme__select,
+.update-scheme__input,
+.update-scheme__textarea {
+    width: 100%;
+    padding: 10px 14px;
+    margin-top: 6px;
+    margin-bottom: 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+.update-scheme__select:focus,
+.update-scheme__input:focus,
+.update-scheme__textarea:focus {
+    border-color: #4a90e2;
+    outline: none;
+}
+
+.update-scheme__input-group,
+.update-scheme__textarea-group {
+    margin-bottom: 20px;
+}
+
+.update-scheme__textarea {
+    resize: vertical;
+}
+
+.update-scheme__card {
+    margin-bottom: 30px;
+}
+
+.update-scheme__error {
+    color: red;
+    margin-bottom: 20px;
+}
+
+.update-scheme__custom-field {
+    padding: 16px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    background-color: #fdfdfd;
+}
+
+.update-scheme__radio-group {
+    margin-top: 10px;
+}
+
+.update-scheme__radio-group input {
+    margin-bottom: 10px;
+    width: calc(100% - 20px);
+}
+
+.update-scheme__button {
+    padding: 10px 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    font-size: 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.update-scheme__button:hover {
+    background-color: #0056b3;
+}
+
+.update-scheme__button--add {
+    background-color: #28a745;
+}
+
+.update-scheme__button--add:hover {
+    background-color: #218838;
+}
+
+.update-scheme__button--submit {
+    background-color: #6f42c1;
+    margin-top: 30px;
+    padding: 12px 20px;
+}
+
+.update-scheme__button--submit:hover {
+    background-color: #5a32a3;
+}
+
+.update-scheme__actions {
+    display: flex;
+    justify-content: center;
+}

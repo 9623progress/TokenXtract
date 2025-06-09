@@ -49,19 +49,19 @@ const ViewAllSCheme = () => {
 
       {selectedDepartment ? (
         <table>
-          <thead className="table-head">
+          <thead>
             <tr>
-              <td>Sr. No.</td>
-              <td>Department Name</td>
-              <td>Scheme Name</td>
-              <td>Budget</td>
-              <td>Ammount Per User</td>
-              <td>Min Age</td>
-              <td>Max Age</td>
-              <td>Special Requirement </td>
-              <td>form</td>
-              <td>Update</td>
-              <td>Delete</td>
+              <th>Sr. No.</th>
+              <th>Department Name</th>
+              <th>Scheme Name</th>
+              <th>Budget</th>
+              <th>Ammount Per User</th>
+              <th>Min Age</th>
+              <th>Max Age</th>
+              <th>Special Requirement </th>
+              <th>form</th>
+              <th>Update</th>
+              <th>Delete</th>
             </tr>
           </thead>
           <tbody>

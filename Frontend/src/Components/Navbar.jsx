@@ -44,14 +44,6 @@ const Navbar = () => {
         <Link to="/about-us" className="navbar-elements">
           About us
         </Link>
-        <Link to="/contact-us" className="navbar-elements">
-          {" "}
-          Contact us
-        </Link>
-        <Link to="/our-services" className="navbar-elements">
-          {" "}
-          Services
-        </Link>
       </div>
       {user ? (
         <div className="right-buttons">

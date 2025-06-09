@@ -13,6 +13,7 @@ const StateProfile = () => {
             <h1>सत्यमेव जयते </h1>
             <p>STATE GOVERNMENT</p>
           </div>
+
           <div className="cg-functions">
             <Link to={"/state/create-scheme"} className="cg-fun-card">
               <p>Create Schemes</p>

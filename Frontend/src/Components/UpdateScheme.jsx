@@ -4,6 +4,7 @@ import DepartmentCard from "./DepartmentCard";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import { toast } from "react-toastify";
+import "../style/UpdatedScheme.css";
 
 const UpdateScheme = () => {
   const [selectedDepartment, setSelectedDepartment] = useState(null);
@@ -138,44 +139,15 @@ const UpdateScheme = () => {
     }
   };
   return (
-    <div>
-      <div className="scheme-div">
-        <div className="scheme-form">
-          <h2>Select Department</h2>
-          <select
-            onChange={handleDepartmentChange}
-            value={selectedDepartment || ""}
-          >
-            <option value="" disabled>
-              Select Department
-            </option>
-            {departments.map((department) => (
-              <option key={department._id} value={department._id}>
-                {department.departmentName}
-              </option>
-            ))}
-          </select>
-
-          {selectedDept ? (
-            <div className="scheme-form-div">
-              <DepartmentCard
-                key={selectedDept._id}
-                title={selectedDept.departmentName}
-                des={selectedDept.des}
-                image={selectedDept.image}
-              />
-            </div>
-          ) : (
-            <p style={{ color: "red" }}>
-              Please select a department to view details.
-            </p>
-          )}
-
-          <div className="scheme-default-input">
-            <div className="scheme-name scheme-input-box">
+    <div className="update-scheme">
+      <div className="update-scheme__form-wrapper">
+        <h2 className="update-tittle">Update Form of {schemeName}</h2>
+        <div className="update-scheme__form">
+          <div className="update-scheme__inputs">
+            <div className="update-scheme__input-group">
               <label htmlFor="schemeName">Scheme Name:</label>
               <input
-                className="scheme-input"
+                className="update-scheme__input"
                 type="text"
                 name="schemeName"
                 value={schemeName}
@@ -185,10 +157,10 @@ const UpdateScheme = () => {
                 id="schemeName"
               />
             </div>
-            <div className="scheme-budget scheme-input-box">
+            <div className="update-scheme__input-group">
               <label htmlFor="scheme-budget">Scheme Budget:</label>
               <input
-                className="scheme-input"
+                className="update-scheme__input"
                 type="number"
                 name="budget"
                 value={budget}
@@ -198,10 +170,10 @@ const UpdateScheme = () => {
                 id="scheme-budget"
               />
             </div>
-            <div className="scheme-amount-per-user scheme-input-box">
+            <div className="update-scheme__input-group">
               <label htmlFor="amount-per-user">Amount Per User:</label>
               <input
-                className="scheme-input"
+                className="update-scheme__input"
                 type="number"
                 name="amountPerUser"
                 value={amountPerUser}
@@ -212,10 +184,10 @@ const UpdateScheme = () => {
               />
             </div>
 
-            <div className="scheme-minAge scheme-input-box">
+            <div className="update-scheme__input-group">
               <label htmlFor="minAge">Minimum Age:</label>
               <input
-                className="scheme-input"
+                className="update-scheme__input"
                 type="number"
                 name="minAge"
                 value={minAge}
@@ -225,10 +197,10 @@ const UpdateScheme = () => {
                 id="minAge"
               />
             </div>
-            <div className="scheme-maxAge scheme-input-box">
+            <div className="update-scheme__input-group">
               <label htmlFor="maxAge">Maximum Age:</label>
               <input
-                className="scheme-input"
+                className="update-scheme__input"
                 type="number"
                 name="maxAge"
                 value={maxAge}
@@ -240,10 +212,10 @@ const UpdateScheme = () => {
             </div>
           </div>
 
-          <div className="scheme-special-requirement">
+          <div className="update-scheme__textarea-group">
             <label htmlFor="special-Requirement">Special Requirements:</label>
             <textarea
-              className="scheme-input"
+              className="update-scheme__textarea"
               name="specialRequirement"
               value={specialRequirement}
               onChange={(e) => setSpecialRequirement(e.target.value)}
@@ -256,10 +228,11 @@ const UpdateScheme = () => {
           </div>
 
           {departmentFields.map((field, index) => (
-            <div key={index} className="scheme-custom-field">
+            <div key={index} className="update-scheme__custom-field">
               <input type="text" name="_id" value={field._id} hidden />
               <label>Field Label:</label>
               <input
+                className="update-scheme__input"
                 type="text"
                 name="label"
                 value={field.label}
@@ -268,6 +241,7 @@ const UpdateScheme = () => {
               />
               <label>Field Name:</label>
               <input
+                className="update-scheme__input"
                 type="text"
                 name="uniqueName"
                 value={field.uniqueName}
@@ -276,6 +250,7 @@ const UpdateScheme = () => {
               />
               <label>Field Type:</label>
               <select
+                className="update-scheme__select"
                 name="type"
                 value={field.type}
                 onChange={(e) => handleFieldChange(e, index)}
@@ -288,11 +263,12 @@ const UpdateScheme = () => {
               </select>
 
               {field.type === "radio" && (
-                <div>
+                <div className="update-scheme__radio-group">
                   <label>Radio Options:</label>
                   {field.options.map((option, optionIndex) => (
                     <div key={optionIndex}>
                       <input
+                        className="update-scheme__input"
                         type="text"
                         value={option}
                         onChange={(e) =>
@@ -304,7 +280,7 @@ const UpdateScheme = () => {
                   ))}
                   <button
                     type="button"
-                    className="scheme-button"
+                    className="update-scheme__button"
                     onClick={() => addRadioOption(index)}
                   >
                     Add Option
@@ -314,20 +290,25 @@ const UpdateScheme = () => {
 
               <button
                 type="button"
-                className="scheme-button"
+                className="update-scheme__button"
                 onClick={() => removeField(index)}
               >
                 Remove Field
               </button>
             </div>
           ))}
-          <button type="button" className="scheme-button" onClick={addField}>
+
+          <button
+            type="button"
+            className="update-scheme__button update-scheme__button--add"
+            onClick={addField}
+          >
             Add Field
           </button>
 
-          <div className="form-actions">
+          <div className="update-scheme__actions">
             <button
-              className="scheme-button"
+              className="update-scheme__button update-scheme__button--submit"
               type="submit"
               onClick={HandleUpdate}
             >

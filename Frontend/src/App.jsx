@@ -10,10 +10,8 @@ import Home from "./Components/Home";
 import CreateScheme from "./Components/CreateScheme";
 import ViewApplication from "./Components/ViewApplication";
 import CreateToken from "./Components/CreateToken";
-import ViewBankRequests from "./Components/ViewBankRequests";
+
 import AboutUs from "./Components/AboutUs";
-import ContactUs from "./Components/ContactUs";
-import OurServices from "./Components/OurServices";
 import Schemes from "./Components/Schemes";
 import UserProfile from "./Components/UserProfile";
 import PrivateRoute from "./Components/PrivateRoute";
@@ -50,8 +48,6 @@ const App = () => {
           element: <Login />,
         },
         { path: "/about-us", element: <AboutUs /> },
-        { path: "/contact-us", element: <ContactUs /> },
-        { path: "/our-services", element: <OurServices /> },
         { path: "/signin", element: <Signup /> },
         { path: "/user-profile", element: <UserProfile /> },
         {
@@ -66,7 +62,7 @@ const App = () => {
             { path: "/cg/create-scheme", element: <CreateScheme /> },
             { path: "/cg/view-application", element: <ViewApplication /> },
             { path: "/cg/create-token", element: <CreateToken /> },
-            { path: "/cg/view-bank-request", element: <ViewBankRequests /> },
+
             { path: "/cg/view-all-scheme", element: <ViewAllSCheme /> },
             { path: "/cg/create-department", element: <CreateDepartment /> },
             { path: "/cg/view-accepted", element: <Accepted /> },

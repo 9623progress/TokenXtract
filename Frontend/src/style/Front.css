@@ -66,26 +66,32 @@
     position: absolute;
     width: 50px;
     height: 50px;
-    /* background-color: #3498db; */
-    color: white;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    /* border-radius: 50%; */
     font-size: 20px;
+    color: rgb(3, 3, 137);
+    opacity: 0;
+    /* hide initially */
     animation: moveInCircle 10s infinite linear;
+    animation-fill-mode: forwards;
+    /* retain visibility after start */
 }
 
-/* Circular animation path */
+/* Keyframe with opacity to become visible immediately after center */
 @keyframes moveInCircle {
     0% {
         transform: rotate(0deg) translateX(200px) rotate(0deg);
+        opacity: 1;
     }
 
     100% {
         transform: rotate(360deg) translateX(200px) rotate(-360deg);
+        opacity: 1;
     }
 }
+
 
 /* Staggering animation start for each icon */
 .front-icon:nth-child(1) {

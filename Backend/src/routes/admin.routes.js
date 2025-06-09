@@ -8,7 +8,7 @@ import {
   createDepartment,
   createScheme,
   createToken,
-  disburseFundsBulk,
+  disburseFundsSingle,
   getAcceptedApplicantsWallet,
   getAcceptedForm,
   getAllApplicationByScheme,
@@ -64,9 +64,7 @@ router.get(
   getAcceptedForm
 );
 
-router.post("/fund-transfer",
-  disburseFundsBulk
-);
+router.post("/fund-transfer", disburseFundsSingle);
 
 // getAcceptedApplicantsWallet
 
@@ -111,7 +109,7 @@ router.post(
   "/fund-transfer",
   verifyJWT,
   authorizeRoles("cg"),
-  disburseFundsBulk
+  disburseFundsSingle
 );
 
 router.get(
@@ -127,9 +125,7 @@ router.get("/getMyPendingContract", getMyPendingContracts);
 router.post("/approvedContract", approveContract);
 router.post("/approveStage", approveContractStage);
 
-
 router.post("/rejectContract", rejectContract); // Central Gov
 router.post("/resubmitContract", resubmitContract); // State Gov
-
 
 export default router;

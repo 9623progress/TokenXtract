@@ -1,14 +1,13 @@
 import React, { useCallback, useState } from "react";
 import { useSelector } from "react-redux";
-import {ethers} from 'ethers'
+import { ethers } from "ethers";
 import axios from "axios";
 import "../style/ViewApplication.css";
 import { toast } from "react-toastify";
 
-const shivaniAddress = "0x9e6DEFb65e5a0c0C6Fa0eAF11CAFd05D31c5e328";
-
-// ✅ Shivani Token ABI (Minimal)
-const shivaniAbi = [
+// Token contract info
+const tokenAddress = "0x9e6DEFb65e5a0c0C6Fa0eAF11CAFd05D31c5e328";
+const tokenAbi = [
   {
     inputs: [
       { internalType: "address", name: "recipient", type: "address" },
@@ -30,233 +29,155 @@ const shivaniAbi = [
 
 const Accepted = () => {
   const { departments } = useSelector((state) => state.departments);
+  const userId = useSelector((state) => state.user.user.id);
+
   const [selectedDepartment, setSelectedDepartment] = useState("");
-  const [scheme, setScheme] = useState([]);
+  const [schemes, setSchemes] = useState([]);
   const [selectedScheme, setSelectedScheme] = useState("");
   const [applicants, setApplicants] = useState([]);
 
-  const id = useSelector((state) => state.user.user.id);
-
-  const fetch = useCallback(async (department_id) => {
+  const connectWallet = async () => {
+    if (!window.ethereum) {
+      toast.error("🚨 MetaMask is not installed!");
+      return null;
+    }
     try {
-      const response = await axios.get(
-        `http://localhost:5000/api/v1/admin/get-scheme/${department_id}`,
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      await window.ethereum.request({ method: "eth_requestAccounts" });
+      return await provider.getSigner();
+    } catch (error) {
+      console.error("Wallet connection failed:", error);
+      toast.error("❌ Failed to connect to MetaMask.");
+      return null;
+    }
+  };
+
+  const handleDepartmentChange = async (e) => {
+    const deptId = e.target.value;
+    setSelectedDepartment(deptId);
+    setSelectedScheme("");
+    setApplicants([]);
+
+    if (deptId) {
+      try {
+        const res = await axios.get(
+          `http://localhost:5000/api/v1/admin/get-scheme/${deptId}`,
+          { withCredentials: true }
+        );
+        setSchemes(res.data.schemes || []);
+      } catch (err) {
+        toast.error(err?.response?.data?.message || "Failed to fetch schemes.");
+      }
+    }
+  };
+
+  const handleSchemeChange = async (e) => {
+    const schemeId = e.target.value;
+    setSelectedScheme(schemeId);
+    try {
+      const res = await axios.get(
+        `http://localhost:5000/api/v1/admin/accepted-form/${schemeId}`,
         { withCredentials: true }
       );
-
-      if (response.status === 200) {
-        setScheme(response.data.schemes);
-      }
-    } catch (error) {
-      console.error("Error fetching schemes:", error);
-      toast.error(error.response.data.message);
-    }
-  }, []);
-
-  const HandleDepartmentChange = async (e) => {
-    const department_id = e.target.value;
-    if (department_id) {
-      setSelectedDepartment(department_id);
-      fetch(department_id);
+      setApplicants(res.data.applicants || []);
+    } catch (err) {
+      toast.error(
+        err?.response?.data?.message || "Failed to fetch applicants."
+      );
     }
   };
 
-  const HandleSchemeChange = (e) => {
-    const scheme_id = e.target.value;
-    setSelectedScheme(scheme_id);
-    fetchApplications(scheme_id);
+  const handleView = (url) => {
+    const newTab = window.open(url, "_blank");
+    newTab?.focus();
   };
-
-  const HandleView = (data) => {
-    const newTab = window.open(data, "_blank");
-    newTab.focus();
-  };
-
-  // const handleDisburstFund = async () => {
-  //   try {
-  //     const response = await axios.post(
-  //       "http://localhost:5000/api/v1/admin/fund-transfer",
-  //       {
-  //         schemeId: selectedScheme,
-  //         adminId: id,
-  //       },
-  //       {
-  //         withCredentials: true,
-  //       }
-  //     );
-
-  //     console.log(response);
-
-  //     if (response.status == 200) {
-  //       toast.success(response.data.success);
-  //       setApplicants([]);
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //     toast.error(error.response.data.message);
-  //   }
-  // };
-
 
   const handleDisburstFund = async () => {
+    if (!selectedScheme) return toast.warn("Select a scheme first!");
+
     try {
-      // 1️⃣ Fetch applicants' wallet addresses
-      console.log(selectedScheme);
-      const response = await axios.get(
+      const res = await axios.get(
         `http://localhost:5000/api/v1/admin/getAcceptedApplicantsWallet/${selectedScheme}`
       );
-      
-      console.log(response);
-      if (response.status !== 200 || response.data.length===0) {
-        toast.error("❌ No applicants found or wallet addresses missing!");
-        return;
-      }
-  
-      const applicantsWallets = response.data.data; // Array of { walletAddress, amount }
-      // const amt=response.data.amountPerUser;
 
-      console.log(applicantsWallets);
-      
-      // 2️⃣ Connect to MetaMask
-      if (!window.ethereum) {
-        toast.error("🚨 MetaMask is not installed!");
+      const applicantsWallets = res.data.data || [];
+      if (!applicantsWallets.length) {
+        toast.error("❌ No valid applicant wallets found.");
         return;
       }
-  
-      const connectWallet = async () => {
-         if (!window.ethereum) {
-           toast.error("🚨 MetaMask not installed! Please install and try again.");
-           return null;
-         }
-         try {
-           const provider = new ethers.BrowserProvider(window.ethereum);
-           await window.ethereum.request({ method: "eth_requestAccounts" });
-           return await provider.getSigner();
-         } catch (error) {
-           console.error("❌ Wallet connection failed:", error);
-           toast.error("❌ Failed to connect wallet!");
-           return null;
-         }
-       };
-  
-       const signer=await connectWallet();
-      // 3️⃣ Load the Token Contract
-      const tokenContract = new ethers.Contract(shivaniAddress, shivaniAbi, signer);
-  
-      // 4️⃣ Transfer tokens to each applicant
+
+      const signer = await connectWallet();
+      if (!signer) return;
+      console.log(applicantsWallets);
+      const tokenContract = new ethers.Contract(tokenAddress, tokenAbi, signer);
+
       for (let applicant of applicantsWallets) {
-        const { walletAddress, amountPerUser } = applicant;
-        
+        const { walletAddress, amountPerUser, _id } = applicant;
+
         if (!ethers.isAddress(walletAddress)) {
-          toast.error(`❌ Invalid wallet address: ${walletAddress}`);
+          toast.error(`❌ Invalid wallet: ${walletAddress}`);
           continue;
         }
-  
-        const amountToSend = ethers.parseUnits((amountPerUser || "0").toString(), 18);
 
-  
+        const amount = ethers.parseUnits(amountPerUser.toString(), 18);
+
         try {
-          const tx = await tokenContract.transfer(walletAddress, amountToSend);
-          console.log(`⏳ Transaction Sent to ${walletAddress} - TX Hash:`, tx.hash);
-          await tx.wait();
-          console.log(`✅ Tokens Transferred to ${walletAddress}`);
-        } catch (txError) {
-          console.error(`❌ Failed for ${walletAddress}:`, txError);
-          toast.error(`❌ Transaction failed for ${walletAddress}`);
+          const tx = await tokenContract.transfer(walletAddress, amount);
+          console.log(`TX Hash: ${tx.hash}`);
+          // ✅ Only update backend after successful transfer
+          const receipt = await tx.wait(); // Wait for confirmation
+          console.log(receipt);
+          if (receipt.status === 1) {
+            toast.success(`✅ Tokens sent to ${walletAddress}`);
+
+            // ✅ Update backend only if transaction succeeded
+            await axios.post(
+              "http://localhost:5000/api/v1/admin/fund-transfer",
+              {
+                schemeID: selectedScheme,
+                adminId: userId,
+                applicantId: _id,
+              },
+              { withCredentials: true }
+            );
+          } else {
+            toast.error(`⚠️ Transaction failed on-chain for ${walletAddress}`);
+          }
+        } catch (txErr) {
+          console.error(txErr);
         }
       }
-  
-      // 5️⃣ Update the backend after successful disbursement
-      await axios.post(
-        "http://localhost:5000/api/v1/admin/fund-transfer",
-        { schemeID: selectedScheme, adminId: id },
-        { withCredentials: true }
-      );
-  
-      toast.success("🎉 Fund disbursed successfully!");
-      setApplicants([]); // Clear the table after successful disbursement
-  
-    } catch (error) {
-        console.error("❌ Error during fund disbursement:", error);
-        if (error.response) {
-          console.log("Error Response Data:", error.response.data);
-          console.log("Error Status:", error.response.status);
-          console.log("Error Headers:", error.response.headers);
-        }
-        toast.error("🚨 Unexpected error occurred. Please try again.");
-      toast.error("🚨 Unexpected error occurred. Please try again.");
+
+      setApplicants([]);
+      toast.success("🎉 Fund disbursement completed.");
+    } catch (err) {
+      console.error(err);
+      toast.error("🚨 Fund disbursement failed.");
     }
   };
 
-  
-  const fetchApplications = useCallback(async (schemeID) => {
-    try {
-      const response = await axios.get(
-        `http://localhost:5000/api/v1/admin/accepted-form/${schemeID}`,
-        { withCredentials: true }
-      );
-      if (response.status === 200) {
-        setApplicants(response.data.applicants);
-      }
-    } catch (error) {
-      console.error("Error fetching applications:", error);
-      toast.error(error.response.data.message);
-    }
-  }, []);
-
-  //   const handleAccept = async (applicantId) => {
-  //     try {
-  //       const response = await axios.patch(
-  //         http://localhost:5000/api/v1/admin/accept-form/${applicantId}
-  //       );
-  //       if (response.status == 200) {
-  //         toast.success(response.data.message || "Form accepted");
-  //       }
-  //     } catch (error) {
-  //       console.log(error);
-  //       toast.error(error.data.message || "something went wrong");
-  //     }
-  //   };
-  //   const handleReject = async (applicantId) => {
-  //     try {
-  //       const response = await axios.patch(
-  //         http://localhost:5000/api/v1/admin/reject-form/${applicantId}
-  //       );
-  //       if (response.status == 200) {
-  //         toast.success(response.data.message || "Form rejected");
-  //       }
-  //     } catch (error) {
-  //       console.log(error);
-  //       toast.error(error.data.message || "something went wrong");
-  //     }
-  //   };
-
   const renderTable = () => {
-    if (applicants.length === 0) {
+    if (!applicants.length) {
       return <p>No applicants found for the selected scheme.</p>;
     }
 
-    // Sorting responses based on key._id
-    const sortedApplicants = applicants.map((applicant) => {
-      const sortedResponses = [...applicant.responses].sort((a, b) => {
-        return a.key._id.localeCompare(b.key._id); // Ascending order
-      });
-      return { ...applicant, responses: sortedResponses };
-    });
+    const sortedApplicants = applicants.map((app) => ({
+      ...app,
+      responses: [...app.responses].sort((a, b) =>
+        a.key._id.localeCompare(b.key._id)
+      ),
+    }));
 
-    // Extracting headers dynamically from the sorted responses
-    const headers = sortedApplicants[0]?.responses.map(
-      (response) => response.key.label
-    );
+    const headers = sortedApplicants[0]?.responses.map((res) => res.key.label);
 
     return (
       <div>
         <table border="1">
           <thead>
             <tr>
-              {headers &&
-                headers.map((header) => <th key={header}>{header}</th>)}
-              {/* <th>Actions</th> */}
+              {headers.map((h) => (
+                <th key={h}>{h}</th>
+              ))}
             </tr>
           </thead>
           <tbody>
@@ -267,7 +188,7 @@ const Accepted = () => {
                     {res.key.type === "image" ? (
                       <button
                         className="view-application-button"
-                        onClick={() => HandleView(res.value)}
+                        onClick={() => handleView(res.value)}
                       >
                         View
                       </button>
@@ -276,22 +197,6 @@ const Accepted = () => {
                     )}
                   </td>
                 ))}
-                {/* <td>
-                <button
-                  className=" accept"
-                  onClick={() => handleAccept(applicant._id)}
-                  style={{ backgroundColor: "green" }}
-                >
-                  Accept
-                </button>
-                <button
-                  className="reject"
-                  onClick={() => handleReject(applicant._id)}
-                  style={{ marginLeft: "10px", backgroundColor: "red" }}
-                >
-                  Reject
-                </button>
-              </td> */}
               </tr>
             ))}
           </tbody>
@@ -305,24 +210,22 @@ const Accepted = () => {
   return (
     <div className="view-application-top-div">
       <div className="view-application-select-div">
-        <select value={selectedDepartment} onChange={HandleDepartmentChange}>
+        <select value={selectedDepartment} onChange={handleDepartmentChange}>
           <option value="">Select Department</option>
-          {departments &&
-            departments.map((dep) => (
-              <option key={dep._id} value={dep._id}>
-                {dep.departmentName}
-              </option>
-            ))}
+          {departments.map((dep) => (
+            <option key={dep._id} value={dep._id}>
+              {dep.departmentName}
+            </option>
+          ))}
         </select>
 
-        <select value={selectedScheme} onChange={HandleSchemeChange}>
+        <select value={selectedScheme} onChange={handleSchemeChange}>
           <option value="">Select Scheme</option>
-          {scheme &&
-            scheme.map((sc) => (
-              <option key={sc._id} value={sc._id}>
-                {sc.schemeName}
-              </option>
-            ))}
+          {schemes.map((sc) => (
+            <option key={sc._id} value={sc._id}>
+              {sc.schemeName}
+            </option>
+          ))}
         </select>
       </div>
 
@@ -332,4 +235,3 @@ const Accepted = () => {
 };
 
 export default Accepted;
-

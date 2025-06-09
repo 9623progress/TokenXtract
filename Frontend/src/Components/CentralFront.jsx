@@ -1,10 +1,24 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "../style/centralFront.css";
 import { Link } from "react-router-dom";
+import { fetchTokenBalance } from "../utils/UniversalTokenData";
+import { useSelector } from "react-redux";
 
 const CentralFront = () => {
+  const [token, setToken] = useState();
+  const id = useSelector((state) => state.user?.user?.walletAddress);
+
+  useEffect(() => {
+    const fetchTokens = async () => {
+      console.log(id);
+      const tokens = await fetchTokenBalance(id);
+      setToken(tokens);
+    };
+    fetchTokens();
+  }, [id]);
+
   return (
-    <div className=" central-Front-container">
+    <div className="central-Front-container">
       <div className="central-front-div2">
         <h1>Central Government Dashboard</h1>
         <div className="cg-Front-option-buttons">
@@ -25,6 +39,10 @@ const CentralFront = () => {
             <p>Request of token-to-money conversion.</p>
           </Link>
         </div>
+      </div>
+
+      <div className="Token-div">
+        Tokens : {token !== undefined ? `${token} GFT` : "Loading..."}
       </div>
     </div>
   );

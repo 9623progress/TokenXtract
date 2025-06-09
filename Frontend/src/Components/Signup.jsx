@@ -40,7 +40,7 @@ const Signup = () => {
         const accounts = await window.ethereum.request({
           method: "eth_requestAccounts",
         });
-        const formattedAddress = ethers.utils.getAddress(accounts[0]); // Convert to checksum format
+        const formattedAddress = ethers.getAddress(accounts[0]);
         setWalletAddress(formattedAddress);
         toast.success(`Connected: ${formattedAddress}`);
       } catch (error) {
@@ -99,7 +99,8 @@ const Signup = () => {
         toast.error(response.data.message || "Registration failed!");
       }
     } catch (error) {
-      toast.error("An error occurred during registration. Please try again.");
+      console.log(error);
+      toast.error(error.response.data.message);
     } finally {
       setLoading(false);
     }

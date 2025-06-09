@@ -26,9 +26,7 @@ const CentralGovernment = () => {
             <Link to={"/cg/create-token"} className="cg-fun-card">
               <p>Create Token</p>
             </Link>
-            <Link to={"/cg/view-bank-request"} className="cg-fun-card">
-              <p>View Bank Requests</p>
-            </Link>
+
             <Link to={"/cg/view-all-scheme"} className="cg-fun-card">
               <p>View All Scheme</p>
             </Link>

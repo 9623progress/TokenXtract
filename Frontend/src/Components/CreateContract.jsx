@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { states } from "../utils/State-District-data";
 import "../style/createContract.css";
 import axios from "axios";
@@ -17,11 +17,27 @@ const CreateContract = () => {
   const [legalRules, setLegalRules] = useState("");
   const [stages, setStages] = useState([{ stageName: "", percentage: 0 }]);
   const [selectedDistrict, setSelectedDistrict] = useState("");
-
   const [secreteKey, setSecreteKey] = useState("");
 
   const { departments } = useSelector((state) => state.departments);
   const id = useSelector((state) => state.user?.user?.id);
+
+  // Function to generate a random secret key
+  const generateSecretKey = () => {
+    const chars =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$!";
+    let key = "";
+    for (let i = 0; i < 16; i++) {
+      key += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return key;
+  };
+
+  // Generate secret key when component mounts
+  useEffect(() => {
+    const key = generateSecretKey();
+    setSecreteKey(key);
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -32,8 +48,8 @@ const CreateContract = () => {
     else if (name === "contract-startDate") setStartDate(value);
     else if (name === "contract-endDate") setEndDate(value);
     else if (name === "contract-legalRules") setLegalRules(value);
-    else if (name === "contract-secreteKey") setSecreteKey(value);
   };
+
   const removeStage = (index) => {
     setStages(stages.filter((_, i) => i !== index));
   };
@@ -62,6 +78,15 @@ const CreateContract = () => {
   };
 
   const HandleSubmit = async () => {
+    const totalPercentage = stages.reduce(
+      (total, stage) => total + Number(stage.percentage),
+      0
+    );
+
+    if (totalPercentage !== 100) {
+      toast.error("Total stage percentages must sum to exactly 100%");
+      return;
+    }
     const contractData = {
       contractName,
       budget,
@@ -83,9 +108,8 @@ const CreateContract = () => {
         { withCredentials: true }
       );
 
-      // console.log(response);
       if (response.status === 201) {
-        toast.success(response.data.message || "contract created sucessfully");
+        toast.success(response.data.message || "Contract created successfully");
 
         setContractName("");
         setBudget(0);
@@ -98,14 +122,13 @@ const CreateContract = () => {
         setLegalRules("");
         setStages([{ stageName: "", percentage: 0 }]);
         setSelectedDistrict("");
-        setSecreteKey("");
+        setSecreteKey(generateSecretKey()); // Regenerate for next form
       } else {
-        // Handle error response
         console.error("Failed to create contract");
       }
     } catch (error) {
       console.log(error);
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "Something went wrong");
     }
   };
 
@@ -204,13 +227,15 @@ const CreateContract = () => {
         </div>
 
         <div className="create-contract-input-div">
-          <label htmlFor="contract-secreteKey">Set Secrete key</label>
+          <label htmlFor="contract-secreteKey">
+            Secret Key (auto-generated)
+          </label>
           <input
             type="text"
             id="contract-secreteKey"
             name="contract-secreteKey"
             value={secreteKey}
-            onChange={handleInputChange}
+            readOnly
           />
         </div>
 
@@ -269,7 +294,7 @@ const CreateContract = () => {
 
         <div className="submit-button">
           <button className="create-contract-button" onClick={HandleSubmit}>
-            submit
+            Submit
           </button>
         </div>
       </div>

@@ -3,15 +3,182 @@ import { useSelector } from "react-redux";
 import "../style/Profile.css";
 import axios from "axios";
 import { toast } from "react-toastify";
+import Modal from "./Modal";
+import { ethers } from "ethers";
+import {
+  fetchTokenBalance,
+  tokenABI,
+  tokenAddress,
+  getMoney,
+  updateMoneyInBackend,
+} from "../utils/UniversalTokenData";
 
 const UserProfile = () => {
   const [appliedSchemes, setAppliedSchemes] = useState([]);
   const [editingScheme, setEditingScheme] = useState(null);
   const [updatedResponses, setUpdatedResponses] = useState({});
   const [totalTokensReceived, setTotalTokensReceived] = useState(0);
-  // const [currentTokenBalance, setCurrentTokenBalance] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [viewBanksModal, setViewBanksModal] = useState(false);
+  const [isBankModalOpen, setIsBankModalOpen] = useState(false);
+  const [accountNo, setAccountNo] = useState("");
+  const [ifsc, setIFsc] = useState("");
+  const [bank_id, setBank_id] = useState("");
+  const [balance, setBalance] = useState(0);
+  const [money, setMoney] = useState(0);
+  const [banks, setBanks] = useState([]);
+  const [tokenAmount, setTokenAmount] = useState(0);
 
   const user = useSelector((state) => state.user.user);
+
+  const connectWallet = async () => {
+    if (!window.ethereum) {
+      toast.error("🚨 MetaMask not installed! Please install and try again.");
+      return null;
+    }
+    try {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      await window.ethereum.request({ method: "eth_requestAccounts" });
+      return await provider.getSigner();
+    } catch (error) {
+      console.error("❌ Wallet connection failed:", error);
+      toast.error("❌ Failed to connect wallet!");
+      return null;
+    }
+  };
+
+  const handleBankClick = () => {
+    getBanks();
+    setBanks(true);
+    setViewBanksModal(true);
+  };
+
+  const firstFetch = async () => {
+    try {
+      const balance = await fetchTokenBalance(user.walletAddress);
+      console.log(balance);
+      if (!balance) {
+        toast.error("Unable to fetch token balance");
+      } else {
+        setBalance(balance);
+      }
+      const Money = await getMoney(user.id);
+      setMoney(Money);
+    } catch (error) {
+      console.error("Error fetching balance:", error);
+      toast.error("Error fetching token balance");
+    }
+  };
+
+  const OpenBankModal = (bank_id) => {
+    setIsBankModalOpen(true);
+    setBank_id(bank_id);
+  };
+
+  const closeBankModal = () => {
+    setIsBankModalOpen(false);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const HanndleBankInputChange = (e) => {
+    const name = e.target.name;
+    const value = e.target.value;
+    if (name == "account-no") {
+      setAccountNo(value);
+    } else if (name == "IFSC-code") {
+      setIFsc(value);
+    } else if (name == "token-Amount") {
+      setTokenAmount(value);
+    }
+  };
+
+  const getBanks = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:5000/api/v1/user/getBanks"
+      );
+      if (response.status == 200) {
+        console.log(response);
+        setBanks(response.data.banks);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const sendTokenToBank = async () => {
+    try {
+      // ✅ Step 1: Fetch receiver wallet address
+      const { data, status } = await axios.get(
+        `http://localhost:5000/api/v1/user/getWalleteId/${bank_id}`
+      );
+
+      if (status !== 200 || !data.walletAddress) {
+        toast.error("❌ Receiver wallet address not found!");
+        return;
+      }
+
+      const receiver = data.walletAddress.trim(); // Ensure no spaces
+      console.log("✅ Receiver Wallet:", receiver);
+
+      if (!ethers.isAddress(receiver)) {
+        toast.error("❌ Invalid receiver address!");
+        return;
+      }
+
+      // ✅ Step 2: Connect Wallet
+      const signer = await connectWallet();
+      if (!signer) return;
+
+      // ✅ Step 3: Get contract instance
+      const contract = new ethers.Contract(tokenAddress, tokenABI, signer);
+      console.log("✅ Contract Instance Loaded:", contract);
+
+      // ✅ Step 4: Convert budget to correct BigInt units
+      const amountToSend = ethers.parseUnits(tokenAmount.toString(), 18);
+      console.log("🔸 Amount to Send:", amountToSend.toString());
+
+      // ✅ Step 5: Execute transfer
+      let tx;
+      try {
+        tx = await contract.transfer(receiver, amountToSend);
+        console.log("⏳ Transaction Pending...");
+        await tx.wait();
+        closeBankModal();
+        console.log("✅ Tokens Sent Successfully!");
+        toast.success("Token Send Sucessfully");
+
+        // ✅ Try to update backend
+        await updateMoneyInBackend(user.id, tokenAmount);
+        const Money = await getMoney(user.id);
+        setMoney(Money);
+        // ✅ Refresh balance
+        const updatedBalance = await fetchTokenBalance(user.walletAddress);
+        setBalance(updatedBalance);
+      } catch (error) {
+        if (error.code === "CALL_EXCEPTION") {
+          console.error("Revert reason:", error);
+        } else {
+          console.error("Other error:", error);
+        }
+
+        toast.error("network full please try again");
+        return;
+      }
+
+      // ✅ Step 6: Update contract status in DB
+    } catch (error) {
+      console.error("❌ Unexpected Error:", error);
+      toast.error("🚨 Unexpected error occurred. Please try again.");
+    }
+  };
+
+  const closeViewBankModal = () => {
+    setViewBanksModal(false);
+  };
 
   if (!user) {
     return <p>Loading user data...</p>;
@@ -23,6 +190,7 @@ const UserProfile = () => {
     fetchAppliedSchemes();
     calculateTokenStats();
     fetchTokenStats();
+    firstFetch();
   }, [user]);
 
   const fetchTokenStats = async () => {
@@ -32,23 +200,25 @@ const UserProfile = () => {
         "http://localhost:5000/api/v1/user/getTokenStats",
         { withCredentials: true }
       );
-  
+
       console.log("Response received:", response.data); // Debug log
-  
+
       if (response.data.success) {
         setTotalTokensReceived(response.data.totalTokensReceived);
       } else {
         console.error("Failed to fetch token stats:", response.data.message);
       }
     } catch (error) {
-      console.error("Error fetching token stats:", error.response?.data || error);
+      console.error(
+        "Error fetching token stats:",
+        error.response?.data || error
+      );
       // toast.error("Error fetching token stats");
     }
   };
-  
+
   // Fetch on mount
 
-  
   const fetchAppliedSchemes = async () => {
     try {
       const response = await axios.get(
@@ -145,11 +315,15 @@ const UserProfile = () => {
               Role: <span>{user.role || "Unknown"}</span>
             </p>
             <p>
-              {/* Total Tokens Received: <span>{totalTokensReceived ?? "00"}</span> */}
+              Tokens : {balance !== undefined ? `${balance} GFT` : "Loading..."}
             </p>
-            {/* <p>
-              Available Wallet Balance: <span>{currentTokenBalance}</span>
-            </p> */}
+            <p>
+              <span>Amount in Rs. : </span> {money}
+            </p>
+
+            <div className="contarctor-banks">
+              <button onClick={handleBankClick}>Convert Tokens to money</button>
+            </div>
           </div>
         </div>
       </div>
@@ -217,6 +391,71 @@ const UserProfile = () => {
           </div>
         )}
       </div>
+
+      {viewBanksModal && (
+        <Modal closeModal={closeViewBankModal}>
+          {banks && banks.length > 0 && (
+            <div className="contractr-banks" onCli>
+              {banks.map((bank) => (
+                <div
+                  onClick={() => {
+                    OpenBankModal(bank._id);
+                  }}
+                  className="contractor-bank-button"
+                >
+                  {"\u{1F3E6} "}
+                  {bank.name}
+                </div>
+              ))}
+            </div>
+          )}
+        </Modal>
+      )}
+
+      {isBankModalOpen && (
+        <Modal closeModal={closeBankModal}>
+          <label htmlFor="account-no">Bank Account No. :</label>
+          <input
+            type="text"
+            name="account-no"
+            value={accountNo}
+            onChange={HanndleBankInputChange}
+            id="account-no"
+          />
+
+          <label htmlFor="IFSC-code">IFSC code :</label>
+          <input
+            type="text"
+            name="IFSC-code"
+            value={ifsc}
+            onChange={HanndleBankInputChange}
+            id="IFSC-code"
+          />
+
+          <label htmlFor="token-Amount">Token Amount</label>
+          <input
+            type="number"
+            name="token-Amount"
+            value={tokenAmount}
+            onChange={HanndleBankInputChange}
+            id="token-Amount"
+          />
+
+          <button className="send-token-btn" onClick={sendTokenToBank}>
+            Send Token
+          </button>
+        </Modal>
+      )}
+
+      {isModalOpen && (
+        <Modal closeModal={closeModal}>
+          <label htmlFor="proof-file">Upload the work done details file</label>
+          <input type="file" name="proof-file" onChange={inputChange} />
+          <button className="submit-proof-btn" onClick={uploadFile}>
+            Submit
+          </button>
+        </Modal>
+      )}
     </>
   );
 };

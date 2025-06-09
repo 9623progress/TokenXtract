@@ -467,38 +467,43 @@ export const getRejectedForm = async (req, res) => {
 
 export const getAcceptedApplicantsWallet = async (req, res) => {
   try {
-      const { schemeID } = req.params;
+    const { schemeID } = req.params;
 
-      // Fetch users where accepted is true for a specific scheme
-      const acceptedApplicants = await userResponse.find({
-          schemeID: schemeID,
-          Accepted: true // Only fetch users who are accepted
+    // Fetch users where accepted is true for a specific scheme
+    const acceptedApplicants = await userResponse
+      .find({
+        schemeID: schemeID,
+        Accepted: true, // Only fetch users who are accepted
+        fundDisburst: false,
       })
       .populate({
-          path: "userID",
-          select: "walletAddress",// Fetch only walletAddress
-          // select:"name" 
+        path: "userID",
+        select: "walletAddress", // Fetch only walletAddress
+        // select:"name"
       })
       .populate({
-          path: "schemeID",
-          select: "amountPerUser" // Fetch amountPerUser
+        path: "schemeID",
+        select: "amountPerUser", // Fetch amountPerUser
       });
 
-      if (!acceptedApplicants.length) {
-          return res.status(404).json({ success: false, message: "No accepted applicants found." });
-      }
+    if (!acceptedApplicants.length) {
+      return res
+        .status(404)
+        .json({ success: false, message: "No accepted applicants found." });
+    }
 
-      // Extract necessary data
-      const formattedResponse = acceptedApplicants.map(applicant => ({
-          walletAddress: applicant.userID.walletAddress,
-          // name: applicant.userID.name,
-          amountPerUser: applicant.schemeID.amountPerUser
-      }));
+    // Extract necessary data
+    const formattedResponse = acceptedApplicants.map((applicant) => ({
+      walletAddress: applicant.userID.walletAddress,
+      // name: applicant.userID.name,
+      amountPerUser: applicant.schemeID.amountPerUser,
+      _id: applicant.userID._id, // Not whole object
+    }));
 
-      res.status(200).json({ success: true, data: formattedResponse });
+    res.status(200).json({ success: true, data: formattedResponse });
   } catch (error) {
-      console.error("Error fetching accepted applicants:", error);
-      res.status(500).json({ success: false, message: "Internal server error" });
+    console.error("Error fetching accepted applicants:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
@@ -785,64 +790,50 @@ export const createToken = async (req, res) => {
 //   }
 // };
 
-
-export const disburseFundsBulk = async (req, res) => {
+export const disburseFundsSingle = async (req, res) => {
   try {
-    const { schemeID, adminId } = req.body;
+    const { schemeID, adminId, applicantId } = req.body;
 
-    // Fetch admin details
+    // Validate admin
     const admin = await User.findById(adminId);
-    if (!admin) return res.status(400).json({ message: "Admin not found" });
-
-    // Fetch scheme applications where `Accepted` is true
-    const schemeApplications = await userResponse.find({ schemeID, Accepted: true }).populate("schemeID");
-
-    if (!schemeApplications || schemeApplications.length === 0) {
-      return res.status(400).json({ message: "No accepted applications found for this scheme" });
+    if (!admin) {
+      return res.status(400).json({ message: "Admin not found" });
     }
 
-    // Calculate total funds required
-    const totalAmount = schemeApplications.reduce((sum, app) => sum + app.schemeID.amountPerUser, 0);
+    // Find the application
+    const application = await userResponse
+      .findOne({ userID: applicantId })
+      .populate("schemeID");
 
-    // Check if admin has enough funds
-    if (admin.Token < totalAmount) {
-      return res.status(400).json({ message: "Insufficient funds" });
+    if (!application || !application.Accepted) {
+      return res.status(404).json({
+        message: "Application not found or not accepted",
+      });
     }
 
-    // Deduct total funds from admin
-    admin.Token -= totalAmount;
-    await admin.save();
-
-    // Disburse funds & update database
-    const failedDisbursements = [];
-    for (const application of schemeApplications) {
-      try {
-        const user = await User.findById(application.userID);
-        if (user) {
-          const amount = application.schemeID.amountPerUser;
-          user.Token += amount;
-          user.totalTokensReceived += amount; // ✅ Update total tokens received
-          user.tokenHistory.push({ schemeID, amount, date: new Date() }); // ✅ Add to transaction history
-          await user.save();
-
-          application.fundDisburst = true; // ✅ Mark funds as disbursed
-          application.tokensReceived += amount; // ✅ Track tokens received per scheme
-          await application.save();
-        } else {
-          failedDisbursements.push(application.userID);
-        }
-      } catch (error) {
-        console.error(`Error disbursing funds to user ${application.userID}:`, error.message);
-        failedDisbursements.push(application.userID);
-      }
+    const user = await User.findById(application.userID);
+    if (!user) {
+      return res.status(404).json({ message: "Applicant user not found" });
     }
 
-    return res.status(200).json({
-      message: "Funds disbursed successfully",
-      failedDisbursements: failedDisbursements.length > 0 ? failedDisbursements : null,
-    });
+    const amount = application.schemeID.amountPerUser;
+
+    // Update user wallet
+    user.Token += amount;
+    user.totalTokensReceived += amount;
+    user.tokenHistory.push({ schemeID, amount, date: new Date() });
+    await user.save();
+
+    // Update application entry
+    application.fundDisburst = true;
+    application.tokensReceived += amount;
+    await application.save();
+
+    return res
+      .status(200)
+      .json({ message: "✅ Funds disbursed and updated in DB." });
   } catch (error) {
-    console.error("Error in bulk fund disbursement:", error.message);
+    console.error("Error in disbursing funds:", error.message);
     return res.status(500).json({ error: "Internal server error" });
   }
 };
@@ -888,7 +879,6 @@ export const getPendingContracts = async (req, res) => {
     });
   }
 };
-
 
 export const getMyApprovedContracts = async (req, res) => {
   try {
@@ -1011,7 +1001,9 @@ export const resubmitContract = async (req, res) => {
 
     // Only allow resubmission if it was previously rejected
     if (existingContract.approvalStatus !== "rejected") {
-      return res.status(400).json({ message: "Contract is not in rejected state" });
+      return res
+        .status(400)
+        .json({ message: "Contract is not in rejected state" });
     }
 
     // Update contract with new data
@@ -1023,10 +1015,11 @@ export const resubmitContract = async (req, res) => {
 
     res.status(200).json({ message: "Contract resubmitted successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Error while resubmitting", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error while resubmitting", error: error.message });
   }
 };
-
 
 export const approveContractStage = async (req, res) => {
   try {

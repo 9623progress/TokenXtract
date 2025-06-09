@@ -5,6 +5,13 @@ import "../style/ContractorProfile.css";
 import Modal from "./Modal";
 import { toast } from "react-toastify";
 import { ethers } from "ethers";
+import {
+  fetchTokenBalance,
+  getMoney,
+  tokenABI,
+  tokenAddress,
+  updateMoneyInBackend,
+} from "../utils/UniversalTokenData";
 
 const ContractorProfile = () => {
   const user = useSelector((state) => state.user?.user);
@@ -23,6 +30,8 @@ const ContractorProfile = () => {
   const [tokenAmount, setTokenAmount] = useState(0);
   const [bank_id, setBank_id] = useState("");
   const [currentStageName, setCurrentStageName] = useState("");
+  const [balance, setBalance] = useState(0);
+  const [money, setMoney] = useState(0);
 
   const connectWallet = async () => {
     if (!window.ethereum) {
@@ -40,28 +49,8 @@ const ContractorProfile = () => {
     }
   };
 
-  const shivaniAddress = "0x9e6DEFb65e5a0c0C6Fa0eAF11CAFd05D31c5e328";
-
-  // ✅ Shivani Token ABI (Minimal)
-  const shivaniAbi = [
-    {
-      inputs: [
-        { internalType: "address", name: "recipient", type: "address" },
-        { internalType: "uint256", name: "amount", type: "uint256" },
-      ],
-      name: "transfer",
-      outputs: [{ internalType: "bool", name: "", type: "bool" }],
-      stateMutability: "nonpayable",
-      type: "function",
-    },
-    {
-      inputs: [{ internalType: "address", name: "account", type: "address" }],
-      name: "balanceOf",
-      outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-      stateMutability: "view",
-      type: "function",
-    },
-  ];
+  const shivaniAddress = tokenAddress;
+  const shivaniAbi = tokenABI;
 
   const inputChange = (e) => {
     if (e.target.files.length > 0) {
@@ -165,9 +154,28 @@ const ContractorProfile = () => {
     setViewBanksModal(true);
   };
 
+  const firstFetch = async () => {
+    try {
+      const balance = await fetchTokenBalance(user.walletAddress);
+      console.log(balance);
+      if (!balance) {
+        toast.error("Unable to fetch token balance");
+      } else {
+        setBalance(balance);
+      }
+      const Money = await getMoney(user.id);
+      setMoney(Money);
+    } catch (error) {
+      console.error("Error fetching balance:", error);
+      toast.error("Error fetching token balance");
+    }
+  };
+
   useEffect(() => {
     if (user?.id) {
       fetchMyAppliedContract();
+      firstFetch();
+      console.log(money, balance);
     }
   }, [user?.id]);
 
@@ -219,9 +227,17 @@ const ContractorProfile = () => {
         closeBankModal();
         console.log("✅ Tokens Sent Successfully!");
         toast.success("Token Send Sucessfully");
+
+        // ✅ Try to update backend
+        await updateMoneyInBackend(user.id, tokenAmount);
+        const Money = await getMoney(user.id);
+        setMoney(Money);
+        // ✅ Refresh balance
+        const updatedBalance = await fetchTokenBalance(user.walletAddress);
+        setBalance(updatedBalance);
       } catch (txError) {
         console.error("❌ Transaction failed:", txError);
-        // toast.error(txError.reason || txError.message || "Transaction failed!");
+
         toast.error("network full please try again");
         return;
       }
@@ -252,6 +268,12 @@ const ContractorProfile = () => {
           </p>
           <p>
             <span>Wallet Address:</span> {user?.walletAddress}
+          </p>
+          <p>
+            <span>Token Balance : </span> {balance} GFT
+          </p>
+          <p>
+            <span>Amount in Rs. : </span> {money}
           </p>
 
           <div className="contarctor-banks">

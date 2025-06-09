@@ -62,6 +62,7 @@ const GetMyApprovedContract = () => {
         const response = await axios.get(
           `http://localhost:5000/api/v1/admin/getMyApprovedContract/${userId}`
         );
+        console.log(response);
         setContracts(response.data.data);
       } catch (err) {
         setError("Failed to load contracts");
@@ -118,7 +119,6 @@ const GetMyApprovedContract = () => {
     const amountToSend = ethers.parseUnits(tokenAmount.toString(), 18);
     console.log("🔸 Amount to Send:", amountToSend.toString());
 
-    
     const senderBalance = await contract.balanceOf(await signer.getAddress());
     console.log("Sender Balance:", senderBalance.toString());
     if (senderBalance < amountToSend) {
